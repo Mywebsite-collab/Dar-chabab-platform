@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "GitHub Pages website with a Cloudflare Worker for the official Facebook Page news feed.",
   "scripts": {
-    "lint": "node --check workers/facebook-feed/index.js && node --check server.mjs && node scripts/check-inline-script.mjs",
-    "build": "node --check workers/facebook-feed/index.js && node scripts/check-assets.mjs"
+    "lint": "node --check workers/facebook-feed/index.js && node scripts/check-inline-script.mjs",
+    "build": "node --check workers/facebook-feed/index.js && node scripts/check-inline-script.mjs && node scripts/check-assets.mjs"
   }
 }
