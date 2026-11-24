@@ -2803,11 +2803,11 @@
       // get a clipped desktop-width timeline.
       const viewportWidth = Math.max(280, (window.innerWidth || 500) - 40);
       const width = Math.min(500, viewportWidth);
-      const height = compact ? 620 : 900;
+      const height = compact ? 560 : 680; // Reduced height keeps the timeline focused on recent posts.
       const pluginUrl = "https://www.facebook.com/plugins/page.php"
         + "?href=" + encodeURIComponent(pageUrl)
         + "&tabs=timeline&width=" + width + "&height=" + height
-        + "&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false";
+        + "&small_header=true&adapt_container_width=true&hide_cover=true&show_facepile=false";
       const veSlot = slot || (compact ? "home" : "news");
       const isVe = state.adminUnlocked && state.visualEditMode && !state.browseOverride && state.activePage !== "admin";
       const fallbackText = lang === "ar"
