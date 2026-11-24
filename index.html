@@ -2799,8 +2799,10 @@
         : "https://www.facebook.com/mjmesra";
       const isDark = variant === "dark";
       // Facebook Page Plugin supports widths from 180px to 500px.
-      // Keep the iframe within that range and give the timeline enough room.
-      const width = 500;
+      // Match the embed width to the current viewport so mobile users do not
+      // get a clipped desktop-width timeline.
+      const viewportWidth = Math.max(280, (window.innerWidth || 500) - 40);
+      const width = Math.min(500, viewportWidth);
       const height = compact ? 620 : 900;
       const pluginUrl = "https://www.facebook.com/plugins/page.php"
         + "?href=" + encodeURIComponent(pageUrl)
