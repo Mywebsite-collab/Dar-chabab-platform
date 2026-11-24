@@ -2646,24 +2646,6 @@
       }
     }
 
-    function getFbToken() {
-      try {
-        return (localStorage.getItem(FB_TOKEN_STORAGE) || "").trim();
-      } catch {
-        return "";
-      }
-    }
-
-    function setFbToken(nextToken) {
-      try {
-        const trimmed = (nextToken || "").trim();
-        if (!trimmed) localStorage.removeItem(FB_TOKEN_STORAGE);
-        else localStorage.setItem(FB_TOKEN_STORAGE, trimmed);
-      } catch {
-        // Ignore privacy restrictions
-      }
-    }
-
     function loadInitialSettings() {
       const s = readLocalJson("mjm_settings", DEFAULT_SETTINGS);
       if (Array.isArray(s?.contact?.socialLinks) && s.contact.socialLinks[0]?.url === "#social-facebook") {
@@ -4253,7 +4235,6 @@
       gallery: readLocalJson("mjm_gallery", DEFAULT_GALLERY),
       uiStrings: readLocalJson("mjm_ui_strings", DEFAULT_UI_STRINGS),
       geminiApiKey: getGeminiApiKey(),
-      fbToken: getFbToken(),
       footerTap: { count: 0, lastAt: 0 }
     };
 
@@ -6135,10 +6116,6 @@
                   <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط الصفحة الرسمية على فيسبوك" : "Official Facebook Page URL")}</span>
                   <input type="url" dir="ltr" value="${escapeHtml(fbCfg.pageUrl || "https://www.facebook.com/mjmesra")}" data-bind="settings.facebookFeed.pageUrl" class="input-field font-mono-tabular" />
                 </label>
-                <label class="stack-xs" style="font-size:0.75rem;">
-                  <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط خلاصة RSS/JSON (اختياري لبطاقات الأخبار)" : "Optional RSS / JSON Feed URL")}</span>
-                  <input type="url" dir="ltr" placeholder="https://rss.app/feeds/....json" value="${escapeHtml(fbCfg.rssJsonUrl || "")}" data-bind="settings.facebookFeed.rssJsonUrl" class="input-field font-mono-tabular" />
-                </label>
               </div>
               ${renderLocalizedFieldGrid(lang === "ar" ? "عنوان عنصر منشورات فيسبوك" : "Facebook Feed Title", { ar: fbUiAr.fbFeedTitle || "", fr: fbUiFr.fbFeedTitle || "", en: fbUiEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
               ${renderLocalizedFieldGrid(lang === "ar" ? "الوصف الفرعي لعنصر فيسبوك" : "Facebook Feed Subtitle", { ar: fbUiAr.fbFeedSubtitle || "", fr: fbUiFr.fbFeedSubtitle || "", en: fbUiEn.fbFeedSubtitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
@@ -6154,11 +6131,6 @@
                       </button>`
                     : ""
                 }
-              </div>
-              <div class="flex-row-wrap" style="gap:0.5rem;">
-                <input type="password" id="admin-fb-token-input" dir="ltr" value="${escapeHtml(state.fbToken)}" placeholder="${escapeHtml(lang === "ar" ? "رمز Meta Graph API اختياري (يُحفظ محلياً في المتصفح فقط)" : "Optional Meta Page Access Token (local browser only)")}" class="input-field font-mono-tabular" style="flex:1;min-width:220px;" />
-                <button type="button" data-action="save-fb-token" class="btn btn-dark" style="padding:0.45rem 0.9rem;">${escapeHtml(lang === "ar" ? "حفظ الرمز" : "Save Token")}</button>
-                ${state.fbToken ? `<button type="button" data-action="clear-fb-token" class="btn btn-outline" style="padding:0.45rem 0.75rem;">${escapeHtml(lang === "ar" ? "حذف" : "Clear")}</button>` : ""}
               </div>
               ${
                 state.fbSync.error
@@ -7789,24 +7761,6 @@
           await syncFacebookNewsFeed({ force: true });
           break;
         }
-        case "save-fb-token": {
-          const inp = document.getElementById("admin-fb-token-input");
-          if (inp) {
-            state.fbToken = inp.value.trim();
-            setFbToken(state.fbToken);
-            flashAdminSaved();
-            await syncFacebookNewsFeed({ force: true });
-          }
-          break;
-        }
-        case "clear-fb-token":
-          state.fbToken = "";
-          setFbToken("");
-          state.fbNews = [];
-          removeLocalKeys([FB_CACHE_STORAGE]);
-          flashAdminSaved();
-          renderShell({ preserve3D: false });
-          break;
         case "select-article":
           state.selectedArticleId = actionEl.getAttribute("data-id");
           renderShell({ preserve3D: false });
