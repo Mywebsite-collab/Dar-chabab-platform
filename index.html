@@ -516,6 +516,7 @@
     }
     .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
     .intelligence-tools-layout { display:grid; grid-template-columns:minmax(0,1fr); gap:1.1rem; align-items:stretch; margin-bottom:1.5rem; width:100%; }
+    .intelligence-tools-layout.map-only-layout { grid-template-columns:minmax(0,1fr) !important; margin-bottom:0; }
     .intelligence-mode-tabs { display:flex; flex-wrap:wrap; gap:0.5rem; width:100%; }
     .institution-map-card { display:block; width:100%; max-width:none; min-width:0; box-sizing:border-box; padding:0.9rem; border:1px solid rgba(176,141,87,0.28); border-radius:16px; background:linear-gradient(145deg,#fbf9f5,#f3efe5); box-shadow:0 8px 24px rgba(24,23,21,0.06); }
     .institution-map-title { margin:0 0 0.75rem; color:#181715; font-size:1rem; line-height:1.5; font-weight:800; text-align:start; }
@@ -4548,34 +4549,11 @@
     }
 
     function renderGeminiHubHtml() {
-      const t = tLocale().intelligence;
-      const g = state.gemini;
       const lang = state.language;
-      const mode = g.mode === "search" ? "search" : "think";
-      const placeholder = mode === "think" ? t.thinkPlaceholder : t.searchPlaceholder;
-      const buttonLabel = mode === "think" ? t.runThink : t.runSearch;
-      const btnField = mode === "think" ? "runThink" : "runSearch";
-
       return `
         <div class="card-surface-solid p-card p-card-lg" id="gemini-hub-box">
-          <div style="max-width:48rem;margin-bottom:2rem;">
-            <p class="kicker"${veAttr({ kind: "ui", section: "intelligence", field: "kicker" })}>${escapeHtml(t.kicker)}</p>
-            <h3 class="font-display heading-lg text-ink text-balance" style="margin-bottom:0.75rem;"${veAttr({ kind: "ui", section: "intelligence", field: "title" })}>${escapeHtml(t.title)}</h3>
-            <p class="text-muted" style="font-size:0.9375rem;line-height:1.65;margin:0;"${veAttr({ kind: "ui", section: "intelligence", field: "subtitle" })}>${escapeHtml(t.subtitle)}</p>
-          </div>
-
-          <div class="intelligence-tools-layout">
-            <div class="intelligence-mode-tabs">
-            <button type="button" data-action="gemini-mode" data-mode="think"${veAttr({ kind: "ui", section: "intelligence", field: "tabThink" })} class="btn-pill ${g.mode === "think" ? "is-active" : ""}" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 1rem;border:1px solid rgba(24,23,21,0.1);${g.mode === "think" ? "" : "background:#fbf9f5;"}">
-              ${icon("brain", "icon-svg")}
-              <span>${escapeHtml(t.tabThink)}</span>
-            </button>
-            <button type="button" data-action="gemini-mode" data-mode="search"${veAttr({ kind: "ui", section: "intelligence", field: "tabSearch" })} class="btn-pill ${g.mode === "search" ? "is-active" : ""}" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 1rem;border:1px solid rgba(24,23,21,0.1);${g.mode === "search" ? "" : "background:#fbf9f5;"}">
-              ${icon("globe", "icon-svg")}
-              <span>${escapeHtml(t.tabSearch)}</span>
-            </button>
-            </div>
-            <div class="institution-map-card">
+          <div class="intelligence-tools-layout map-only-layout">
+                        <div class="institution-map-card">
               <div class="institution-map-heading" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem;">
                 <h4 class="institution-map-title" style="margin:0;">${escapeHtml(lang === "ar" ? "موقع دار الشباب سي سالم – مسرى" : lang === "fr" ? "Emplacement de la Maison de jeunes Si Salem – Mesra" : "Dar Chabab Si Salem – Mesra Location")}</h4>
                 <a href="https://maps.app.goo.gl/X8BTpEEywCdx71Dx9" target="_blank" rel="noopener noreferrer" aria-label="Open directions to Dar Chabab Si Salem in Google Maps" style="display:inline-flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.55rem 0.85rem;border-radius:9px;background:#b08d57;color:#fff;text-decoration:none;font-size:0.8rem;font-weight:700;white-space:nowrap;box-shadow:0 3px 10px rgba(24,23,21,0.12);">
@@ -4589,50 +4567,6 @@
               </a>
             </div>
           </div>
-
-          <form data-action="gemini-submit" class="stack-md">
-            <textarea rows="3" id="gemini-prompt-input" placeholder="${escapeHtml(placeholder)}" class="textarea-field" style="padding:0.75rem 1rem;border-radius:12px;">${escapeHtml(g.prompt)}</textarea>
-            <div>
-              <button type="submit" ${g.loading ? "disabled" : ""}${veAttr({ kind: "ui", section: "intelligence", field: btnField })} class="btn btn-gold" style="padding:0.625rem 1.5rem;font-size:0.875rem;">
-                ${g.loading ? icon("loader", "icon-svg") : ""}
-                <span>${escapeHtml(g.loading ? t.loading : buttonLabel)}</span>
-              </button>
-            </div>
-          </form>
-
-          ${g.error ? `<div class="warn-box" style="margin-top:1.5rem;">${escapeHtml(g.error)}</div>` : ""}
-
-          ${
-            !g.loading && !g.answer && !g.error
-              ? `<p class="hairline-t text-subtle" style="margin-top:1.5rem;padding-top:1rem;font-size:0.75rem;"${veAttr({ kind: "ui", section: "intelligence", field: "emptyHint" })}>${escapeHtml(t.emptyHint)}</p>`
-              : ""
-          }
-
-          ${
-            g.answer
-              ? `<div class="hairline-t stack-md" style="margin-top:1.5rem;">
-                  <div style="font-size:0.9375rem;color:#181715;line-height:1.7;white-space:pre-wrap;">${escapeHtml(g.answer)}</div>
-                  ${
-                    g.sources.length > 0
-                      ? `<div>
-                          <h4 class="kicker" style="color:#5c5852;margin-bottom:0.75rem;">${escapeHtml(t.sourcesLabel)}</h4>
-                          <div class="grid-2" style="gap:0.625rem;">
-                            ${g.sources
-                              .map(
-                                (src) => `
-                                <a href="${escapeHtml(safeHref(src.uri))}" target="_blank" rel="noopener noreferrer" class="pill-link-card">
-                                  <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;">${escapeHtml(src.title)}</span>
-                                  ${icon("externalLink", "icon-sm text-gold-hover")}
-                                </a>`
-                              )
-                              .join("")}
-                          </div>
-                        </div>`
-                      : ""
-                  }
-                </div>`
-              : ""
-          }
         </div>
       `;
     }
