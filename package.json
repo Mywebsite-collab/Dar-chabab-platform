@@ -1,12 +1,10 @@
 {
-  "name": "masra-youth-house-static",
+  "name": "masra-youth-house-github-pages",
   "private": true,
   "version": "1.0.0",
-  "description": "Maison de Jeunes de Masra website with a secure Meta Graph API backend for live Facebook Page posts.",
+  "description": "GitHub Pages website with a Cloudflare Worker for the official Facebook Page news feed.",
   "scripts": {
-    "dev": "node server.mjs",
-    "start": "node server.mjs",
-    "build": "node --check server.mjs && node -e \"const fs=require('fs');if(!fs.existsSync('index.html'))throw new Error('Missing index.html');if(!fs.existsSync('server.mjs'))throw new Error('Missing server.mjs');console.log('Website and Facebook feed server are ready.');\"",
-    "lint": "node --check server.mjs && node -e \"const fs=require('fs'),cp=require('child_process');const h=fs.readFileSync('index.html','utf8');const a=h.indexOf('<script type=\\\"module\\\">');const b=h.lastIndexOf('</script>');if(a<0||b<=a)throw new Error('Missing module script');const js=h.slice(a+'<script type=\\\"module\\\">'.length,b);fs.writeFileSync('/tmp/mjm_lint.mjs',js);cp.execFileSync('node',['--check','/tmp/mjm_lint.mjs']);fs.unlinkSync('/tmp/mjm_lint.mjs');console.log('Server and browser JavaScript syntax OK');\""
+    "lint": "node --check workers/facebook-feed/index.js && node --check server.mjs",
+    "build": "node --check workers/facebook-feed/index.js && node scripts/check-assets.mjs"
   }
 }
