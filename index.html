@@ -515,6 +515,12 @@
       .col-span-3 { grid-column: span 3 / span 3; }
     }
     .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    .intelligence-tools-layout { display:grid; grid-template-columns:minmax(0,1fr); gap:1rem; align-items:start; margin-bottom:1.5rem; }
+    .intelligence-mode-tabs { display:flex; flex-wrap:wrap; gap:0.5rem; }
+    .institution-map-card { width:100%; max-width:none; min-width:0; }
+    .institution-map-frame { display:block; width:100%; height:220px; border:0; pointer-events:none; }
+    @media (min-width: 768px) { .intelligence-tools-layout { grid-template-columns:minmax(0,1fr) minmax(280px,0.9fr); gap:1.25rem; } }
+    @media (max-width: 767px) { .institution-map-frame { height:190px; } }
     @media (min-width: 768px) { .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; } }
     .grid-3 { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
     @media (min-width: 768px) { .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem; } }
@@ -4542,6 +4548,7 @@
     function renderGeminiHubHtml() {
       const t = tLocale().intelligence;
       const g = state.gemini;
+      const lang = state.language;
       const mode = g.mode === "search" ? "search" : "think";
       const placeholder = mode === "think" ? t.thinkPlaceholder : t.searchPlaceholder;
       const buttonLabel = mode === "think" ? t.runThink : t.runSearch;
@@ -4555,7 +4562,8 @@
             <p class="text-muted" style="font-size:0.9375rem;line-height:1.65;margin:0;"${veAttr({ kind: "ui", section: "intelligence", field: "subtitle" })}>${escapeHtml(t.subtitle)}</p>
           </div>
 
-          <div class="flex-row-wrap" style="gap:0.5rem;margin-bottom:1.5rem;">
+          <div class="intelligence-tools-layout">
+            <div class="intelligence-mode-tabs">
             <button type="button" data-action="gemini-mode" data-mode="think"${veAttr({ kind: "ui", section: "intelligence", field: "tabThink" })} class="btn-pill ${g.mode === "think" ? "is-active" : ""}" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 1rem;border:1px solid rgba(24,23,21,0.1);${g.mode === "think" ? "" : "background:#fbf9f5;"}">
               ${icon("brain", "icon-svg")}
               <span>${escapeHtml(t.tabThink)}</span>
@@ -4564,7 +4572,8 @@
               ${icon("globe", "icon-svg")}
               <span>${escapeHtml(t.tabSearch)}</span>
             </button>
-            <div class="institution-map-card" style="width:100%;max-width:460px;margin-inline-start:auto;padding:0.75rem;border:1px solid rgba(176,141,87,0.32);border-radius:14px;background:#fbf9f5;box-shadow:0 8px 24px rgba(24,23,21,0.07);">
+            </div>
+                        <div class="institution-map-card" >
               <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.65rem;color:#181715;">
                 <span style="display:inline-flex;align-items:center;gap:0.45rem;font-weight:700;font-size:0.9rem;">
                   ${icon("mapPin", "icon-svg")}
@@ -4576,7 +4585,7 @@
                 </a>
               </div>
               <a href="https://maps.app.goo.gl/X8BTpEEywCdx71Dx9" target="_blank" rel="noopener noreferrer" style="display:block;overflow:hidden;border-radius:10px;border:1px solid rgba(24,23,21,0.1);" aria-label="View the institution on Google Maps">
-                <iframe title="Google Maps - Dar Chabab Si Salem" src="https://www.google.com/maps?q=${encodeURIComponent("دار الشباب سي سالم، مسرى، مستغانم، الجزائر")}&output=embed" width="100%" height="220" style="display:block;width:100%;height:220px;border:0;pointer-events:none;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                <iframe title="Google Maps - Dar Chabab Si Salem" src="https://www.google.com/maps?q=${encodeURIComponent("دار الشباب سي سالم، مسرى، مستغانم، الجزائر")}&output=embed" class="institution-map-frame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
               </a>
               <p style="margin:0.55rem 0 0;color:#6b665e;font-size:0.72rem;line-height:1.5;">${escapeHtml(lang === "ar" ? "الخريطة التوضيحية — افتح Google Maps لعرض الموقع والاتجاهات الدقيقة." : lang === "fr" ? "Carte indicative — ouvrez Google Maps pour l’emplacement et l’itinéraire exacts." : "Map preview — open Google Maps for the exact location and directions.")}</p>
             </div>
