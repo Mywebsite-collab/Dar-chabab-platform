@@ -1131,6 +1131,48 @@
       border: 1px solid rgba(24, 23, 21, 0.12);
       color: #181715;
     }
+    .fb-feed-frame {
+      width: 100%;
+      max-width: 500px;
+      min-width: 0;
+      min-height: 480px;
+      margin-inline: auto;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #fff;
+      isolation: isolate;
+    }
+    .fb-feed-frame iframe {
+      display: block;
+      width: 100%;
+      max-width: 500px;
+      min-width: 0;
+      border: 0;
+      background: #fff;
+    }
+    .fb-feed-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid rgba(24, 23, 21, 0.1);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.72);
+      color: #5c5852;
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+    .fb-feed-panel.is-dark .fb-feed-fallback {
+      background: rgba(251,249,245,0.07);
+      border-color: rgba(251,249,245,0.14);
+      color: rgba(251,249,245,0.78);
+    }
+    @media (max-width: 520px) {
+      .fb-feed-panel { padding: 1rem; }
+      .fb-feed-frame { border-radius: 10px; }
+    }
     .fb-posts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -2750,16 +2792,27 @@
       const t = tLocale().newsPage;
       const cfg = state.settings?.facebookFeed || DEFAULT_SETTINGS.facebookFeed;
       if (cfg.enabled === false) return "";
+
       const configuredUrl = safeHref(cfg.pageUrl || "https://www.facebook.com/mjmesra");
-      const pageUrl = configuredUrl.startsWith("http") ? configuredUrl : "https://www.facebook.com/mjmesra";
+      const pageUrl = configuredUrl.startsWith("https://www.facebook.com/")
+        ? configuredUrl
+        : "https://www.facebook.com/mjmesra";
       const isDark = variant === "dark";
-      const height = compact ? 480 : 760;
+      // Facebook Page Plugin supports widths from 180px to 500px.
+      // Keep the iframe within that range and give the timeline enough room.
+      const width = 500;
+      const height = compact ? 620 : 900;
       const pluginUrl = "https://www.facebook.com/plugins/page.php"
         + "?href=" + encodeURIComponent(pageUrl)
-        + "&tabs=timeline&width=500&height=" + height
+        + "&tabs=timeline&width=" + width + "&height=" + height
         + "&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false";
       const veSlot = slot || (compact ? "home" : "news");
       const isVe = state.adminUnlocked && state.visualEditMode && !state.browseOverride && state.activePage !== "admin";
+      const fallbackText = lang === "ar"
+        ? "إذا لم تظهر المنشورات، فقد يمنع المتصفح أو إعدادات الخصوصية تضمين فيسبوك. يمكنك فتح الصفحة الرسمية مباشرة."
+        : lang === "fr"
+          ? "Si les publications ne s'affichent pas, les paramètres de confidentialité ou le navigateur peuvent bloquer l'intégration. Ouvrez la page officielle."
+          : "If posts do not appear, browser privacy settings may block the embed. Open the official page directly.";
 
       return `
         <div class="fb-feed-panel ${isDark ? "is-dark" : "is-light"}"${veAttr({ kind: "fbFeedSection" }, veSlot)}>
@@ -2789,22 +2842,25 @@
               <span>${escapeHtml(t.openFacebookBtn)}</span> ${icon("externalLink", "icon-sm")}
             </a>
           </div>
-          <div style="width:100%;display:flex;justify-content:center;overflow:hidden;border-radius:12px;background:${isDark ? "#fff" : "#fff"};min-height:${height}px;">
+          <div class="fb-feed-frame" style="min-height:${height}px;">
             <iframe
-              title="${escapeHtml(lang === "ar" ? "آخر منشورات صفحة دار الشباب ماسرى على فيسبوك" : "Latest posts from Maison de Jeunes de Masra on Facebook")}"
+              title="${escapeHtml(lang === "ar" ? "آخر منشورات صفحة دار الشباب ماسرى على فيسبوك" : lang === "fr" ? "Dernières publications de la Maison de Jeunes de Masra sur Facebook" : "Latest posts from Maison de Jeunes de Masra on Facebook")}"
               src="${escapeHtml(pluginUrl)}"
-              width="500"
+              width="${width}"
               height="${height}"
               loading="lazy"
-              scrolling="no"
+              scrolling="yes"
               frameborder="0"
+              referrerpolicy="strict-origin-when-cross-origin"
               allow="encrypted-media; picture-in-picture; web-share"
-              style="width:100%;max-width:500px;height:${height}px;border:0;overflow:hidden;"
+              style="height:${height}px;"
             ></iframe>
           </div>
-          <div class="flex-between" style="font-size:11px;color:${isDark ? "rgba(251,249,245,0.6)" : "#8b857c"};gap:0.5rem;flex-wrap:wrap;">
-            <span class="font-mono-tabular" dir="ltr">${escapeHtml(pageUrl)}</span>
-            <span>${escapeHtml(lang === "ar" ? "تُعرض المنشورات مباشرة من فيسبوك" : lang === "fr" ? "Publications intégrées depuis Facebook" : "Posts embedded directly from Facebook")}</span>
+          <div class="fb-feed-fallback">
+            <span>${escapeHtml(fallbackText)}</span>
+            <a href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer" class="editorial-link" style="font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
+              ${escapeHtml(t.openFacebookBtn)}
+            </a>
           </div>
         </div>
       `;
