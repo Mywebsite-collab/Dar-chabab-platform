@@ -1131,21 +1131,47 @@
       border: 1px solid rgba(24, 23, 21, 0.12);
       color: #181715;
     }
-    .fb-embed-wrap {
+    .fb-feed-frame {
       width: 100%;
-      max-width: 100%;
+      max-width: 500px;
+      min-width: 0;
+      min-height: 480px;
       margin-inline: auto;
-      border-radius: 12px;
       overflow: hidden;
-      background: #ffffff;
-      border: 1px solid rgba(24, 23, 21, 0.1);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+      border-radius: 12px;
+      background: #fff;
+      isolation: isolate;
     }
-    .fb-embed-frame {
-      width: 100%;
-      border: none;
+    .fb-feed-frame iframe {
       display: block;
-      background: #ffffff;
+      width: 100%;
+      max-width: 500px;
+      min-width: 0;
+      border: 0;
+      background: #fff;
+    }
+    .fb-feed-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      padding: 0.75rem 0.9rem;
+      border: 1px solid rgba(24, 23, 21, 0.1);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.72);
+      color: #5c5852;
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+    .fb-feed-panel.is-dark .fb-feed-fallback {
+      background: rgba(251,249,245,0.07);
+      border-color: rgba(251,249,245,0.14);
+      color: rgba(251,249,245,0.78);
+    }
+    @media (max-width: 520px) {
+      .fb-feed-panel { padding: 1rem; }
+      .fb-feed-frame { border-radius: 10px; }
     }
     .fb-posts-grid {
       display: grid;
@@ -1261,7 +1287,7 @@
           fr: "Plateforme éditoriale présentant les ateliers, la visionneuse 3D (.glb) et le calendrier culturel de la Maison de Jeunes de Masra.",
           en: "An editorial digital showcase presenting the training studios, custom 3D (.glb) viewer, and cultural calendar of Masra Youth House."
         },
-        heroImage: "/src/assets/images/hero_masra_pavilion_1794615113578.jpg"
+        heroImage: "./images/hero_masra_pavilion_1794615113578.jpg"
       },
       contact: {
         _notice: "Editable institutional placeholder fields — update with official coordinates before deployment",
@@ -1343,9 +1369,9 @@
     };
 
     const DEFAULT_ABOUT = {
-      homeImage: "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg",
+      homeImage: "./images/gallery_courtyard_detail_1794615114519.jpg",
       history: {
-        image: "/src/assets/images/hero_masra_pavilion_1794615113578.jpg",
+        image: "./images/hero_masra_pavilion_1794615113578.jpg",
         badge: {
           ar: "التأسيس والهوية [بيانات قابلة للتعديل]",
           fr: "IDENTITÉ & ANCRAGE [MODIFIABLE]",
@@ -1440,7 +1466,7 @@
           en: "An open showcase bringing together robotics club demos, fine arts exhibitions, and community roundtables."
         },
         registrationNote: { ar: "الدخول مجاني بمقر المؤسسة [نموذج تجريبي]", fr: "Entrée libre sur place [Exemple]", en: "Free local registration [Demo Entry]" },
-        image: "/src/assets/images/event_cultural_forum_1794615114219.jpg"
+        image: "./images/event_cultural_forum_1794615114219.jpg"
       },
       {
         id: "evt-digital-hackathon",
@@ -1460,7 +1486,7 @@
           en: "Collaborative youth sprint prototyping civic, environmental, and cultural micro-tools."
         },
         registrationNote: { ar: "التسجيل مفتوح لفرق من 2 إلى 4 شباب", fr: "Ouvert aux équipes de 2 à 4 jeunes", en: "Open to teams of 2–4 participants" },
-        image: "/src/assets/images/activity_digital_lab_1794615114351.jpg"
+        image: "./images/activity_digital_lab_1794615114351.jpg"
       },
       {
         id: "evt-heritage-exhibition",
@@ -1480,7 +1506,7 @@
           en: "Retrospective showcasing calligraphy and architectural sketching produced during the autumn studio."
         },
         registrationNote: { ar: "فعالية مختتمة — متاحة في الأرشيف", fr: "Événement clôturé — Archive", en: "Concluded — Archived Highlight" },
-        image: "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg"
+        image: "./images/gallery_courtyard_detail_1794615114519.jpg"
       }
     ];
 
@@ -1492,7 +1518,7 @@
         title: { ar: "الواجهة الرئيسية والرواق الحجري", fr: "Façade Principale & Colonnade", en: "Main Pavilion & Stone Colonnade" },
         caption: { ar: "إطلالة معمارية عند الغسق تبرز الحجر الجيري والمشربية البرونزية.", fr: "Vue architecturale au crépuscule entre pierre calcaire et bronze.", en: "Dusk view highlighting warm limestone arches and bronze louvers." },
         aspect: "wide",
-        image: "/src/assets/images/hero_masra_pavilion_1794615113578.jpg"
+        image: "./images/hero_masra_pavilion_1794615113578.jpg"
       },
       {
         id: "gal-atelier",
@@ -1501,7 +1527,7 @@
         title: { ar: "محترف الرسم والخط العربي", fr: "Atelier Beaux-Arts & Calligraphie", en: "Fine Arts & Calligraphy Studio" },
         caption: { ar: "جلسة عمل أسبوعية لمجموعة الفنون التشكيلية.", fr: "Séance hebdomadaire du groupe arts plastiques.", en: "Weekly practice session inside the natural-lit arts studio." },
         aspect: "landscape",
-        image: "/src/assets/images/activity_arts_atelier_1794615113765.jpg"
+        image: "./images/activity_arts_atelier_1794615113765.jpg"
       },
       {
         id: "gal-courtyard",
@@ -1510,7 +1536,7 @@
         title: { ar: "الفناء الداخلي وشجرة الزيتون", fr: "Patio Intérieur & Olivier", en: "Courtyard Colonnade & Olive Tree" },
         caption: { ar: "مساحة هادئة للمطالعة والحوار الثقافي بين الجلسات.", fr: "Espace calme dédié à la lecture et aux échanges.", en: "Quiet sunlit colonnade framing outdoor reading tables." },
         aspect: "portrait",
-        image: "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg"
+        image: "./images/gallery_courtyard_detail_1794615114519.jpg"
       },
       {
         id: "gal-robotics",
@@ -1519,7 +1545,7 @@
         title: { ar: "تطبيقات الروبوتيك والبرمجة", fr: "Séance Robotique & Code", en: "Robotics & Engineering Session" },
         caption: { ar: "تركيب وبرمجة النماذج الأولية في مخبر الابتكار.", fr: "Assemblage et programmation de prototypes au laboratoire.", en: "Prototyping embedded circuits in the digital lab." },
         aspect: "landscape",
-        image: "/src/assets/images/activity_digital_lab_1794615114351.jpg"
+        image: "./images/activity_digital_lab_1794615114351.jpg"
       },
       {
         id: "gal-forum",
@@ -1528,7 +1554,7 @@
         title: { ar: "المنتدى الثقافي واللقاءات", fr: "Forum Culturel & Conférences", en: "Auditorium Cultural Forum" },
         caption: { ar: "لقاء حواري حول المبادرات الثقافية الشبابية.", fr: "Rencontre autour des initiatives culturelles locales.", en: "Youth panel inside the auditorium hall." },
         aspect: "wide",
-        image: "/src/assets/images/event_cultural_forum_1794615114219.jpg"
+        image: "./images/event_cultural_forum_1794615114219.jpg"
       }
     ];
 
@@ -1551,7 +1577,7 @@
         schedule: { ar: "السبت · 14:00 – 16:30 [قابل للتعديل]", fr: "Samedi · 14:00 – 16:30 [Modifiable]", en: "Saturday · 14:00 – 16:30 [Editable]" },
         space: { ar: "قاعة المطالعة والمحاضرات", fr: "Salle de Lecture & Conférences", en: "Reading & Lecture Hall" },
         mentor: "[Animateur / Enseignant — Placeholder]",
-        image: "/src/assets/images/event_cultural_forum_1794615114219.jpg"
+        image: "./images/event_cultural_forum_1794615114219.jpg"
       },
       {
         id: "act-artistic",
@@ -1571,7 +1597,7 @@
         schedule: { ar: "الثلاثاء والخميس · 15:00 – 17:30 [قابل للتعديل]", fr: "Mar & Jeu · 15:00 – 17:30 [Modifiable]", en: "Tue & Thu · 15:00 – 17:30 [Editable]" },
         space: { ar: "مرسم الفنون", fr: "Atelier des Beaux-Arts", en: "North Daylight Studio" },
         mentor: "[Artiste Encadrant — Placeholder]",
-        image: "/src/assets/images/activity_arts_atelier_1794615113765.jpg"
+        image: "./images/activity_arts_atelier_1794615113765.jpg"
       },
       {
         id: "act-sports",
@@ -1591,7 +1617,7 @@
         schedule: { ar: "الأربعاء · 14:30 – 17:00 [قابل للتعديل]", fr: "Mercredi · 14:30 – 17:00 [Modifiable]", en: "Wednesday · 14:30 – 17:00 [Editable]" },
         space: { ar: "الساحة الرياضية والفضاء الخارجي", fr: "Cour & Espace Sportif", en: "Courtyard & Activity Deck" },
         mentor: "[Éducateur Sportif — Placeholder]",
-        image: "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg"
+        image: "./images/gallery_courtyard_detail_1794615114519.jpg"
       },
       {
         id: "act-educational",
@@ -1611,7 +1637,7 @@
         schedule: { ar: "الإثنين والأربعاء · 10:00 – 12:00 [قابل للتعديل]", fr: "Lun & Mer · 10:00 – 12:00 [Modifiable]", en: "Mon & Wed · 10:00 – 12:00 [Editable]" },
         space: { ar: "قاعة التكوين التربوي", fr: "Salle Pédagogique", en: "Learning Pavilion" },
         mentor: "[Formateur Pédagogique — Placeholder]",
-        image: "/src/assets/images/hero_masra_pavilion_1794615113578.jpg"
+        image: "./images/hero_masra_pavilion_1794615113578.jpg"
       },
       {
         id: "act-scientific",
@@ -1631,7 +1657,7 @@
         schedule: { ar: "السبت · 09:30 – 12:00 [قابل للتعديل]", fr: "Samedi · 09:30 – 12:00 [Modifiable]", en: "Saturday · 09:30 – 12:00 [Editable]" },
         space: { ar: "مخبر العلوم والشرفة", fr: "Laboratoire Sciences", en: "Science Lab & Terrace" },
         mentor: "[Animateur Scientifique — Placeholder]",
-        image: "/src/assets/images/activity_digital_lab_1794615114351.jpg"
+        image: "./images/activity_digital_lab_1794615114351.jpg"
       },
       {
         id: "act-digital",
@@ -1651,7 +1677,7 @@
         schedule: { ar: "الأحد والثلاثاء · 14:00 – 17:00 [قابل للتعديل]", fr: "Dim & Mar · 14:00 – 17:00 [Modifiable]", en: "Sun & Tue · 14:00 – 17:00 [Editable]" },
         space: { ar: "مخبر الابتكار الرقمي", fr: "Digital FabLab", en: "Digital Innovation Lab" },
         mentor: "[Ingénieur / Formateur — Placeholder]",
-        image: "/src/assets/images/activity_digital_lab_1794615114351.jpg"
+        image: "./images/activity_digital_lab_1794615114351.jpg"
       },
       {
         id: "act-recreational",
@@ -1671,7 +1697,7 @@
         schedule: { ar: "الخميس · 14:00 – 17:00 [قابل للتعديل]", fr: "Jeudi · 14:00 – 17:00 [Modifiable]", en: "Thursday · 14:00 – 17:00 [Editable]" },
         space: { ar: "الرواق والبهو المركزي", fr: "Patio & Salon Jeunesse", en: "Central Patio Lounge" },
         mentor: "[Animateur Socio-Culturel — Placeholder]",
-        image: "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg"
+        image: "./images/gallery_courtyard_detail_1794615114519.jpg"
       },
       {
         id: "act-initiatives",
@@ -1691,7 +1717,7 @@
         schedule: { ar: "أيام مفتوحة · حسب الموعد [قابل للتعديل]", fr: "Sur rendez-vous · Hebdomadaire [Modifiable]", en: "Weekly Open Lab · By Schedule [Editable]" },
         space: { ar: "فضاء المبادرات والتنسيق", fr: "Espace Projets", en: "Project Incubation Suite" },
         mentor: "[Coordinateur Projets — Placeholder]",
-        image: "/src/assets/images/event_cultural_forum_1794615114219.jpg"
+        image: "./images/event_cultural_forum_1794615114219.jpg"
       }
     ];
 
@@ -1716,7 +1742,7 @@
           fr: "Cette plateforme de démonstration propose une architecture éditoriale conçue pour valoriser les programmes culturels, artistiques et scientifiques de la Maison de Jeunes de Masra. L'ensemble des contenus reste modifiable localement sans dépendance complexe, garantissant pérennité et clarté.",
           en: "Designed as a contemporary digital flagship, this prototype honors Arabic RTL typography alongside French and English editorial layouts. Every announcement, activity schedule, and gallery archive can be maintained effortlessly through local JSON data files or the integrated Studio Admin view."
         },
-        image: "/src/assets/images/hero_masra_pavilion_1794615113578.jpg"
+        image: "./images/hero_masra_pavilion_1794615113578.jpg"
       },
       {
         id: "news-atelier-season",
@@ -1738,7 +1764,7 @@
           fr: "Afin d'offrir un équilibre entre sensibilité artistique et compétences numériques, les ateliers préparent l'accueil de nouveaux groupes en dessin, céramique et programmation créative. Ces informations servent de modèle modifiable.",
           en: "Bringing together tactile craftsmanship and modern engineering, the seasonal cycle welcomes new youth cohorts across drawing, ceramics, and creative computing. Replace dates and seats with official schedules prior to deployment."
         },
-        image: "/src/assets/images/activity_arts_atelier_1794615113765.jpg"
+        image: "./images/activity_arts_atelier_1794615113765.jpg"
       },
       {
         id: "news-courtyard-dialogue",
@@ -1760,7 +1786,7 @@
           fr: "Le patio central a réuni plusieurs collectifs de jeunes autour de propositions d'actions bénévoles, de sensibilisation environnementale et d'animation locale.",
           en: "Young participants gathered in the sunlit colonnade to exchange civic proposals focused on community green spaces and volunteer workshops."
         },
-        image: "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg"
+        image: "./images/gallery_courtyard_detail_1794615114519.jpg"
       }
     ];
 
@@ -2361,23 +2387,23 @@
     const BUNDLED_PRESETS = [
       {
         label: { ar: "الواجهة الرئيسية للمقر", fr: "Façade Pavillon", en: "Hero Pavilion" },
-        path: "/src/assets/images/hero_masra_pavilion_1794615113578.jpg"
+        path: "./images/hero_masra_pavilion_1794615113578.jpg"
       },
       {
         label: { ar: "محترف الفنون التشكيلية", fr: "Atelier Beaux-Arts", en: "Fine Arts Atelier" },
-        path: "/src/assets/images/activity_arts_atelier_1794615113765.jpg"
+        path: "./images/activity_arts_atelier_1794615113765.jpg"
       },
       {
         label: { ar: "مخبر الابتكار والروبوتيك", fr: "Lab Numérique", en: "Digital & Robotics Lab" },
-        path: "/src/assets/images/activity_digital_lab_1794615114351.jpg"
+        path: "./images/activity_digital_lab_1794615114351.jpg"
       },
       {
         label: { ar: "قاعة الندوات والمعارض", fr: "Auditorium Culturel", en: "Cultural Auditorium" },
-        path: "/src/assets/images/event_cultural_forum_1794615114219.jpg"
+        path: "./images/event_cultural_forum_1794615114219.jpg"
       },
       {
         label: { ar: "الرواق والزيتون", fr: "Colonnade & Patio", en: "Courtyard Colonnade" },
-        path: "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg"
+        path: "./images/gallery_courtyard_detail_1794615114519.jpg"
       }
     ];
 
@@ -2395,7 +2421,6 @@
     const PUBLIC_PAGES = new Set(["home", "about", "activities", "events", "gallery", "news", "contact"]);
     const MASRA_DEFAULT_COORDS = { latitude: 35.8373, longitude: 0.1693 };
     const GEMINI_KEY_STORAGE = "mjm_gemini_api_key";
-    const FB_TOKEN_STORAGE = "mjm_fb_token";
     const FB_CACHE_STORAGE = "mjm_fb_news_cache";
 
     const SVG_PATHS = {
@@ -2556,8 +2581,8 @@
     function resolveAssetUrl(path) {
       if (!path || typeof path !== "string") return "";
       const clean = path.trim();
-      if (clean.startsWith("/src/assets/images/")) {
-        return "./images/" + clean.slice("/src/assets/images/".length);
+      if (clean.startsWith("./images/")) {
+        return "./images/" + clean.slice("./images/".length);
       }
       if (clean.startsWith("src/assets/images/")) {
         return "./images/" + clean.slice("src/assets/images/".length);
@@ -2646,24 +2671,6 @@
       }
     }
 
-    function getFbToken() {
-      try {
-        return (localStorage.getItem(FB_TOKEN_STORAGE) || "").trim();
-      } catch {
-        return "";
-      }
-    }
-
-    function setFbToken(nextToken) {
-      try {
-        const trimmed = (nextToken || "").trim();
-        if (!trimmed) localStorage.removeItem(FB_TOKEN_STORAGE);
-        else localStorage.setItem(FB_TOKEN_STORAGE, trimmed);
-      } catch {
-        // Ignore privacy restrictions
-      }
-    }
-
     function loadInitialSettings() {
       const s = readLocalJson("mjm_settings", DEFAULT_SETTINGS);
       if (Array.isArray(s?.contact?.socialLinks) && s.contact.socialLinks[0]?.url === "#social-facebook") {
@@ -2691,12 +2698,6 @@
       }
     }
 
-    function buildFacebookPluginUrl(pageUrl, { width = 500, height = 520, smallHeader = true } = {}) {
-      const target = safeHref(pageUrl || "https://www.facebook.com/mjmesra");
-      const finalUrl = target.startsWith("http") ? target : "https://www.facebook.com/mjmesra";
-      return `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(finalUrl)}&tabs=timeline&width=${width}&height=${height}&small_header=${smallHeader ? "true" : "false"}&adapt_container_width=true&hide_cover=true&show_facepile=false`;
-    }
-
     function stripHtmlText(html) {
       if (!html || typeof html !== "string") return "";
       const tmp = document.createElement("div");
@@ -2717,7 +2718,7 @@
       const isoDate = parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate.toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
       const safeId = String(raw.id || `${isoDate}-${headline.slice(0, 20)}`).replace(/[^a-zA-Z0-9_-]/g, "_");
       const extUrl = safeHref(raw.url || fallbackPageUrl || "https://www.facebook.com/mjmesra");
-      const img = raw.image && /^https?:\/\//i.test(raw.image) ? raw.image : "/src/assets/images/event_cultural_forum_1794615114219.jpg";
+      const img = raw.image && /^https?:\/\//i.test(raw.image) ? raw.image : "./images/event_cultural_forum_1794615114219.jpg";
       return {
         id: `fb-${safeId}`,
         isFacebookPost: true,
@@ -2775,155 +2776,15 @@
       return merged;
     }
 
-    async function syncFacebookNewsFeed({ force = false, silent = false } = {}) {
-      const cfg = state.settings?.facebookFeed || DEFAULT_SETTINGS.facebookFeed;
-      if (cfg.enabled === false) return { ok: false, mode: "disabled" };
-      const pageUrl = cfg.pageUrl || "https://www.facebook.com/mjmesra";
-      const token = getFbToken();
-      const rssUrl = (cfg.rssJsonUrl || "").trim();
-      const limit = Math.max(1, Math.min(20, Number(cfg.syncLimit) || 8));
-      const isFileOrigin = window.location.protocol === "file:";
-      const deletedSet = new Set(Array.isArray(cfg.deletedPostIds) ? cfg.deletedPostIds : []);
-      const existingById = new Map((Array.isArray(state.fbNews) ? state.fbNews : []).map((it) => [it.id, it]));
-
-      if (!token && !rssUrl && isFileOrigin) {
-        const cached = readLocalJson(FB_CACHE_STORAGE, null);
-        if (cached?.pageUrl === pageUrl && Array.isArray(cached.items)) {
-          state.fbNews = cached.items.filter((it) => it && !deletedSet.has(it.id));
-          state.fbPageName = cached.pageName || "";
-        }
-        if (force) {
-          state.fbEmbedNonce += 1;
-          state.fbSync = { loading: false, lastSyncedAt: new Date().toISOString(), error: "", mode: "embed" };
-          if (!silent) renderShell({ preserve3D: state.activePage === "home" });
-        }
-        return { ok: true, mode: "embed" };
-      }
-
-      const cached = readLocalJson(FB_CACHE_STORAGE, null);
-      if (!force && cached?.syncedAt && Array.isArray(cached.items) && cached.items.length && cached.pageUrl === pageUrl) {
-        const ageMs = Date.now() - new Date(cached.syncedAt).getTime();
-        if (ageMs < 10 * 60 * 1000) {
-          state.fbNews = cached.items.filter((it) => it && !deletedSet.has(it.id));
-          state.fbPageName = cached.pageName || "";
-          state.fbSync = { loading: false, lastSyncedAt: cached.syncedAt, error: "", mode: token ? "graph" : rssUrl ? "rss" : "direct" };
-          return { ok: true, cached: true };
-        }
-      }
-
-      state.fbSync = { ...state.fbSync, loading: true, error: "" };
+    async function syncFacebookNewsFeed({ silent = false } = {}) {
+      // Facebook's official Page Plugin now renders the live public timeline.
+      // No Graph API request, access token, or third-party feed service is used.
+      state.fbNews = [];
+      state.fbPageName = "";
+      removeLocalKeys([FB_CACHE_STORAGE]);
+      state.fbSync = { loading: false, lastSyncedAt: new Date().toISOString(), error: "", mode: "embedded" };
       if (!silent) renderShell({ preserve3D: state.activePage === "home" });
-
-      try {
-        let normalized = [];
-        let pageName = state.fbPageName || "";
-        let mode = "direct";
-        if (token) {
-          mode = "graph";
-          const slug = extractFacebookSlug(pageUrl);
-          const endpoint = `https://graph.facebook.com/v21.0/${encodeURIComponent(slug)}/posts?fields=id,message,created_time,permalink_url,full_picture&limit=${limit}&access_token=${encodeURIComponent(token)}`;
-          const res = await fetch(endpoint);
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) {
-            throw new Error(data?.error?.message || `Facebook Graph API (${res.status})`);
-          }
-          const rows = Array.isArray(data?.data) ? data.data : [];
-          normalized = rows
-            .filter((r) => r && (r.message || r.full_picture))
-            .map((r) =>
-              normalizeFacebookPostToNews(
-                {
-                  id: r.id,
-                  message: r.message || "",
-                  date: r.created_time,
-                  url: r.permalink_url || pageUrl,
-                  image: r.full_picture || ""
-                },
-                pageUrl
-              )
-            );
-        } else if (rssUrl) {
-          mode = "rss";
-          const res = await fetch(rssUrl, { headers: { Accept: "application/json" } });
-          if (!res.ok) throw new Error(`Feed HTTP ${res.status}`);
-          const data = await res.json();
-          const rawItems = Array.isArray(data)
-            ? data
-            : Array.isArray(data?.items)
-              ? data.items
-              : Array.isArray(data?.data)
-                ? data.data
-                : Array.isArray(data?.posts)
-                  ? data.posts
-                  : [];
-          normalized = rawItems.slice(0, limit).map((it) =>
-            normalizeFacebookPostToNews(
-              {
-                id: it.id || it.guid || it.url || it.link,
-                title: it.title || "",
-                fullText: it.content_text || it.content_html || it.description || it.message || it.content || "",
-                date: it.date_published || it.pubDate || it.created_time || it.date,
-                url: it.url || it.link || it.permalink_url || pageUrl,
-                image: it.image || it.thumbnail || it.full_picture || it.enclosure?.link || it.enclosure?.url || ""
-              },
-              pageUrl
-            )
-          );
-        } else {
-          mode = "direct";
-          const res = await fetch(`/api/facebook-feed?url=${encodeURIComponent(pageUrl)}`);
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok || !data.ok) {
-            throw new Error(data?.error || `Facebook page fetch (${res.status})`);
-          }
-          if (data.pageName) pageName = data.pageName;
-          const rows = Array.isArray(data.posts) ? data.posts : [];
-          normalized = rows
-            .filter((r) => r && (r.message || r.full_picture))
-            .slice(0, limit)
-            .map((r) =>
-              normalizeFacebookPostToNews(
-                {
-                  id: r.id,
-                  message: r.message || "",
-                  date: r.created_time,
-                  url: r.permalink_url || pageUrl,
-                  image: r.full_picture || ""
-                },
-                pageUrl
-              )
-            );
-        }
-
-        const mergedPosts = normalized
-          .filter((item) => item && !deletedSet.has(item.id))
-          .map((item) => {
-            const existing = existingById.get(item.id);
-            return existing?.editedLocally ? existing : item;
-          });
-
-        const nowIso = new Date().toISOString();
-        state.fbPageName = pageName;
-        state.fbEmbedNonce += 1;
-        state.fbSync = { loading: false, lastSyncedAt: nowIso, error: "", mode };
-        updateFbNews(mergedPosts, { syncedAt: nowIso, pageUrl, pageName });
-      } catch (err) {
-        state.fbSync = {
-          ...state.fbSync,
-          loading: false,
-          error: err instanceof Error ? err.message : "Sync failed"
-        };
-      }
-      if (state.activePage === "home") {
-        const slot = document.getElementById("home-news-live-slot");
-        if (slot) {
-          slot.innerHTML = renderHomeNewsColumnHtml();
-          applyElementStyles(slot);
-          return { ok: !state.fbSync.error };
-        }
-      }
-      renderShell({ preserve3D: state.activePage === "home" });
-      return { ok: !state.fbSync.error };
+      return { ok: true, mode: "embedded" };
     }
 
     function renderFacebookFeedWidget({ variant = "light", compact = false, slot = "" } = {}) {
@@ -2931,129 +2792,77 @@
       const t = tLocale().newsPage;
       const cfg = state.settings?.facebookFeed || DEFAULT_SETTINGS.facebookFeed;
       if (cfg.enabled === false) return "";
-      const pageUrl = safeHref(cfg.pageUrl || "https://www.facebook.com/mjmesra");
-      const extUrl = pageUrl.startsWith("http") ? pageUrl : "https://www.facebook.com/mjmesra";
-      const slug = extractFacebookSlug(extUrl);
+
+      const configuredUrl = safeHref(cfg.pageUrl || "https://www.facebook.com/mjmesra");
+      const pageUrl = configuredUrl.startsWith("https://www.facebook.com/")
+        ? configuredUrl
+        : "https://www.facebook.com/mjmesra";
       const isDark = variant === "dark";
-      const isFileOrigin = window.location.protocol === "file:";
-      const posts = Array.isArray(state.fbNews) ? state.fbNews : [];
-      const limit = compact ? 3 : Math.max(1, Math.min(12, Number(cfg.syncLimit) || 6));
-      const visiblePosts = posts.slice(0, limit);
-      const clickAction = state.activePage === "news" ? "select-article" : "open-news";
+      // Facebook Page Plugin supports widths from 180px to 500px.
+      // Match the embed width to the current viewport so mobile users do not
+      // get a clipped desktop-width timeline.
+      const viewportWidth = Math.max(280, (window.innerWidth || 500) - 40);
+      const width = Math.min(500, viewportWidth);
+      const height = compact ? 620 : 900;
+      const pluginUrl = "https://www.facebook.com/plugins/page.php"
+        + "?href=" + encodeURIComponent(pageUrl)
+        + "&tabs=timeline&width=" + width + "&height=" + height
+        + "&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false";
       const veSlot = slot || (compact ? "home" : "news");
       const isVe = state.adminUnlocked && state.visualEditMode && !state.browseOverride && state.activePage !== "admin";
+      const fallbackText = lang === "ar"
+        ? "إذا لم تظهر المنشورات، فقد يمنع المتصفح أو إعدادات الخصوصية تضمين فيسبوك. يمكنك فتح الصفحة الرسمية مباشرة."
+        : lang === "fr"
+          ? "Si les publications ne s'affichent pas, les paramètres de confidentialité ou le navigateur peuvent bloquer l'intégration. Ouvrez la page officielle."
+          : "If posts do not appear, browser privacy settings may block the embed. Open the official page directly.";
 
       return `
         <div class="fb-feed-panel ${isDark ? "is-dark" : "is-light"}"${veAttr({ kind: "fbFeedSection" }, veSlot)}>
-          ${
-            isVe
-              ? `<div class="ve-studio-chrome flex-between" style="padding:0.45rem 0.7rem;border-radius:10px;background:rgba(176,141,87,0.16);border:1px dashed rgba(176,141,87,0.65);gap:0.5rem;">
-                  <span style="font-size:11px;font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
-                    ${escapeHtml(lang === "ar" ? "عنصر منشورات فيسبوك — قابل للتعديل أو الحذف" : lang === "fr" ? "Section Facebook — modifiable ou supprimable" : "Facebook Feed — Editable or Deletable")}
-                  </span>
-                  <div class="flex-row-wrap" style="gap:0.35rem;">
-                    <button type="button" data-action="ve-open-fb-section" class="ve-inline-action btn btn-gold" style="padding:0.25rem 0.6rem;font-size:11px;">
-                      <span>${escapeHtml(lang === "ar" ? "تعديل العنصر" : lang === "fr" ? "Modifier" : "Edit Element")}</span>
-                    </button>
-                    <button type="button" data-action="ve-delete-fb-section" class="ve-inline-action btn" style="padding:0.25rem 0.6rem;font-size:11px;background:rgba(154,52,18,0.18);border:1px solid rgba(154,52,18,0.45);color:${isDark ? "#fca5a5" : "#9a3412"};">
-                      ${icon("trash", "icon-sm")}
-                      <span>${escapeHtml(lang === "ar" ? "حذف العنصر" : lang === "fr" ? "Supprimer" : "Delete Element")}</span>
-                    </button>
-                  </div>
-                </div>`
-              : ""
-          }
-          <div class="flex-between" style="gap:0.75rem;">
+          ${isVe ? `<div class="ve-studio-chrome flex-between" style="padding:0.45rem 0.7rem;border-radius:10px;background:rgba(176,141,87,0.16);border:1px dashed rgba(176,141,87,0.65);gap:0.5rem;">
+            <span style="font-size:11px;font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
+              ${escapeHtml(lang === "ar" ? "عنصر صفحة فيسبوك — قابل للتعديل أو الحذف" : lang === "fr" ? "Section Facebook — modifiable ou supprimable" : "Facebook Page — Editable or Deletable")}
+            </span>
+            <div class="flex-row-wrap" style="gap:0.35rem;">
+              <button type="button" data-action="ve-open-fb-section" class="ve-inline-action btn btn-gold" style="padding:0.25rem 0.6rem;font-size:11px;">
+                ${escapeHtml(lang === "ar" ? "تعديل العنصر" : lang === "fr" ? "Modifier" : "Edit Element")}
+              </button>
+              <button type="button" data-action="ve-delete-fb-section" class="ve-inline-action btn" style="padding:0.25rem 0.6rem;font-size:11px;background:rgba(154,52,18,0.18);border:1px solid rgba(154,52,18,0.45);color:${isDark ? "#fca5a5" : "#9a3412"};">
+                ${icon("trash", "icon-sm")} <span>${escapeHtml(lang === "ar" ? "حذف العنصر" : lang === "fr" ? "Supprimer" : "Delete Element")}</span>
+              </button>
+            </div>
+          </div>` : ""}
+          <div class="flex-between" style="gap:0.75rem;flex-wrap:wrap;">
             <div class="stack-xs">
               <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;">
-                <span class="fb-badge">${icon("globe", "icon-sm")}<span>${escapeHtml(state.fbPageName || `@${slug}`)}</span></span>
+                <span class="fb-badge">${icon("globe", "icon-sm")}<span>Facebook · ${escapeHtml(lang === "ar" ? "الصفحة الرسمية" : lang === "fr" ? "Page officielle" : "Official Page")}</span></span>
                 <span${veAttr({ kind: "ui", section: "newsPage", field: "fbFeedKicker" }, veSlot)} class="font-mono-tabular" style="font-size:11px;color:${isDark ? "rgba(251,249,245,0.65)" : "#5c5852"};">${escapeHtml(t.fbFeedKicker)}</span>
               </div>
               <h3${veAttr({ kind: "ui", section: "newsPage", field: "fbFeedTitle" }, veSlot)} class="font-display heading-md" style="margin:0;color:${isDark ? "#fbf9f5" : "#181715"};${compact ? "font-size:1.25rem;" : "font-size:1.625rem;"}">${escapeHtml(t.fbFeedTitle)}</h3>
               ${!compact ? `<p${veAttr({ kind: "ui", section: "newsPage", field: "fbFeedSubtitle" }, veSlot)} style="margin:0;font-size:0.875rem;line-height:1.6;color:${isDark ? "rgba(251,249,245,0.75)" : "#5c5852"};">${escapeHtml(t.fbFeedSubtitle)}</p>` : ""}
             </div>
-            <div class="flex-row-wrap" style="gap:0.5rem;">
-              <button type="button" data-action="sync-fb-news" class="btn btn-outline" style="padding:0.45rem 0.75rem;font-size:0.75rem;${isDark ? "border-color:rgba(251,249,245,0.28);color:#fbf9f5;" : ""}">
-                ${state.fbSync.loading ? icon("loader", "icon-sm") : icon("refreshCw", "icon-sm")}
-                <span>${escapeHtml(state.fbSync.loading ? t.syncingFeed : t.refreshFeedBtn)}</span>
-              </button>
-              <a href="${escapeHtml(extUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="padding:0.45rem 0.85rem;font-size:0.75rem;">
-                <span>${escapeHtml(t.openFacebookBtn)}</span>
-                ${icon("externalLink", "icon-sm")}
-              </a>
-            </div>
+            <a href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="padding:0.45rem 0.85rem;font-size:0.75rem;">
+              <span>${escapeHtml(t.openFacebookBtn)}</span> ${icon("externalLink", "icon-sm")}
+            </a>
           </div>
-
-          ${
-            state.fbSync.error
-              ? `<p class="warn-box" style="margin:0;padding:0.65rem 0.85rem;font-size:0.75rem;">${escapeHtml(state.fbSync.error)}</p>`
-              : ""
-          }
-
-          ${
-            visiblePosts.length
-              ? `<div class="fb-posts-grid ${compact ? "is-compact" : ""}">
-                  ${visiblePosts
-                    .map(
-                      (post) => `
-                      <article class="fb-post-card ${compact ? "is-row" : ""}"${veAttr({ kind: "fbPost", id: post.id }, veSlot)}>
-                        <button type="button" data-action="${clickAction}" data-id="${escapeHtml(post.id)}" style="display:flex;${compact ? "flex-direction:row;align-items:stretch;" : "flex-direction:column;"}width:100%;text-align:start;flex:1;">
-                          <div class="fb-post-thumb">
-                            ${renderSafeImage(post.image, post.title[lang], "")}
-                          </div>
-                          <div style="padding:${compact ? "0.75rem 0.9rem" : "1rem"};display:flex;flex-direction:column;justify-content:space-between;gap:0.45rem;flex:1;min-width:0;">
-                            <div class="stack-xs">
-                              <div class="font-mono-tabular" style="font-size:11px;color:${isDark ? "#d4b886" : "#967542"};display:flex;align-items:center;gap:0.4rem;">
-                                <span>${escapeHtml(post.date)}</span>
-                                <span aria-hidden="true">·</span>
-                                <span>${escapeHtml(post.category[lang])}</span>
-                              </div>
-                              <h4 class="font-display line-clamp-2" style="margin:0;font-size:${compact ? "0.95rem" : "1.1rem"};line-height:1.4;color:${isDark ? "#fbf9f5" : "#181715"};">${escapeHtml(post.title[lang])}</h4>
-                              ${!compact ? `<p class="line-clamp-2" style="margin:0;font-size:0.8125rem;line-height:1.6;color:${isDark ? "rgba(251,249,245,0.75)" : "#5c5852"};">${escapeHtml(post.summary[lang])}</p>` : ""}
-                            </div>
-                            <span style="font-size:11px;font-weight:600;color:${isDark ? "#93c5fd" : "#1877f2"};">${escapeHtml(t.readArticle)}</span>
-                          </div>
-                        </button>
-                        <div style="padding:0.45rem ${compact ? "0.75rem" : "1rem"};border-top:1px solid ${isDark ? "rgba(251,249,245,0.08)" : "rgba(24,23,21,0.08)"};display:flex;align-items:center;justify-content:${isVe ? "space-between" : "flex-end"};gap:0.5rem;">
-                          ${
-                            isVe
-                              ? `<span class="ve-studio-chrome" style="display:inline-flex;gap:0.35rem;">
-                                  <button type="button" data-action="ve-delete-fb-post" data-id="${escapeHtml(post.id)}" class="ve-inline-action btn" style="padding:0.2rem 0.45rem;font-size:10px;background:rgba(154,52,18,0.16);border:1px solid rgba(154,52,18,0.4);color:${isDark ? "#fca5a5" : "#9a3412"};">
-                                    ${icon("trash", "icon-sm")}
-                                    <span>${escapeHtml(lang === "ar" ? "حذف" : "Delete")}</span>
-                                  </button>
-                                </span>`
-                              : ""
-                          }
-                          <a href="${escapeHtml(safeHref(post.externalUrl || extUrl))}" target="_blank" rel="noopener noreferrer" style="font-size:11px;font-weight:600;color:${isDark ? "rgba(251,249,245,0.75)" : "#5c5852"};display:inline-flex;align-items:center;gap:0.3rem;">
-                            <span>${escapeHtml(t.originalPostBtn)}</span>
-                            ${icon("externalLink", "icon-sm")}
-                          </a>
-                        </div>
-                      </article>`
-                    )
-                    .join("")}
-                </div>`
-              : `<div style="padding:1rem;border-radius:12px;background:${isDark ? "rgba(251,249,245,0.06)" : "#fbf9f5"};border:1px dashed ${isDark ? "rgba(251,249,245,0.2)" : "rgba(24,23,21,0.18)"};" class="stack-sm">
-                  <p style="margin:0;font-size:0.8125rem;line-height:1.65;color:${isDark ? "rgba(251,249,245,0.8)" : "#5c5852"};">
-                    ${escapeHtml(
-                      isFileOrigin
-                        ? t.fileOriginHint
-                        : state.fbSync.loading
-                          ? t.syncingFeed
-                          : (lang === "ar" ? "اضغط على «تحديث المنشورات» لعرض أحدث الأخبار والمنشورات من الصفحة الرسمية." : lang === "fr" ? "Cliquez sur Actualiser pour charger les dernières publications." : "Click Refresh to load the latest news posts from the official page.")
-                    )}
-                  </p>
-                </div>`
-          }
-
-          <div class="flex-between" style="font-size:11px;color:${isDark ? "rgba(251,249,245,0.6)" : "#8b857c"};">
-            <span class="font-mono-tabular" dir="ltr">${escapeHtml(extUrl)}</span>
-            ${
-              visiblePosts.length
-                ? `<span>${escapeHtml(`${visiblePosts.length} ${t.syncedLabel}`)}</span>`
-                : `<span>${escapeHtml(lang === "ar" ? "أحدث أخبار الصفحة الرسمية" : lang === "fr" ? "Dernières actualités officielles" : "Latest official news")}</span>`
-            }
+          <div class="fb-feed-frame" style="min-height:${height}px;">
+            <iframe
+              title="${escapeHtml(lang === "ar" ? "آخر منشورات صفحة دار الشباب ماسرى على فيسبوك" : lang === "fr" ? "Dernières publications de la Maison de Jeunes de Masra sur Facebook" : "Latest posts from Maison de Jeunes de Masra on Facebook")}"
+              src="${escapeHtml(pluginUrl)}"
+              width="${width}"
+              height="${height}"
+              loading="lazy"
+              scrolling="yes"
+              frameborder="0"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="encrypted-media; picture-in-picture; web-share"
+              style="height:${height}px;"
+            ></iframe>
+          </div>
+          <div class="fb-feed-fallback">
+            <span>${escapeHtml(fallbackText)}</span>
+            <a href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer" class="editorial-link" style="font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
+              ${escapeHtml(t.openFacebookBtn)}
+            </a>
           </div>
         </div>
       `;
@@ -4314,7 +4123,6 @@
       fbNews: (readLocalJson(FB_CACHE_STORAGE, null)?.items || []),
       fbPageName: (readLocalJson(FB_CACHE_STORAGE, null)?.pageName || ""),
       fbSync: { loading: false, lastSyncedAt: (readLocalJson(FB_CACHE_STORAGE, null)?.syncedAt || ""), error: "", mode: "direct" },
-      fbEmbedNonce: 0,
       adminTab: "settings",
       savedFlag: false,
       savedTimer: null,
@@ -4331,11 +4139,11 @@
       newsDraft: {
         title_ar: "", title_fr: "", title_en: "",
         summary_ar: "", summary_fr: "", summary_en: "",
-        image: "/src/assets/images/event_cultural_forum_1794615114219.jpg"
+        image: "./images/event_cultural_forum_1794615114219.jpg"
       },
-      newEvent: { title: "", date: "2026-12-22", image: "/src/assets/images/hero_masra_pavilion_1794615113578.jpg" },
-      newActivity: { title: "", categoryKey: "cultural", image: "/src/assets/images/activity_arts_atelier_1794615113765.jpg" },
-      newGallery: { title: "", image: "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg" },
+      newEvent: { title: "", date: "2026-12-22", image: "./images/hero_masra_pavilion_1794615113578.jpg" },
+      newActivity: { title: "", categoryKey: "cultural", image: "./images/activity_arts_atelier_1794615113765.jpg" },
+      newGallery: { title: "", image: "./images/gallery_courtyard_detail_1794615114519.jpg" },
       activeVeTarget: null,
 
       settings: loadInitialSettings(),
@@ -4346,7 +4154,6 @@
       gallery: readLocalJson("mjm_gallery", DEFAULT_GALLERY),
       uiStrings: readLocalJson("mjm_ui_strings", DEFAULT_UI_STRINGS),
       geminiApiKey: getGeminiApiKey(),
-      fbToken: getFbToken(),
       footerTap: { count: 0, lastAt: 0 }
     };
 
@@ -4989,7 +4796,7 @@
                 </div>
               </div>
               <div class="col-span-6 editorial-image-frame media-frame rounded-16" style="min-height:360px;"${veAttr({ kind: "aboutField", field: "homeImage" }, "home-about")}>
-                ${renderSafeImage(state.about.homeImage || "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg", state.about.history.title[lang], "")}
+                ${renderSafeImage(state.about.homeImage || "./images/gallery_courtyard_detail_1794615114519.jpg", state.about.history.title[lang], "")}
               </div>
             </div>
           </section>`,
@@ -5190,7 +4997,7 @@
 
           <section class="grid-12" style="align-items:stretch;">
             <div class="col-span-5 media-frame rounded-16" style="min-height:320px;"${veAttr({ kind: "aboutField", field: "history.image" }, "about")}>
-              ${renderSafeImage(ab.history?.image || "/src/assets/images/hero_masra_pavilion_1794615113578.jpg", ab.history.title[lang], "")}
+              ${renderSafeImage(ab.history?.image || "./images/hero_masra_pavilion_1794615113578.jpg", ab.history.title[lang], "")}
             </div>
             <div class="col-span-7" style="display:flex;flex-direction:column;justify-content:center;gap:1.5rem;">
               <p class="drop-cap text-ink" style="font-size:1.0625rem;line-height:1.75;margin:0;"${veAttr({ kind: "aboutField", field: "history.body" }, "about")}>${escapeHtml(ab.history.body[lang])}</p>
@@ -6133,13 +5940,13 @@
               ${renderAdminImageControl({
                 language: lang,
                 label: lang === "ar" ? "صورة صفحة من نحن" : lang === "fr" ? "Image de la page À propos" : "About Page Image",
-                value: ab.history?.image || "/src/assets/images/hero_masra_pavilion_1794615113578.jpg",
+                value: ab.history?.image || "./images/hero_masra_pavilion_1794615113578.jpg",
                 bindKey: "about.history.image"
               })}
               ${renderAdminImageControl({
                 language: lang,
                 label: lang === "ar" ? "صورة قسم من نحن (الصفحة الرئيسية)" : lang === "fr" ? "Image section À propos (Accueil)" : "Home About Section Image",
-                value: ab.homeImage || "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg",
+                value: ab.homeImage || "./images/gallery_courtyard_detail_1794615114519.jpg",
                 bindKey: "about.homeImage"
               })}
             </div>
@@ -6202,10 +6009,10 @@
                   <h2 class="font-display heading-md" style="margin:0;">${escapeHtml(lang === "ar" ? "ربط وإدارة عنصر آخر منشورات فيسبوك" : lang === "fr" ? "Gestion des publications Facebook officielles" : "Official Facebook Posts Element")}</h2>
                 </div>
                 <div class="flex-row-wrap" style="gap:0.45rem;">
-                  <button type="button" data-action="sync-fb-news" class="btn btn-gold" style="padding:0.45rem 0.9rem;">
-                    ${state.fbSync.loading ? icon("loader", "icon-sm") : icon("refreshCw", "icon-sm")}
-                    <span>${escapeHtml(lang === "ar" ? "تحديث ومزامنة المنشورات الآن" : lang === "fr" ? "Synchroniser maintenant" : "Sync & Refresh Now")}</span>
-                  </button>
+                  <a href="https://www.facebook.com/mjmesra" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="padding:0.45rem 0.9rem;">
+                    ${icon("externalLink", "icon-sm")}
+                    <span>${escapeHtml(lang === "ar" ? "فتح صفحة فيسبوك" : lang === "fr" ? "Ouvrir Facebook" : "Open Facebook Page")}</span>
+                  </a>
                   <button type="button" data-action="toggle-fb-setting" data-key="enabled" class="btn" style="padding:0.45rem 0.9rem;${fbCfg.enabled !== false ? "background:rgba(154,52,18,0.1);border:1px solid rgba(154,52,18,0.3);color:#9a3412;" : "background:#14532d;color:#fbf9f5;"}">
                     ${fbCfg.enabled !== false ? icon("trash", "icon-sm") : icon("rotateCcw", "icon-sm")}
                     <span>${escapeHtml(lang === "ar" ? (fbCfg.enabled !== false ? "حذف عنصر فيسبوك من الموقع" : "استعادة عنصر فيسبوك للموقع") : (fbCfg.enabled !== false ? "Delete FB Section" : "Restore FB Section"))}</span>
@@ -6217,10 +6024,10 @@
                   fbCfg.enabled === false
                     ? (lang === "ar" ? "عنصر «آخر منشورات دار الشباب على فيسبوك» محذوف/مخفي حالياً من صفحات المنصة. اضغط «استعادة عنصر فيسبوك للموقع» أعلاه لإعادته في أي وقت." : "The Facebook Posts element is currently removed/hidden. Click Restore above to re-enable it.")
                     : (lang === "ar"
-                      ? "يتم جلب وعرض منشورات الصفحة الرسمية لدار الشباب (https://www.facebook.com/mjmesra) مباشرة. يمكنك تعديل نصوص العنصر، تعديل أي منشور أو صورته، أو حذفه نهائياً."
+                      ? "يتم عرض موجز الصفحة العامة عبر أداة Facebook الرسمية. لا يحتاج الموقع إلى رمز وصول أو إعداد Cloudflare. قد يطلب فيسبوك تسجيل الدخول، كما أن شكل المنشورات داخل الإطار تحدده Meta."
                       : lang === "fr"
-                        ? "Les publications de la page officielle (https://www.facebook.com/mjmesra) sont affichées directement. Vous pouvez modifier le titre, éditer ou supprimer n'importe quelle publication."
-                        : "Posts from https://www.facebook.com/mjmesra load directly. You can edit the section headings, edit any post or image, or delete individual posts or the entire section.")
+                        ? "Le fil public est intégré avec le plugin officiel Facebook. Aucun jeton d'accès ni configuration Cloudflare n'est nécessaire. Facebook contrôle l'affichage du contenu intégré."
+                        : "The public Page timeline is embedded using Meta's official Facebook Page Plugin. No access token or Cloudflare setup is required. Facebook controls the embedded post layout.")
                 )}
               </p>
               <div class="grid-2" style="gap:0.75rem;">
@@ -6228,17 +6035,11 @@
                   <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط الصفحة الرسمية على فيسبوك" : "Official Facebook Page URL")}</span>
                   <input type="url" dir="ltr" value="${escapeHtml(fbCfg.pageUrl || "https://www.facebook.com/mjmesra")}" data-bind="settings.facebookFeed.pageUrl" class="input-field font-mono-tabular" />
                 </label>
-                <label class="stack-xs" style="font-size:0.75rem;">
-                  <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط خلاصة RSS/JSON (اختياري لبطاقات الأخبار)" : "Optional RSS / JSON Feed URL")}</span>
-                  <input type="url" dir="ltr" placeholder="https://rss.app/feeds/....json" value="${escapeHtml(fbCfg.rssJsonUrl || "")}" data-bind="settings.facebookFeed.rssJsonUrl" class="input-field font-mono-tabular" />
-                </label>
               </div>
               ${renderLocalizedFieldGrid(lang === "ar" ? "عنوان عنصر منشورات فيسبوك" : "Facebook Feed Title", { ar: fbUiAr.fbFeedTitle || "", fr: fbUiFr.fbFeedTitle || "", en: fbUiEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
               ${renderLocalizedFieldGrid(lang === "ar" ? "الوصف الفرعي لعنصر فيسبوك" : "Facebook Feed Subtitle", { ar: fbUiAr.fbFeedSubtitle || "", fr: fbUiFr.fbFeedSubtitle || "", en: fbUiEn.fbFeedSubtitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
               <div class="flex-row-wrap" style="gap:0.75rem;">
-                <button type="button" data-action="toggle-fb-setting" data-key="autoMergeSynced" class="btn-pill ${fbCfg.autoMergeSynced !== false ? "is-active" : ""}">
-                  ${escapeHtml(lang === "ar" ? "دمج المنشورات المتزامنة في الأخبار" : "Merge Synced Posts")}
-                </button>
+                
                 ${
                   deletedFbCount > 0
                     ? `<button type="button" data-action="restore-fb-deleted" class="btn btn-outline" style="padding:0.35rem 0.75rem;font-size:0.75rem;">
@@ -6247,11 +6048,6 @@
                       </button>`
                     : ""
                 }
-              </div>
-              <div class="flex-row-wrap" style="gap:0.5rem;">
-                <input type="password" id="admin-fb-token-input" dir="ltr" value="${escapeHtml(state.fbToken)}" placeholder="${escapeHtml(lang === "ar" ? "رمز Meta Graph API اختياري (يُحفظ محلياً في المتصفح فقط)" : "Optional Meta Page Access Token (local browser only)")}" class="input-field font-mono-tabular" style="flex:1;min-width:220px;" />
-                <button type="button" data-action="save-fb-token" class="btn btn-dark" style="padding:0.45rem 0.9rem;">${escapeHtml(lang === "ar" ? "حفظ الرمز" : "Save Token")}</button>
-                ${state.fbToken ? `<button type="button" data-action="clear-fb-token" class="btn btn-outline" style="padding:0.45rem 0.75rem;">${escapeHtml(lang === "ar" ? "حذف" : "Clear")}</button>` : ""}
               </div>
               ${
                 state.fbSync.error
@@ -6923,8 +6719,8 @@
           case "history.body": coreHtml = renderLocalizedFieldGrid("History Body", ab.history.body, { multiline: true, rows: 4, bindPrefix: "about.history.body" }); break;
           case "mission": coreHtml = renderLocalizedFieldGrid("Mission", ab.mission, { multiline: true, rows: 3, bindPrefix: "about.mission" }); break;
           case "vision": coreHtml = renderLocalizedFieldGrid("Vision", ab.vision, { multiline: true, rows: 3, bindPrefix: "about.vision" }); break;
-          case "history.image": coreHtml = renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة صفحة من نحن" : "About Page Image", value: ab.history?.image || "/src/assets/images/hero_masra_pavilion_1794615113578.jpg", bindKey: "about.history.image" }); break;
-          case "homeImage": coreHtml = renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة قسم من نحن (الرئيسية)" : "Home About Section Image", value: ab.homeImage || "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg", bindKey: "about.homeImage" }); break;
+          case "history.image": coreHtml = renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة صفحة من نحن" : "About Page Image", value: ab.history?.image || "./images/hero_masra_pavilion_1794615113578.jpg", bindKey: "about.history.image" }); break;
+          case "homeImage": coreHtml = renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة قسم من نحن (الرئيسية)" : "Home About Section Image", value: ab.homeImage || "./images/gallery_courtyard_detail_1794615114519.jpg", bindKey: "about.homeImage" }); break;
         }
       } else if (target.kind === "aboutValue") {
         const idx = target.index;
@@ -7031,19 +6827,12 @@
                 <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط الصفحة الرسمية على فيسبوك" : "Facebook Page URL")}</span>
                 <input type="url" dir="ltr" value="${escapeHtml(fbCfg.pageUrl || "https://www.facebook.com/mjmesra")}" data-bind="settings.facebookFeed.pageUrl" class="input-field font-mono-tabular" />
               </label>
-              <label class="stack-xs" style="font-size:0.75rem;">
-                <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط خلاصة RSS/JSON (اختياري)" : "RSS / JSON Feed URL (Optional)")}</span>
-                <input type="url" dir="ltr" value="${escapeHtml(fbCfg.rssJsonUrl || "")}" data-bind="settings.facebookFeed.rssJsonUrl" class="input-field font-mono-tabular" />
-              </label>
             </div>
             <div class="flex-row-wrap" style="gap:0.5rem;">
-              <button type="button" data-action="sync-fb-news" class="btn btn-gold" style="padding:0.45rem 0.85rem;font-size:0.75rem;">
-                ${icon("refreshCw", "icon-sm")}
-                <span>${escapeHtml(lang === "ar" ? "تحديث المنشورات الآن" : "Sync Posts Now")}</span>
-              </button>
-              <button type="button" data-action="toggle-fb-setting" data-key="autoMergeSynced" class="btn-pill ${fbCfg.autoMergeSynced !== false ? "is-active" : ""}">
-                ${escapeHtml(lang === "ar" ? "دمج في الأخبار الرئيسية" : "Merge Into Main News")}
-              </button>
+              <a href="https://www.facebook.com/mjmesra" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="padding:0.45rem 0.85rem;font-size:0.75rem;">
+                ${icon("externalLink", "icon-sm")}
+                <span>${escapeHtml(lang === "ar" ? "فتح الصفحة الرسمية" : lang === "fr" ? "Ouvrir la page officielle" : "Open Official Page")}</span>
+              </a>
             </div>
             <div class="hairline-t" style="padding-top:0.85rem;display:flex;justify-content:flex-end;">
               <button type="button" data-action="ve-delete-fb-section" class="btn" style="padding:0.5rem 0.95rem;background:rgba(154,52,18,0.12);border:1px solid rgba(154,52,18,0.35);color:#9a3412;font-weight:600;">
@@ -7882,24 +7671,6 @@
           await syncFacebookNewsFeed({ force: true });
           break;
         }
-        case "save-fb-token": {
-          const inp = document.getElementById("admin-fb-token-input");
-          if (inp) {
-            state.fbToken = inp.value.trim();
-            setFbToken(state.fbToken);
-            flashAdminSaved();
-            await syncFacebookNewsFeed({ force: true });
-          }
-          break;
-        }
-        case "clear-fb-token":
-          state.fbToken = "";
-          setFbToken("");
-          state.fbNews = [];
-          removeLocalKeys([FB_CACHE_STORAGE]);
-          flashAdminSaved();
-          renderShell({ preserve3D: false });
-          break;
         case "select-article":
           state.selectedArticleId = actionEl.getAttribute("data-id");
           renderShell({ preserve3D: false });
@@ -8466,10 +8237,10 @@
           title: { ar: d.title_ar || d.title_en || d.title_fr, fr: d.title_fr || d.title_en || d.title_ar, en: d.title_en || d.title_fr || d.title_ar },
           summary: { ar: d.summary_ar || d.summary_en, fr: d.summary_fr || d.summary_en, en: d.summary_en || d.summary_fr },
           body: { ar: d.summary_ar || d.summary_en, fr: d.summary_fr || d.summary_en, en: d.summary_en || d.summary_fr },
-          image: d.image || "/src/assets/images/event_cultural_forum_1794615114219.jpg"
+          image: d.image || "./images/event_cultural_forum_1794615114219.jpg"
         };
         updateNews([entry, ...state.news]);
-        state.newsDraft = { title_ar: "", title_fr: "", title_en: "", summary_ar: "", summary_fr: "", summary_en: "", image: "/src/assets/images/event_cultural_forum_1794615114219.jpg" };
+        state.newsDraft = { title_ar: "", title_fr: "", title_en: "", summary_ar: "", summary_fr: "", summary_en: "", image: "./images/event_cultural_forum_1794615114219.jpg" };
         flashAdminSaved();
         renderShell({ preserve3D: false });
         return;
@@ -8487,7 +8258,7 @@
           title: { ar: ne.title, fr: ne.title, en: ne.title },
           description: { ar: "[حدث مضاف عبر لوحة الإدارة المحلية]", fr: "[Événement ajouté via l'administration locale]", en: "[Event added via Local Studio Admin]" },
           registrationNote: { ar: "التسجيل مفتوح محلياً.", fr: "Inscription ouverte localement.", en: "Open local registration." },
-          image: ne.image || "/src/assets/images/hero_masra_pavilion_1794615113578.jpg"
+          image: ne.image || "./images/hero_masra_pavilion_1794615113578.jpg"
         };
         updateEvents([item, ...state.events]);
         state.newEvent.title = "";
@@ -8527,7 +8298,7 @@
           title: { ar: ng.title, fr: ng.title, en: ng.title },
           caption: { ar: ng.title, fr: ng.title, en: ng.title },
           aspect: "landscape",
-          image: ng.image || "/src/assets/images/gallery_courtyard_detail_1794615114519.jpg"
+          image: ng.image || "./images/gallery_courtyard_detail_1794615114519.jpg"
         };
         updateGallery([nextItem, ...state.gallery]);
         state.newGallery.title = "";
@@ -8586,9 +8357,10 @@
     });
 
     function initApp() {
+      // Clear any previously cached API posts before the first render.
+      syncFacebookNewsFeed({ silent: true });
       renderShell({ preserve3D: false });
       mountCustomCursor();
-      syncFacebookNewsFeed({ silent: true });
     }
 
     initApp();
