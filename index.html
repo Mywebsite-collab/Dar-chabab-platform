@@ -1118,7 +1118,7 @@
       overflow: hidden;
       padding: 1.25rem;
       display: grid;
-      grid-template-columns: minmax(220px, 0.85fr) minmax(280px, 1.15fr);
+      grid-template-columns: minmax(180px, 0.72fr) minmax(280px, 1.25fr) minmax(190px, 0.78fr);
       align-items: center;
       gap: 1.25rem;
     }
@@ -1139,6 +1139,50 @@
     .fb-feed-fallback {
       grid-column: 1 / -1;
     }
+    .fb-feed-qr {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      min-width: 0;
+      padding: 0.85rem;
+      border-radius: 16px;
+      border: 1px solid rgba(212,168,79,0.55);
+      background: linear-gradient(155deg, rgba(212,168,79,0.16), rgba(16,45,82,0.08) 58%, rgba(255,255,255,0.72));
+      box-shadow: 0 12px 30px rgba(20,35,55,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
+      text-align: center;
+    }
+    .fb-feed-qr img {
+      display: block;
+      width: 100%;
+      max-width: 230px;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #fff;
+      border: 3px solid #d4a84f;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+    }
+    .fb-feed-qr-title {
+      margin: 0;
+      color: inherit;
+      font-weight: 800;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .fb-feed-qr-note {
+      margin: 0;
+      color: inherit;
+      opacity: 0.78;
+      font-size: 0.78rem;
+      line-height: 1.6;
+    }
+
     .fb-feed-panel.is-dark {
       background: #22201d;
       border: 1px solid rgba(251, 249, 245, 0.14);
@@ -1195,6 +1239,7 @@
       }
       .fb-feed-heading,
       .fb-feed-frame,
+      .fb-feed-qr,
       .fb-feed-fallback {
         grid-column: 1;
         grid-row: auto;
@@ -2887,6 +2932,13 @@
               style="height:${height}px;"
             ></iframe>
           </div>
+          <aside class="fb-feed-qr" aria-label="Official QR code">
+            <p class="fb-feed-qr-title">${escapeHtml(lang === "ar" ? "تابعنا وامسح الرمز" : lang === "fr" ? "Scannez notre QR code" : "Scan our official QR code")}</p>
+            <a href="https://www.facebook.com/mjmesra" target="_blank" rel="noopener noreferrer" aria-label="Open official Facebook page">
+              <img src="https://raw.githubusercontent.com/Mywebsite-collab/Dar-chabab-platform/fix/platform-stability-audit/file_00000000cdcc81f49d55235738fa813a.png" alt="QR code officiel de la page Dar Chabab Si Salem" loading="lazy" decoding="async">
+            </a>
+            <p class="fb-feed-qr-note">${escapeHtml(lang === "ar" ? "امسح للوصول السريع إلى الصفحة الرسمية ومشاريع الشباب" : lang === "fr" ? "Accès rapide à notre page officielle et aux projets des jeunes" : "Quick access to our official page and youth projects")}</p>
+          </aside>
           <div class="fb-feed-fallback">
             <span>${escapeHtml(fallbackText)}</span>
             <a href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer" class="editorial-link" style="font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
