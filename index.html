@@ -1214,7 +1214,6 @@
   <div id="visual-overlay-root"></div>
   <div id="custom-cursor" class="custom-cursor" style="display:none;" aria-hidden="true"></div>
 
-  <script src="./facebook-feed-config.js"></script>
   <script type="module">
     const DEFAULT_SETTINGS = {
       institution: {
@@ -2735,74 +2734,12 @@
       return merged;
     }
 
-    async function syncFacebookNewsFeed({ force = false, silent = false } = {}) {
-      const cfg = state.settings?.facebookFeed || DEFAULT_SETTINGS.facebookFeed;
-      if (cfg.enabled === false) return { ok: false, mode: "disabled" };
-      const pageUrl = "https://www.facebook.com/mjmesra";
-      const limit = Math.max(1, Math.min(20, Number(cfg.syncLimit) || 8));
-      const deletedSet = new Set(Array.isArray(cfg.deletedPostIds) ? cfg.deletedPostIds : []);
-      const existingById = new Map((Array.isArray(state.fbNews) ? state.fbNews : []).map((it) => [it.id, it]));
-      const cached = readLocalJson(FB_CACHE_STORAGE, null);
-
-      if (!force && cached?.syncedAt && Array.isArray(cached.items) && cached.items.length && cached.pageUrl === pageUrl) {
-        const ageMs = Date.now() - new Date(cached.syncedAt).getTime();
-        if (ageMs < 3 * 60 * 1000) {
-          state.fbNews = cached.items.filter((it) => it && !deletedSet.has(it.id));
-          state.fbPageName = cached.pageName || "";
-          state.fbSync = { loading: false, lastSyncedAt: cached.syncedAt, error: "", mode: "server" };
-          return { ok: true, cached: true };
-        }
-      }
-
-      state.fbSync = { ...state.fbSync, loading: true, error: "" };
+    async function syncFacebookNewsFeed({ silent = false } = {}) {
+      // Facebook's official Page Plugin now renders the live public timeline.
+      // No Graph API request, access token, or third-party feed service is used.
+      state.fbSync = { loading: false, lastSyncedAt: new Date().toISOString(), error: "", mode: "embedded" };
       if (!silent) renderShell({ preserve3D: state.activePage === "home" });
-      try {
-        if (window.location.protocol === "file:") {
-          throw new Error(state.language === "ar" ? "شغّل الموقع عبر الخادم لعرض الأخبار المباشرة." : "Run the site through its server to load live posts.");
-        }
-        const feedApiBase = String(window.MJM_FACEBOOK_API_URL || "").trim().replace(/\/+$/, "");
-        if (!feedApiBase) {
-          throw new Error(state.language === "ar"
-            ? "لم يتم ضبط رابط خدمة أخبار فيسبوك بعد. راجع إعداد facebook-feed-config.js."
-            : "Facebook feed service URL is not configured. Check facebook-feed-config.js.");
-        }
-        const res = await fetch(`${feedApiBase}/api/facebook-feed?limit=${limit}`, {
-          headers: { Accept: "application/json" },
-          cache: "no-store"
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data.ok) throw new Error(data?.message || data?.error || `Facebook feed API (${res.status})`);
-
-        const normalized = (Array.isArray(data.posts) ? data.posts : [])
-          .filter((r) => r && (r.message || r.full_picture))
-          .slice(0, limit)
-          .map((r) => normalizeFacebookPostToNews({
-            id: r.id, message: r.message || "", date: r.created_time,
-            url: r.permalink_url || pageUrl, image: r.full_picture || ""
-          }, pageUrl));
-        const mergedPosts = normalized
-          .filter((item) => item && !deletedSet.has(item.id))
-          .map((item) => {
-            const existing = existingById.get(item.id);
-            return existing?.editedLocally ? existing : item;
-          });
-        const nowIso = data.syncedAt || new Date().toISOString();
-        state.fbPageName = data.pageName || "دار الشباب ماسرى";
-        state.fbSync = { loading: false, lastSyncedAt: nowIso, error: "", mode: "server" };
-        updateFbNews(mergedPosts, { syncedAt: nowIso, pageUrl, pageName: state.fbPageName });
-      } catch (err) {
-        state.fbSync = { ...state.fbSync, loading: false, error: err instanceof Error ? err.message : "Feed sync failed" };
-      }
-      if (state.activePage === "home") {
-        const slot = document.getElementById("home-news-live-slot");
-        if (slot) {
-          slot.innerHTML = renderHomeNewsColumnHtml();
-          applyElementStyles(slot);
-          return { ok: !state.fbSync.error };
-        }
-      }
-      renderShell({ preserve3D: state.activePage === "home" });
-      return { ok: !state.fbSync.error };
+      return { ok: true, mode: "embedded" };
     }
 
     function renderFacebookFeedWidget({ variant = "light", compact = false, slot = "" } = {}) {
@@ -2810,129 +2747,61 @@
       const t = tLocale().newsPage;
       const cfg = state.settings?.facebookFeed || DEFAULT_SETTINGS.facebookFeed;
       if (cfg.enabled === false) return "";
-      const pageUrl = safeHref(cfg.pageUrl || "https://www.facebook.com/mjmesra");
-      const extUrl = pageUrl.startsWith("http") ? pageUrl : "https://www.facebook.com/mjmesra";
-      const slug = extractFacebookSlug(extUrl);
+      const configuredUrl = safeHref(cfg.pageUrl || "https://www.facebook.com/mjmesra");
+      const pageUrl = configuredUrl.startsWith("http") ? configuredUrl : "https://www.facebook.com/mjmesra";
       const isDark = variant === "dark";
-      const isFileOrigin = window.location.protocol === "file:";
-      const posts = Array.isArray(state.fbNews) ? state.fbNews : [];
-      const limit = compact ? 3 : Math.max(1, Math.min(12, Number(cfg.syncLimit) || 6));
-      const visiblePosts = posts.slice(0, limit);
-      const clickAction = state.activePage === "news" ? "select-article" : "open-news";
+      const height = compact ? 480 : 760;
+      const pluginUrl = "https://www.facebook.com/plugins/page.php"
+        + "?href=" + encodeURIComponent(pageUrl)
+        + "&tabs=timeline&width=500&height=" + height
+        + "&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false";
       const veSlot = slot || (compact ? "home" : "news");
       const isVe = state.adminUnlocked && state.visualEditMode && !state.browseOverride && state.activePage !== "admin";
 
       return `
         <div class="fb-feed-panel ${isDark ? "is-dark" : "is-light"}"${veAttr({ kind: "fbFeedSection" }, veSlot)}>
-          ${
-            isVe
-              ? `<div class="ve-studio-chrome flex-between" style="padding:0.45rem 0.7rem;border-radius:10px;background:rgba(176,141,87,0.16);border:1px dashed rgba(176,141,87,0.65);gap:0.5rem;">
-                  <span style="font-size:11px;font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
-                    ${escapeHtml(lang === "ar" ? "عنصر منشورات فيسبوك — قابل للتعديل أو الحذف" : lang === "fr" ? "Section Facebook — modifiable ou supprimable" : "Facebook Feed — Editable or Deletable")}
-                  </span>
-                  <div class="flex-row-wrap" style="gap:0.35rem;">
-                    <button type="button" data-action="ve-open-fb-section" class="ve-inline-action btn btn-gold" style="padding:0.25rem 0.6rem;font-size:11px;">
-                      <span>${escapeHtml(lang === "ar" ? "تعديل العنصر" : lang === "fr" ? "Modifier" : "Edit Element")}</span>
-                    </button>
-                    <button type="button" data-action="ve-delete-fb-section" class="ve-inline-action btn" style="padding:0.25rem 0.6rem;font-size:11px;background:rgba(154,52,18,0.18);border:1px solid rgba(154,52,18,0.45);color:${isDark ? "#fca5a5" : "#9a3412"};">
-                      ${icon("trash", "icon-sm")}
-                      <span>${escapeHtml(lang === "ar" ? "حذف العنصر" : lang === "fr" ? "Supprimer" : "Delete Element")}</span>
-                    </button>
-                  </div>
-                </div>`
-              : ""
-          }
-          <div class="flex-between" style="gap:0.75rem;">
+          ${isVe ? `<div class="ve-studio-chrome flex-between" style="padding:0.45rem 0.7rem;border-radius:10px;background:rgba(176,141,87,0.16);border:1px dashed rgba(176,141,87,0.65);gap:0.5rem;">
+            <span style="font-size:11px;font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
+              ${escapeHtml(lang === "ar" ? "عنصر صفحة فيسبوك — قابل للتعديل أو الحذف" : lang === "fr" ? "Section Facebook — modifiable ou supprimable" : "Facebook Page — Editable or Deletable")}
+            </span>
+            <div class="flex-row-wrap" style="gap:0.35rem;">
+              <button type="button" data-action="ve-open-fb-section" class="ve-inline-action btn btn-gold" style="padding:0.25rem 0.6rem;font-size:11px;">
+                ${escapeHtml(lang === "ar" ? "تعديل العنصر" : lang === "fr" ? "Modifier" : "Edit Element")}
+              </button>
+              <button type="button" data-action="ve-delete-fb-section" class="ve-inline-action btn" style="padding:0.25rem 0.6rem;font-size:11px;background:rgba(154,52,18,0.18);border:1px solid rgba(154,52,18,0.45);color:${isDark ? "#fca5a5" : "#9a3412"};">
+                ${icon("trash", "icon-sm")} <span>${escapeHtml(lang === "ar" ? "حذف العنصر" : lang === "fr" ? "Supprimer" : "Delete Element")}</span>
+              </button>
+            </div>
+          </div>` : ""}
+          <div class="flex-between" style="gap:0.75rem;flex-wrap:wrap;">
             <div class="stack-xs">
               <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;">
-                <span class="fb-badge">${icon("globe", "icon-sm")}<span>${escapeHtml(state.fbPageName || `@${slug}`)}</span></span>
+                <span class="fb-badge">${icon("globe", "icon-sm")}<span>Facebook · ${escapeHtml(lang === "ar" ? "الصفحة الرسمية" : lang === "fr" ? "Page officielle" : "Official Page")}</span></span>
                 <span${veAttr({ kind: "ui", section: "newsPage", field: "fbFeedKicker" }, veSlot)} class="font-mono-tabular" style="font-size:11px;color:${isDark ? "rgba(251,249,245,0.65)" : "#5c5852"};">${escapeHtml(t.fbFeedKicker)}</span>
               </div>
               <h3${veAttr({ kind: "ui", section: "newsPage", field: "fbFeedTitle" }, veSlot)} class="font-display heading-md" style="margin:0;color:${isDark ? "#fbf9f5" : "#181715"};${compact ? "font-size:1.25rem;" : "font-size:1.625rem;"}">${escapeHtml(t.fbFeedTitle)}</h3>
               ${!compact ? `<p${veAttr({ kind: "ui", section: "newsPage", field: "fbFeedSubtitle" }, veSlot)} style="margin:0;font-size:0.875rem;line-height:1.6;color:${isDark ? "rgba(251,249,245,0.75)" : "#5c5852"};">${escapeHtml(t.fbFeedSubtitle)}</p>` : ""}
             </div>
-            <div class="flex-row-wrap" style="gap:0.5rem;">
-              <button type="button" data-action="sync-fb-news" class="btn btn-outline" style="padding:0.45rem 0.75rem;font-size:0.75rem;${isDark ? "border-color:rgba(251,249,245,0.28);color:#fbf9f5;" : ""}">
-                ${state.fbSync.loading ? icon("loader", "icon-sm") : icon("refreshCw", "icon-sm")}
-                <span>${escapeHtml(state.fbSync.loading ? t.syncingFeed : t.refreshFeedBtn)}</span>
-              </button>
-              <a href="${escapeHtml(extUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="padding:0.45rem 0.85rem;font-size:0.75rem;">
-                <span>${escapeHtml(t.openFacebookBtn)}</span>
-                ${icon("externalLink", "icon-sm")}
-              </a>
-            </div>
+            <a href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="padding:0.45rem 0.85rem;font-size:0.75rem;">
+              <span>${escapeHtml(t.openFacebookBtn)}</span> ${icon("externalLink", "icon-sm")}
+            </a>
           </div>
-
-          ${
-            state.fbSync.error
-              ? `<p class="warn-box" style="margin:0;padding:0.65rem 0.85rem;font-size:0.75rem;">${escapeHtml(state.fbSync.error)}</p>`
-              : ""
-          }
-
-          ${
-            visiblePosts.length
-              ? `<div class="fb-posts-grid ${compact ? "is-compact" : ""}">
-                  ${visiblePosts
-                    .map(
-                      (post) => `
-                      <article class="fb-post-card ${compact ? "is-row" : ""}"${veAttr({ kind: "fbPost", id: post.id }, veSlot)}>
-                        <button type="button" data-action="${clickAction}" data-id="${escapeHtml(post.id)}" style="display:flex;${compact ? "flex-direction:row;align-items:stretch;" : "flex-direction:column;"}width:100%;text-align:start;flex:1;">
-                          <div class="fb-post-thumb">
-                            ${renderSafeImage(post.image, post.title[lang], "")}
-                          </div>
-                          <div style="padding:${compact ? "0.75rem 0.9rem" : "1rem"};display:flex;flex-direction:column;justify-content:space-between;gap:0.45rem;flex:1;min-width:0;">
-                            <div class="stack-xs">
-                              <div class="font-mono-tabular" style="font-size:11px;color:${isDark ? "#d4b886" : "#967542"};display:flex;align-items:center;gap:0.4rem;">
-                                <span>${escapeHtml(post.date)}</span>
-                                <span aria-hidden="true">·</span>
-                                <span>${escapeHtml(post.category[lang])}</span>
-                              </div>
-                              <h4 class="font-display line-clamp-2" style="margin:0;font-size:${compact ? "0.95rem" : "1.1rem"};line-height:1.4;color:${isDark ? "#fbf9f5" : "#181715"};">${escapeHtml(post.title[lang])}</h4>
-                              ${!compact ? `<p class="line-clamp-2" style="margin:0;font-size:0.8125rem;line-height:1.6;color:${isDark ? "rgba(251,249,245,0.75)" : "#5c5852"};">${escapeHtml(post.summary[lang])}</p>` : ""}
-                            </div>
-                            <span style="font-size:11px;font-weight:600;color:${isDark ? "#93c5fd" : "#1877f2"};">${escapeHtml(t.readArticle)}</span>
-                          </div>
-                        </button>
-                        <div style="padding:0.45rem ${compact ? "0.75rem" : "1rem"};border-top:1px solid ${isDark ? "rgba(251,249,245,0.08)" : "rgba(24,23,21,0.08)"};display:flex;align-items:center;justify-content:${isVe ? "space-between" : "flex-end"};gap:0.5rem;">
-                          ${
-                            isVe
-                              ? `<span class="ve-studio-chrome" style="display:inline-flex;gap:0.35rem;">
-                                  <button type="button" data-action="ve-delete-fb-post" data-id="${escapeHtml(post.id)}" class="ve-inline-action btn" style="padding:0.2rem 0.45rem;font-size:10px;background:rgba(154,52,18,0.16);border:1px solid rgba(154,52,18,0.4);color:${isDark ? "#fca5a5" : "#9a3412"};">
-                                    ${icon("trash", "icon-sm")}
-                                    <span>${escapeHtml(lang === "ar" ? "حذف" : "Delete")}</span>
-                                  </button>
-                                </span>`
-                              : ""
-                          }
-                          <a href="${escapeHtml(safeHref(post.externalUrl || extUrl))}" target="_blank" rel="noopener noreferrer" style="font-size:11px;font-weight:600;color:${isDark ? "rgba(251,249,245,0.75)" : "#5c5852"};display:inline-flex;align-items:center;gap:0.3rem;">
-                            <span>${escapeHtml(t.originalPostBtn)}</span>
-                            ${icon("externalLink", "icon-sm")}
-                          </a>
-                        </div>
-                      </article>`
-                    )
-                    .join("")}
-                </div>`
-              :  `<div style="padding:1rem;border-radius:12px;background:${isDark ? "rgba(251,249,245,0.06)" : "#fbf9f5"};border:1px dashed ${isDark ? "rgba(251,249,245,0.2)" : "rgba(24,23,21,0.18)"};" class="stack-sm">
-                  <p style="margin:0;font-size:0.8125rem;line-height:1.65;color:${isDark ? "rgba(251,249,245,0.8)" : "#5c5852"};">
-                    ${escapeHtml(
-                      isFileOrigin
-                        ? t.fileOriginHint
-                        : state.fbSync.loading
-                          ? t.syncingFeed
-                          : (lang === "ar" ? "اضغط على «تحديث المنشورات» لعرض أحدث الأخبار والمنشورات من الصفحة الرسمية." : lang === "fr" ? "Cliquez sur Actualiser pour charger les dernières publications." : "Click Refresh to load the latest news posts from the official page.")
-                    )}
-                  </p>
-                </div>`
-          }
-
-          <div class="flex-between" style="font-size:11px;color:${isDark ? "rgba(251,249,245,0.6)" : "#8b857c"};">
-            <span class="font-mono-tabular" dir="ltr">${escapeHtml(extUrl)}</span>
-            ${
-              visiblePosts.length
-                ? `<span>${escapeHtml(`${visiblePosts.length} ${t.syncedLabel}`)}</span>`
-                : `<span>${escapeHtml(lang === "ar" ? "أحدث أخبار الصفحة الرسمية" : lang === "fr" ? "Dernières actualités officielles" : "Latest official news")}</span>`
-            }
+          <div style="width:100%;display:flex;justify-content:center;overflow:hidden;border-radius:12px;background:${isDark ? "#fff" : "#fff"};min-height:${height}px;">
+            <iframe
+              title="${escapeHtml(lang === "ar" ? "آخر منشورات صفحة دار الشباب ماسرى على فيسبوك" : "Latest posts from Maison de Jeunes de Masra on Facebook")}"
+              src="${escapeHtml(pluginUrl)}"
+              width="500"
+              height="${height}"
+              loading="lazy"
+              scrolling="no"
+              frameborder="0"
+              allow="encrypted-media; picture-in-picture; web-share"
+              style="width:100%;max-width:500px;height:${height}px;border:0;overflow:hidden;"
+            ></iframe>
+          </div>
+          <div class="flex-between" style="font-size:11px;color:${isDark ? "rgba(251,249,245,0.6)" : "#8b857c"};gap:0.5rem;flex-wrap:wrap;">
+            <span class="font-mono-tabular" dir="ltr">${escapeHtml(pageUrl)}</span>
+            <span>${escapeHtml(lang === "ar" ? "تُعرض المنشورات مباشرة من فيسبوك" : lang === "fr" ? "Publications intégrées depuis Facebook" : "Posts embedded directly from Facebook")}</span>
           </div>
         </div>
       `;
@@ -8434,7 +8303,6 @@
     function initApp() {
       renderShell({ preserve3D: false });
       mountCustomCursor();
-      syncFacebookNewsFeed({ silent: true });
     }
 
     initApp();
