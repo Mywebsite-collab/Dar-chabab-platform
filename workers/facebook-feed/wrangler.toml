@@ -1,0 +1,8 @@
+name = "mjm-facebook-feed"
+main = "index.js"
+compatibility_date = "2026-11-24"
+
+[vars]
+FB_GRAPH_VERSION = "v27.0"
+FB_PAGE_NAME = "دار الشباب ماسرى"
+ALLOWED_ORIGIN = "*"
