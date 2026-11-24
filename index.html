@@ -2737,6 +2737,9 @@
     async function syncFacebookNewsFeed({ silent = false } = {}) {
       // Facebook's official Page Plugin now renders the live public timeline.
       // No Graph API request, access token, or third-party feed service is used.
+      state.fbNews = [];
+      state.fbPageName = "";
+      removeLocalKeys([FB_CACHE_STORAGE]);
       state.fbSync = { loading: false, lastSyncedAt: new Date().toISOString(), error: "", mode: "embedded" };
       if (!silent) renderShell({ preserve3D: state.activePage === "home" });
       return { ok: true, mode: "embedded" };
@@ -5978,9 +5981,7 @@
               ${renderLocalizedFieldGrid(lang === "ar" ? "عنوان عنصر منشورات فيسبوك" : "Facebook Feed Title", { ar: fbUiAr.fbFeedTitle || "", fr: fbUiFr.fbFeedTitle || "", en: fbUiEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
               ${renderLocalizedFieldGrid(lang === "ar" ? "الوصف الفرعي لعنصر فيسبوك" : "Facebook Feed Subtitle", { ar: fbUiAr.fbFeedSubtitle || "", fr: fbUiFr.fbFeedSubtitle || "", en: fbUiEn.fbFeedSubtitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
               <div class="flex-row-wrap" style="gap:0.75rem;">
-                <button type="button" data-action="toggle-fb-setting" data-key="autoMergeSynced" class="btn-pill ${fbCfg.autoMergeSynced !== false ? "is-active" : ""}">
-                  ${escapeHtml(lang === "ar" ? "دمج المنشورات المتزامنة في الأخبار" : "Merge Synced Posts")}
-                </button>
+                
                 ${
                   deletedFbCount > 0
                     ? `<button type="button" data-action="restore-fb-deleted" class="btn btn-outline" style="padding:0.35rem 0.75rem;font-size:0.75rem;">
@@ -6770,13 +6771,10 @@
               </label>
             </div>
             <div class="flex-row-wrap" style="gap:0.5rem;">
-              <button type="button" data-action="sync-fb-news" class="btn btn-gold" style="padding:0.45rem 0.85rem;font-size:0.75rem;">
-                ${icon("refreshCw", "icon-sm")}
-                <span>${escapeHtml(lang === "ar" ? "تحديث المنشورات الآن" : "Sync Posts Now")}</span>
-              </button>
-              <button type="button" data-action="toggle-fb-setting" data-key="autoMergeSynced" class="btn-pill ${fbCfg.autoMergeSynced !== false ? "is-active" : ""}">
-                ${escapeHtml(lang === "ar" ? "دمج في الأخبار الرئيسية" : "Merge Into Main News")}
-              </button>
+              <a href="https://www.facebook.com/mjmesra" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="padding:0.45rem 0.85rem;font-size:0.75rem;">
+                ${icon("externalLink", "icon-sm")}
+                <span>${escapeHtml(lang === "ar" ? "فتح الصفحة الرسمية" : lang === "fr" ? "Ouvrir la page officielle" : "Open Official Page")}</span>
+              </a>
             </div>
             <div class="hairline-t" style="padding-top:0.85rem;display:flex;justify-content:flex-end;">
               <button type="button" data-action="ve-delete-fb-section" class="btn" style="padding:0.5rem 0.95rem;background:rgba(154,52,18,0.12);border:1px solid rgba(154,52,18,0.35);color:#9a3412;font-weight:600;">
