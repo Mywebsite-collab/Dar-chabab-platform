@@ -1131,22 +1131,6 @@
       border: 1px solid rgba(24, 23, 21, 0.12);
       color: #181715;
     }
-    .fb-embed-wrap {
-      width: 100%;
-      max-width: 100%;
-      margin-inline: auto;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #ffffff;
-      border: 1px solid rgba(24, 23, 21, 0.1);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
-    }
-    .fb-embed-frame {
-      width: 100%;
-      border: none;
-      display: block;
-      background: #ffffff;
-    }
     .fb-posts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -2395,7 +2379,6 @@
     const PUBLIC_PAGES = new Set(["home", "about", "activities", "events", "gallery", "news", "contact"]);
     const MASRA_DEFAULT_COORDS = { latitude: 35.8373, longitude: 0.1693 };
     const GEMINI_KEY_STORAGE = "mjm_gemini_api_key";
-    const FB_TOKEN_STORAGE = "mjm_fb_token";
     const FB_CACHE_STORAGE = "mjm_fb_news_cache";
 
     const SVG_PATHS = {
@@ -4203,7 +4186,6 @@
       fbNews: (readLocalJson(FB_CACHE_STORAGE, null)?.items || []),
       fbPageName: (readLocalJson(FB_CACHE_STORAGE, null)?.pageName || ""),
       fbSync: { loading: false, lastSyncedAt: (readLocalJson(FB_CACHE_STORAGE, null)?.syncedAt || ""), error: "", mode: "direct" },
-      fbEmbedNonce: 0,
       adminTab: "settings",
       savedFlag: false,
       savedTimer: null,
@@ -6909,10 +6891,6 @@
               <label class="stack-xs" style="font-size:0.75rem;">
                 <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط الصفحة الرسمية على فيسبوك" : "Facebook Page URL")}</span>
                 <input type="url" dir="ltr" value="${escapeHtml(fbCfg.pageUrl || "https://www.facebook.com/mjmesra")}" data-bind="settings.facebookFeed.pageUrl" class="input-field font-mono-tabular" />
-              </label>
-              <label class="stack-xs" style="font-size:0.75rem;">
-                <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط خلاصة RSS/JSON (اختياري)" : "RSS / JSON Feed URL (Optional)")}</span>
-                <input type="url" dir="ltr" value="${escapeHtml(fbCfg.rssJsonUrl || "")}" data-bind="settings.facebookFeed.rssJsonUrl" class="input-field font-mono-tabular" />
               </label>
             </div>
             <div class="flex-row-wrap" style="gap:0.5rem;">
