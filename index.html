@@ -2691,12 +2691,6 @@
       }
     }
 
-    function buildFacebookPluginUrl(pageUrl, { width = 500, height = 520, smallHeader = true } = {}) {
-      const target = safeHref(pageUrl || "https://www.facebook.com/mjmesra");
-      const finalUrl = target.startsWith("http") ? target : "https://www.facebook.com/mjmesra";
-      return `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(finalUrl)}&tabs=timeline&width=${width}&height=${height}&small_header=${smallHeader ? "true" : "false"}&adapt_container_width=true&hide_cover=true&show_facepile=false`;
-    }
-
     function stripHtmlText(html) {
       if (!html || typeof html !== "string") return "";
       const tmp = document.createElement("div");
@@ -2778,148 +2772,54 @@
     async function syncFacebookNewsFeed({ force = false, silent = false } = {}) {
       const cfg = state.settings?.facebookFeed || DEFAULT_SETTINGS.facebookFeed;
       if (cfg.enabled === false) return { ok: false, mode: "disabled" };
-      const pageUrl = cfg.pageUrl || "https://www.facebook.com/mjmesra";
-      const token = getFbToken();
-      const rssUrl = (cfg.rssJsonUrl || "").trim();
+      const pageUrl = "https://www.facebook.com/mjmesra";
       const limit = Math.max(1, Math.min(20, Number(cfg.syncLimit) || 8));
-      const isFileOrigin = window.location.protocol === "file:";
       const deletedSet = new Set(Array.isArray(cfg.deletedPostIds) ? cfg.deletedPostIds : []);
       const existingById = new Map((Array.isArray(state.fbNews) ? state.fbNews : []).map((it) => [it.id, it]));
-
-      if (!token && !rssUrl && isFileOrigin) {
-        const cached = readLocalJson(FB_CACHE_STORAGE, null);
-        if (cached?.pageUrl === pageUrl && Array.isArray(cached.items)) {
-          state.fbNews = cached.items.filter((it) => it && !deletedSet.has(it.id));
-          state.fbPageName = cached.pageName || "";
-        }
-        if (force) {
-          state.fbEmbedNonce += 1;
-          state.fbSync = { loading: false, lastSyncedAt: new Date().toISOString(), error: "", mode: "embed" };
-          if (!silent) renderShell({ preserve3D: state.activePage === "home" });
-        }
-        return { ok: true, mode: "embed" };
-      }
-
       const cached = readLocalJson(FB_CACHE_STORAGE, null);
+
       if (!force && cached?.syncedAt && Array.isArray(cached.items) && cached.items.length && cached.pageUrl === pageUrl) {
         const ageMs = Date.now() - new Date(cached.syncedAt).getTime();
-        if (ageMs < 10 * 60 * 1000) {
+        if (ageMs < 3 * 60 * 1000) {
           state.fbNews = cached.items.filter((it) => it && !deletedSet.has(it.id));
           state.fbPageName = cached.pageName || "";
-          state.fbSync = { loading: false, lastSyncedAt: cached.syncedAt, error: "", mode: token ? "graph" : rssUrl ? "rss" : "direct" };
+          state.fbSync = { loading: false, lastSyncedAt: cached.syncedAt, error: "", mode: "server" };
           return { ok: true, cached: true };
         }
       }
 
       state.fbSync = { ...state.fbSync, loading: true, error: "" };
       if (!silent) renderShell({ preserve3D: state.activePage === "home" });
-
       try {
-        let normalized = [];
-        let pageName = state.fbPageName || "";
-        let mode = "direct";
-        if (token) {
-          mode = "graph";
-          const slug = extractFacebookSlug(pageUrl);
-          const endpoint = `https://graph.facebook.com/v21.0/${encodeURIComponent(slug)}/posts?fields=id,message,created_time,permalink_url,full_picture&limit=${limit}&access_token=${encodeURIComponent(token)}`;
-          const res = await fetch(endpoint);
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok) {
-            throw new Error(data?.error?.message || `Facebook Graph API (${res.status})`);
-          }
-          const rows = Array.isArray(data?.data) ? data.data : [];
-          normalized = rows
-            .filter((r) => r && (r.message || r.full_picture))
-            .map((r) =>
-              normalizeFacebookPostToNews(
-                {
-                  id: r.id,
-                  message: r.message || "",
-                  date: r.created_time,
-                  url: r.permalink_url || pageUrl,
-                  image: r.full_picture || ""
-                },
-                pageUrl
-              )
-            );
-        } else if (rssUrl) {
-          mode = "rss";
-          const res = await fetch(rssUrl, { headers: { Accept: "application/json" } });
-          if (!res.ok) throw new Error(`Feed HTTP ${res.status}`);
-          const data = await res.json();
-          const rawItems = Array.isArray(data)
-            ? data
-            : Array.isArray(data?.items)
-              ? data.items
-              : Array.isArray(data?.data)
-                ? data.data
-                : Array.isArray(data?.posts)
-                  ? data.posts
-                  : [];
-          normalized = rawItems.slice(0, limit).map((it) =>
-            normalizeFacebookPostToNews(
-              {
-                id: it.id || it.guid || it.url || it.link,
-                title: it.title || "",
-                fullText: it.content_text || it.content_html || it.description || it.message || it.content || "",
-                date: it.date_published || it.pubDate || it.created_time || it.date,
-                url: it.url || it.link || it.permalink_url || pageUrl,
-                image: it.image || it.thumbnail || it.full_picture || it.enclosure?.link || it.enclosure?.url || ""
-              },
-              pageUrl
-            )
-          );
-        } else {
-          mode = "direct";
-          const res = await fetch(`/api/facebook-feed?url=${encodeURIComponent(pageUrl)}`);
-          const data = await res.json().catch(() => ({}));
-          if (!res.ok || !data.ok) {
-            throw new Error(data?.error || `Facebook page fetch (${res.status})`);
-          }
-          if (data.pageName) pageName = data.pageName;
-          const rows = Array.isArray(data.posts) ? data.posts : [];
-          normalized = rows
-            .filter((r) => r && (r.message || r.full_picture))
-            .slice(0, limit)
-            .map((r) =>
-              normalizeFacebookPostToNews(
-                {
-                  id: r.id,
-                  message: r.message || "",
-                  date: r.created_time,
-                  url: r.permalink_url || pageUrl,
-                  image: r.full_picture || ""
-                },
-                pageUrl
-              )
-            );
+        if (window.location.protocol === "file:") {
+          throw new Error(lang === "ar" ? "شغّل الموقع عبر الخادم لعرض الأخبار المباشرة." : "Run the site through its server to load live posts.");
         }
+        const res = await fetch(`/api/facebook-feed?limit=${limit}`, {
+          headers: { Accept: "application/json" },
+          cache: "no-store"
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) throw new Error(data?.message || data?.error || `Facebook feed API (${res.status})`);
 
+        const normalized = (Array.isArray(data.posts) ? data.posts : [])
+          .filter((r) => r && (r.message || r.full_picture))
+          .slice(0, limit)
+          .map((r) => normalizeFacebookPostToNews({
+            id: r.id, message: r.message || "", date: r.created_time,
+            url: r.permalink_url || pageUrl, image: r.full_picture || ""
+          }, pageUrl));
         const mergedPosts = normalized
           .filter((item) => item && !deletedSet.has(item.id))
           .map((item) => {
             const existing = existingById.get(item.id);
             return existing?.editedLocally ? existing : item;
           });
-
-        const nowIso = new Date().toISOString();
-        state.fbPageName = pageName;
-        state.fbEmbedNonce += 1;
-        state.fbSync = { loading: false, lastSyncedAt: nowIso, error: "", mode };
-        updateFbNews(mergedPosts, { syncedAt: nowIso, pageUrl, pageName });
+        const nowIso = data.syncedAt || new Date().toISOString();
+        state.fbPageName = data.pageName || "دار الشباب ماسرى";
+        state.fbSync = { loading: false, lastSyncedAt: nowIso, error: "", mode: "server" };
+        updateFbNews(mergedPosts, { syncedAt: nowIso, pageUrl, pageName: state.fbPageName });
       } catch (err) {
-        // Static hosting does not provide the optional /api/facebook-feed proxy.
-        // Fall back to Meta's official Page Plugin instead of showing a misleading 404.
-        if (!token && !rssUrl && !isFileOrigin) {
-          state.fbEmbedNonce += 1;
-          state.fbSync = { ...state.fbSync, loading: false, error: "", mode: "embed" };
-        } else {
-          state.fbSync = {
-            ...state.fbSync,
-            loading: false,
-            error: err instanceof Error ? err.message : "Sync failed"
-          };
-        }
+        state.fbSync = { ...state.fbSync, loading: false, error: err instanceof Error ? err.message : "Feed sync failed" };
       }
       if (state.activePage === "home") {
         const slot = document.getElementById("home-news-live-slot");
@@ -3041,25 +2941,7 @@
                     )
                     .join("")}
                 </div>`
-              : state.fbSync.mode === "embed"
-                ? `<div class="fb-embed-wrap" style="width:100%;max-width:500px;margin-inline:auto;min-height:520px;">
-                    <iframe
-                      class="fb-embed-frame"
-                      title="${escapeHtml(lang === "ar" ? "منشورات الصفحة الرسمية لدار الشباب ماسرى على فيسبوك" : lang === "fr" ? "Publications officielles de la Maison de Jeunes de Masra sur Facebook" : "Official Masra Youth House Facebook posts")}"
-                      src="${escapeHtml(buildFacebookPluginUrl(extUrl, { width: 500, height: 720, smallHeader: true }))}"
-                      width="500"
-                      height="720"
-                      loading="lazy"
-                      scrolling="no"
-                      frameborder="0"
-                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                      style="border:0;width:100%;min-height:520px;background:#fff;"
-                    ></iframe>
-                  </div>
-                  <p style="margin:0;font-size:0.75rem;line-height:1.6;color:${isDark ? "rgba(251,249,245,0.72)" : "#5c5852"};">
-                    ${escapeHtml(lang === "ar" ? "تُعرض المنشورات عبر أداة فيسبوك الرسمية. إذا لم تظهر بسبب إعدادات الخصوصية أو قيود الصفحة، يمكنك فتح الصفحة مباشرة من الزر أعلاه." : lang === "fr" ? "Les publications sont intégrées via le plugin officiel de Facebook. Si elles ne s’affichent pas en raison des paramètres de confidentialité, ouvrez la page directement." : "Posts are embedded using Facebook’s official plugin. If privacy settings prevent display, open the page directly using the button above.")}
-                  </p>`
-                : `<div style="padding:1rem;border-radius:12px;background:${isDark ? "rgba(251,249,245,0.06)" : "#fbf9f5"};border:1px dashed ${isDark ? "rgba(251,249,245,0.2)" : "rgba(24,23,21,0.18)"};" class="stack-sm">
+              :  `<div style="padding:1rem;border-radius:12px;background:${isDark ? "rgba(251,249,245,0.06)" : "#fbf9f5"};border:1px dashed ${isDark ? "rgba(251,249,245,0.2)" : "rgba(24,23,21,0.18)"};" class="stack-sm">
                   <p style="margin:0;font-size:0.8125rem;line-height:1.65;color:${isDark ? "rgba(251,249,245,0.8)" : "#5c5852"};">
                     ${escapeHtml(
                       isFileOrigin
