@@ -518,6 +518,7 @@
     .intelligence-tools-layout { display:grid; grid-template-columns:minmax(0,1fr); gap:1.1rem; align-items:stretch; margin-bottom:1.5rem; width:100%; }
     .intelligence-mode-tabs { display:flex; flex-wrap:wrap; gap:0.5rem; width:100%; }
     .institution-map-card { display:block; width:100%; max-width:none; min-width:0; box-sizing:border-box; padding:0.9rem; border:1px solid rgba(176,141,87,0.28); border-radius:16px; background:linear-gradient(145deg,#fbf9f5,#f3efe5); box-shadow:0 8px 24px rgba(24,23,21,0.06); }
+    .institution-map-title { margin:0 0 0.75rem; color:#181715; font-size:1rem; line-height:1.5; font-weight:800; text-align:start; }
     .institution-map-frame { display:block; width:100%; height:clamp(280px,38vw,420px); border:0; pointer-events:none; }
     .institution-map-viewport { display:block; width:100%; overflow:hidden; border-radius:12px; border:1px solid rgba(24,23,21,0.12); }
     @media (max-width: 767px) { .institution-map-card { padding:0.65rem; } .institution-map-frame { height:300px; } }
@@ -4575,20 +4576,10 @@
             </button>
             </div>
             <div class="institution-map-card">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-bottom:0.65rem;color:#181715;">
-                <span style="display:inline-flex;align-items:center;gap:0.45rem;font-weight:700;font-size:0.9rem;">
-                  ${icon("mapPin", "icon-svg")}
-                  ${escapeHtml(t.institutionLocation)}
-                </span>
-                <a href="https://maps.app.goo.gl/X8BTpEEywCdx71Dx9" target="_blank" rel="noopener noreferrer" aria-label="Open institution location in Google Maps" style="display:inline-flex;align-items:center;gap:0.35rem;color:#8b6b32;font-size:0.75rem;font-weight:700;text-decoration:none;white-space:nowrap;">
-                  ${escapeHtml(lang === "ar" ? "فتح الاتجاهات" : lang === "fr" ? "Itinéraire" : "Directions")}
-                  ${icon("externalLink", "icon-sm")}
-                </a>
-              </div>
+              <h4 class="institution-map-title">${escapeHtml(lang === "ar" ? "موقع دار الشباب سي سالم – مسرى" : lang === "fr" ? "Emplacement de la Maison de jeunes Si Salem – Mesra" : "Dar Chabab Si Salem – Mesra Location")}</h4>
               <a class="institution-map-viewport" href="https://maps.app.goo.gl/X8BTpEEywCdx71Dx9" target="_blank" rel="noopener noreferrer" aria-label="View the institution on Google Maps">
                 <iframe title="Google Maps - Dar Chabab Si Salem" src="https://www.google.com/maps?q=${encodeURIComponent("دار الشباب سي سالم، مسرى، مستغانم، الجزائر")}&output=embed" class="institution-map-frame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
               </a>
-              <p style="margin:0.55rem 0 0;color:#6b665e;font-size:0.72rem;line-height:1.5;">${escapeHtml(lang === "ar" ? "الخريطة التوضيحية — افتح Google Maps لعرض الموقع والاتجاهات الدقيقة." : lang === "fr" ? "Carte indicative — ouvrez Google Maps pour l’emplacement et l’itinéraire exacts." : "Map preview — open Google Maps for the exact location and directions.")}</p>
             </div>
           </div>
 
