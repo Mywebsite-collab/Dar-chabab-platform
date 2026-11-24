@@ -2757,7 +2757,7 @@
       if (!silent) renderShell({ preserve3D: state.activePage === "home" });
       try {
         if (window.location.protocol === "file:") {
-          throw new Error(lang === "ar" ? "شغّل الموقع عبر الخادم لعرض الأخبار المباشرة." : "Run the site through its server to load live posts.");
+          throw new Error(state.language === "ar" ? "شغّل الموقع عبر الخادم لعرض الأخبار المباشرة." : "Run the site through its server to load live posts.");
         }
         const res = await fetch(`/api/facebook-feed?limit=${limit}`, {
           headers: { Accept: "application/json" },
