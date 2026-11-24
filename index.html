@@ -2015,17 +2015,13 @@
           subtitle: "صمّم مبادرة شبابية بالتفكير العميق، أو ابحث عبر الويب وخرائط Google عن المرافق والفرص في محيط ماسرى.",
           tabThink: "مخطط المبادرات (تفكير عميق)",
           tabSearch: "بحث الويب الموثق",
-          tabMaps: "خرائط ومحيط ماسرى",
+          institutionLocation: "موقع المؤسسة على الخريطة",
           thinkPlaceholder: "مثال: اقترح برنامجاً فصلياً متكاملاً لنادي الروبوتيك والفنون التشكيلية لفئة 15–22 سنة...",
           searchPlaceholder: "مثال: مسابقات الروبوتيك الوطنية أو المنح الثقافية للشباب في الجزائر 2026...",
-          mapsPlaceholder: "مثال: ما هي المرافق الرياضية والثقافية والجامعية القريبة من بلدية ماسرى؟",
           runThink: "تحليل وتصميم الخطة",
           runSearch: "بحث موثق",
-          runMaps: "استكشاف الخرائط",
-          useMyLocation: "استخدام موقعي الحالي",
           loading: "جارٍ التحليل وجلب البيانات...",
           sourcesLabel: "المصادر الموثقة",
-          placesLabel: "روابط خرائط Google",
           emptyHint: "اختر وضعاً وأدخل سؤالك للحصول على إجابة منظمة وموثقة."
         },
         adminPage: {
@@ -2212,17 +2208,13 @@
           subtitle: "Concevez un projet jeunesse avec réflexion approfondie, ou explorez des ressources vérifiées via Google Search et Google Maps.",
           tabThink: "Architecte IA (Réflexion Haute)",
           tabSearch: "Recherche Web Vérifiée",
-          tabMaps: "Carte & Environs de Masra",
+          institutionLocation: "Emplacement officiel de l’établissement",
           thinkPlaceholder: "Ex : Proposez un programme trimestriel reliant robotique et arts plastiques pour les 15–22 ans...",
           searchPlaceholder: "Ex : Concours nationaux de robotique ou programmes jeunesse en Algérie 2026...",
-          mapsPlaceholder: "Ex : Quels équipements culturels, sportifs et éducatifs se trouvent autour de Masra ?",
           runThink: "Élaborer le plan",
           runSearch: "Lancer la recherche",
-          runMaps: "Explorer sur Maps",
-          useMyLocation: "Utiliser ma position",
           loading: "Analyse et recherche en cours...",
           sourcesLabel: "Sources vérifiées",
-          placesLabel: "Lieux Google Maps",
           emptyHint: "Sélectionnez un mode et formulez votre requête."
         },
         adminPage: {
@@ -2409,17 +2401,13 @@
           subtitle: "Design structured youth initiatives using high-thinking reasoning, or query real-time web and Google Maps context around Masra.",
           tabThink: "Program Architect (High Thinking)",
           tabSearch: "Grounded Web Search",
-          tabMaps: "Masra Area & Google Maps",
+          institutionLocation: "Official institution location",
           thinkPlaceholder: "Example: Design a 12-week interdisciplinary curriculum combining robotics and fine arts for ages 15–22...",
           searchPlaceholder: "Example: National youth robotics competitions or cultural fellowships in Algeria 2026...",
-          mapsPlaceholder: "Example: Cultural centers, libraries, and sports complexes near Masra, Mostaganem...",
           runThink: "Generate Blueprint",
           runSearch: "Search Web",
-          runMaps: "Explore Maps",
-          useMyLocation: "Use My Location",
           loading: "Thinking and gathering grounded context...",
           sourcesLabel: "Grounded Web Sources",
-          placesLabel: "Google Maps Links",
           emptyHint: "Choose a capability tab and enter a prompt above."
         },
         adminPage: {
@@ -2490,7 +2478,6 @@
     ];
 
     const PUBLIC_PAGES = new Set(["home", "about", "activities", "events", "gallery", "news", "contact"]);
-    const MASRA_DEFAULT_COORDS = { latitude: 35.8373, longitude: 0.1693 };
     const GEMINI_KEY_STORAGE = "mjm_gemini_api_key";
     const FB_CACHE_STORAGE = "mjm_fb_news_cache";
 
@@ -3216,56 +3203,6 @@
         }
       }
       return { text: extractGeminiText(data), sources };
-    }
-
-    async function callGeminiMaps(query, language, coords) {
-      const langLabel = language === "ar" ? "Arabic" : language === "fr" ? "French" : "English";
-      const validLat =
-        typeof coords?.lat === "number" && Number.isFinite(coords.lat) && coords.lat >= -90 && coords.lat <= 90
-          ? coords.lat
-          : MASRA_DEFAULT_COORDS.latitude;
-      const validLng =
-        typeof coords?.lng === "number" && Number.isFinite(coords.lng) && coords.lng >= -180 && coords.lng <= 180
-          ? coords.lng
-          : MASRA_DEFAULT_COORDS.longitude;
-
-      const data = await callGeminiRest(
-        "gemini-4-hydrogen",
-        {
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: `Answer in ${langLabel}. Center geographic context around Masra (Mesra), Mostaganem Province, Algeria when the user asks about local civic, cultural, educational, or sports places. User query: ${query.trim()}`
-                }
-              ]
-            }
-          ],
-          tools: [{ googleMaps: {} }],
-          toolConfig: {
-            retrievalConfig: {
-              latLng: { latitude: validLat, longitude: validLng }
-            }
-          }
-        },
-        language
-      );
-
-      const rawChunks = data?.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
-      const seen = new Set();
-      const places = [];
-      for (const chunk of rawChunks) {
-        const maps = chunk?.maps;
-        if (!maps?.uri || !/^https?:\/\//i.test(maps.uri) || seen.has(maps.uri)) continue;
-        seen.add(maps.uri);
-        const rawSnippets = maps.placeAnswerSources?.reviewSnippets ?? [];
-        const snippets = rawSnippets
-          .map((s) => (typeof s === "string" ? s : s?.review || s?.text || ""))
-          .filter((s) => Boolean(s && s.trim()));
-        places.push({ title: maps.title || maps.uri, uri: maps.uri, snippets });
-      }
-      return { text: extractGeminiText(data), places };
     }
 
     async function callGeminiEditorial(topic, kind = "news announcement", language = "ar") {
@@ -4605,9 +4542,10 @@
     function renderGeminiHubHtml() {
       const t = tLocale().intelligence;
       const g = state.gemini;
-      const placeholder = g.mode === "think" ? t.thinkPlaceholder : g.mode === "search" ? t.searchPlaceholder : t.mapsPlaceholder;
-      const buttonLabel = g.mode === "think" ? t.runThink : g.mode === "search" ? t.runSearch : t.runMaps;
-      const btnField = g.mode === "think" ? "runThink" : g.mode === "search" ? "runSearch" : "runMaps";
+      const mode = g.mode === "search" ? "search" : "think";
+      const placeholder = mode === "think" ? t.thinkPlaceholder : t.searchPlaceholder;
+      const buttonLabel = mode === "think" ? t.runThink : t.runSearch;
+      const btnField = mode === "think" ? "runThink" : "runSearch";
 
       return `
         <div class="card-surface-solid p-card p-card-lg" id="gemini-hub-box">
@@ -4626,18 +4564,11 @@
               ${icon("globe", "icon-svg")}
               <span>${escapeHtml(t.tabSearch)}</span>
             </button>
-            <button type="button" data-action="gemini-mode" data-mode="maps"${veAttr({ kind: "ui", section: "intelligence", field: "tabMaps" })} class="btn-pill ${g.mode === "maps" ? "is-active" : ""}" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 1rem;border:1px solid rgba(24,23,21,0.1);${g.mode === "maps" ? "" : "background:#fbf9f5;"}">
-              ${icon("mapPin", "icon-svg")}
-              <span>${escapeHtml(t.tabMaps)}</span>
-            </button>
-            ${
-              g.mode === "maps"
-                ? `<button type="button" data-action="gemini-geo"${veAttr({ kind: "ui", section: "intelligence", field: "useMyLocation" })} class="btn" style="padding:0.5rem 0.75rem;background:#fbf9f5;border:1px solid rgba(176,141,87,0.4);color:#967542;">
-                    ${icon("compass", "icon-sm")}
-                    <span>${g.coords ? `${g.coords.lat.toFixed(2)}, ${g.coords.lng.toFixed(2)}` : escapeHtml(t.useMyLocation)}</span>
-                  </button>`
-                : ""
-            }
+            <a href="https://maps.app.goo.gl/X8BTpEEywCdx71Dx9" target="_blank" rel="noopener noreferrer" class="btn-pill" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.625rem 1rem;border:1px solid rgba(176,141,87,0.45);background:#fbf9f5;color:#181715;text-decoration:none;">
+              \${icon("mapPin", "icon-svg")}
+              <span>\${escapeHtml(t.institutionLocation)}</span>
+              \${icon("externalLink", "icon-sm")}
+            </a>
           </div>
 
           <form data-action="gemini-submit" class="stack-md">
@@ -4674,28 +4605,6 @@
                                   <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;">${escapeHtml(src.title)}</span>
                                   ${icon("externalLink", "icon-sm text-gold-hover")}
                                 </a>`
-                              )
-                              .join("")}
-                          </div>
-                        </div>`
-                      : ""
-                  }
-                  ${
-                    g.places.length > 0
-                      ? `<div>
-                          <h4 class="kicker" style="color:#5c5852;margin-bottom:0.75rem;">${escapeHtml(t.placesLabel)}</h4>
-                          <div class="grid-2" style="gap:0.75rem;">
-                            ${g.places
-                              .map(
-                                (place) => `
-                                <div style="padding:1rem;border-radius:12px;background:#fbf9f5;border:1px solid rgba(24,23,21,0.1);" class="stack-xs">
-                                  <a href="${escapeHtml(safeHref(place.uri))}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.875rem;font-weight:600;color:#181715;">
-                                    ${icon("mapPin", "icon-svg text-gold")}
-                                    <span>${escapeHtml(place.title)}</span>
-                                    ${icon("externalLink", "icon-sm")}
-                                  </a>
-                                  ${place.snippets?.length ? `<p class="text-muted" style="font-size:0.75rem;line-height:1.6;margin:0;">${escapeHtml(place.snippets[0])}</p>` : ""}
-                                </div>`
                               )
                               .join("")}
                           </div>
@@ -7319,9 +7228,9 @@
           g.answer = res.text || "";
           g.sources = res.sources || [];
         } else {
-          const res = await callGeminiMaps(g.prompt, state.language, g.coords);
+          const res = await callGeminiSearch(g.prompt, state.language);
           g.answer = res.text || "";
-          g.places = res.places || [];
+          g.sources = res.sources || [];
         }
       } catch (err) {
         g.error = err instanceof Error ? err.message : "Unable to complete request.";
@@ -7764,18 +7673,6 @@
           {
             const hub = document.getElementById("gemini-hub-box");
             if (hub) hub.outerHTML = renderGeminiHubHtml();
-          }
-          break;
-        case "gemini-geo":
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-              (pos) => {
-                state.gemini.coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                const hub = document.getElementById("gemini-hub-box");
-                if (hub) hub.outerHTML = renderGeminiHubHtml();
-              },
-              () => {}
-            );
           }
           break;
         case "footer-secret-bar":
