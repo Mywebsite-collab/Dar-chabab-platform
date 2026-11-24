@@ -38,7 +38,8 @@ export default {
           "access-control-allow-methods": "GET, OPTIONS",
           "access-control-allow-headers": "Content-Type",
           "access-control-max-age": "86400",
-          "vary": "Origin"
+          "vary": "Origin",
+          "x-content-type-options": "nosniff"
         }
       });
     }
@@ -76,6 +77,7 @@ export default {
       const headers = new Headers(cached.headers);
       headers.set("access-control-allow-origin", origin);
       headers.set("cache-control", "public, max-age=60");
+      headers.set("vary", "Origin");
       return new Response(cached.body, { status: cached.status, headers });
     }
 
@@ -90,7 +92,8 @@ export default {
       graphUrl.searchParams.set("access_token", env.FB_PAGE_ACCESS_TOKEN);
 
       const graphResponse = await fetch(graphUrl.toString(), {
-        headers: { Accept: "application/json" }
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(12_000)
       });
       const graphData = await graphResponse.json().catch(() => ({}));
       if (!graphResponse.ok || graphData.error) {
@@ -121,7 +124,8 @@ export default {
       };
       const response = json(payload, 200, origin, {
         "cache-control": `public, max-age=${CACHE_TTL}`,
-        "vary": "Origin"
+        "vary": "Origin",
+        "x-content-type-options": "nosniff"
       });
       ctx.waitUntil(cache.put(cacheKey, response.clone()));
       return response;
