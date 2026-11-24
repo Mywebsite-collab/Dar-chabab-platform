@@ -8299,9 +8299,10 @@
     });
 
     function initApp() {
+      // Clear any previously cached API posts before the first render.
+      syncFacebookNewsFeed({ silent: true });
       renderShell({ preserve3D: false });
       mountCustomCursor();
-      syncFacebookNewsFeed({ silent: true });
     }
 
     initApp();
