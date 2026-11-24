@@ -2759,7 +2759,13 @@
         if (window.location.protocol === "file:") {
           throw new Error(state.language === "ar" ? "شغّل الموقع عبر الخادم لعرض الأخبار المباشرة." : "Run the site through its server to load live posts.");
         }
-        const res = await fetch(`/api/facebook-feed?limit=${limit}`, {
+        const feedApiBase = String(window.MJM_FACEBOOK_API_URL || "").trim().replace(/\/+$/, "");
+        if (!feedApiBase) {
+          throw new Error(state.language === "ar"
+            ? "لم يتم ضبط رابط خدمة أخبار فيسبوك بعد. راجع إعداد facebook-feed-config.js."
+            : "Facebook feed service URL is not configured. Check facebook-feed-config.js.");
+        }
+        const res = await fetch(`${feedApiBase}/api/facebook-feed?limit=${limit}`, {
           headers: { Accept: "application/json" },
           cache: "no-store"
         });
