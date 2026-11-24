@@ -5948,10 +5948,10 @@
                   <h2 class="font-display heading-md" style="margin:0;">${escapeHtml(lang === "ar" ? "ربط وإدارة عنصر آخر منشورات فيسبوك" : lang === "fr" ? "Gestion des publications Facebook officielles" : "Official Facebook Posts Element")}</h2>
                 </div>
                 <div class="flex-row-wrap" style="gap:0.45rem;">
-                  <button type="button" data-action="sync-fb-news" class="btn btn-gold" style="padding:0.45rem 0.9rem;">
-                    ${state.fbSync.loading ? icon("loader", "icon-sm") : icon("refreshCw", "icon-sm")}
-                    <span>${escapeHtml(lang === "ar" ? "تحديث ومزامنة المنشورات الآن" : lang === "fr" ? "Synchroniser maintenant" : "Sync & Refresh Now")}</span>
-                  </button>
+                  <a href="https://www.facebook.com/mjmesra" target="_blank" rel="noopener noreferrer" class="btn btn-gold" style="padding:0.45rem 0.9rem;">
+                    ${icon("externalLink", "icon-sm")}
+                    <span>${escapeHtml(lang === "ar" ? "فتح صفحة فيسبوك" : lang === "fr" ? "Ouvrir Facebook" : "Open Facebook Page")}</span>
+                  </a>
                   <button type="button" data-action="toggle-fb-setting" data-key="enabled" class="btn" style="padding:0.45rem 0.9rem;${fbCfg.enabled !== false ? "background:rgba(154,52,18,0.1);border:1px solid rgba(154,52,18,0.3);color:#9a3412;" : "background:#14532d;color:#fbf9f5;"}">
                     ${fbCfg.enabled !== false ? icon("trash", "icon-sm") : icon("rotateCcw", "icon-sm")}
                     <span>${escapeHtml(lang === "ar" ? (fbCfg.enabled !== false ? "حذف عنصر فيسبوك من الموقع" : "استعادة عنصر فيسبوك للموقع") : (fbCfg.enabled !== false ? "Delete FB Section" : "Restore FB Section"))}</span>
@@ -5963,10 +5963,10 @@
                   fbCfg.enabled === false
                     ? (lang === "ar" ? "عنصر «آخر منشورات دار الشباب على فيسبوك» محذوف/مخفي حالياً من صفحات المنصة. اضغط «استعادة عنصر فيسبوك للموقع» أعلاه لإعادته في أي وقت." : "The Facebook Posts element is currently removed/hidden. Click Restore above to re-enable it.")
                     : (lang === "ar"
-                      ? "يتم جلب وعرض منشورات الصفحة الرسمية لدار الشباب (https://www.facebook.com/mjmesra) مباشرة. يمكنك تعديل نصوص العنصر، تعديل أي منشور أو صورته، أو حذفه نهائياً."
+                      ? "يتم عرض موجز الصفحة العامة عبر أداة Facebook الرسمية. لا يحتاج الموقع إلى رمز وصول أو إعداد Cloudflare. قد يطلب فيسبوك تسجيل الدخول، كما أن شكل المنشورات داخل الإطار تحدده Meta."
                       : lang === "fr"
-                        ? "Les publications de la page officielle (https://www.facebook.com/mjmesra) sont affichées directement. Vous pouvez modifier le titre, éditer ou supprimer n'importe quelle publication."
-                        : "Posts from https://www.facebook.com/mjmesra load directly. You can edit the section headings, edit any post or image, or delete individual posts or the entire section.")
+                        ? "Le fil public est intégré avec le plugin officiel Facebook. Aucun jeton d'accès ni configuration Cloudflare n'est nécessaire. Facebook contrôle l'affichage du contenu intégré."
+                        : "The public Page timeline is embedded using Meta's official Facebook Page Plugin. No access token or Cloudflare setup is required. Facebook controls the embedded post layout.")
                 )}
               </p>
               <div class="grid-2" style="gap:0.75rem;">
