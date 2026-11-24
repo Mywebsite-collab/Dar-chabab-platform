@@ -2908,11 +2908,18 @@
         state.fbSync = { loading: false, lastSyncedAt: nowIso, error: "", mode };
         updateFbNews(mergedPosts, { syncedAt: nowIso, pageUrl, pageName });
       } catch (err) {
-        state.fbSync = {
-          ...state.fbSync,
-          loading: false,
-          error: err instanceof Error ? err.message : "Sync failed"
-        };
+        // Static hosting does not provide the optional /api/facebook-feed proxy.
+        // Fall back to Meta's official Page Plugin instead of showing a misleading 404.
+        if (!token && !rssUrl && !isFileOrigin) {
+          state.fbEmbedNonce += 1;
+          state.fbSync = { ...state.fbSync, loading: false, error: "", mode: "embed" };
+        } else {
+          state.fbSync = {
+            ...state.fbSync,
+            loading: false,
+            error: err instanceof Error ? err.message : "Sync failed"
+          };
+        }
       }
       if (state.activePage === "home") {
         const slot = document.getElementById("home-news-live-slot");
@@ -3034,7 +3041,25 @@
                     )
                     .join("")}
                 </div>`
-              : `<div style="padding:1rem;border-radius:12px;background:${isDark ? "rgba(251,249,245,0.06)" : "#fbf9f5"};border:1px dashed ${isDark ? "rgba(251,249,245,0.2)" : "rgba(24,23,21,0.18)"};" class="stack-sm">
+              : state.fbSync.mode === "embed"
+                ? `<div class="fb-embed-wrap" style="width:100%;max-width:500px;margin-inline:auto;min-height:520px;">
+                    <iframe
+                      class="fb-embed-frame"
+                      title="${escapeHtml(lang === "ar" ? "منشورات الصفحة الرسمية لدار الشباب ماسرى على فيسبوك" : lang === "fr" ? "Publications officielles de la Maison de Jeunes de Masra sur Facebook" : "Official Masra Youth House Facebook posts")}"
+                      src="${escapeHtml(buildFacebookPluginUrl(extUrl, { width: 500, height: 720, smallHeader: true }))}"
+                      width="500"
+                      height="720"
+                      loading="lazy"
+                      scrolling="no"
+                      frameborder="0"
+                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                      style="border:0;width:100%;min-height:520px;background:#fff;"
+                    ></iframe>
+                  </div>
+                  <p style="margin:0;font-size:0.75rem;line-height:1.6;color:${isDark ? "rgba(251,249,245,0.72)" : "#5c5852"};">
+                    ${escapeHtml(lang === "ar" ? "تُعرض المنشورات عبر أداة فيسبوك الرسمية. إذا لم تظهر بسبب إعدادات الخصوصية أو قيود الصفحة، يمكنك فتح الصفحة مباشرة من الزر أعلاه." : lang === "fr" ? "Les publications sont intégrées via le plugin officiel de Facebook. Si elles ne s’affichent pas en raison des paramètres de confidentialité, ouvrez la page directement." : "Posts are embedded using Facebook’s official plugin. If privacy settings prevent display, open the page directly using the button above.")}
+                  </p>`
+                : `<div style="padding:1rem;border-radius:12px;background:${isDark ? "rgba(251,249,245,0.06)" : "#fbf9f5"};border:1px dashed ${isDark ? "rgba(251,249,245,0.2)" : "rgba(24,23,21,0.18)"};" class="stack-sm">
                   <p style="margin:0;font-size:0.8125rem;line-height:1.65;color:${isDark ? "rgba(251,249,245,0.8)" : "#5c5852"};">
                     ${escapeHtml(
                       isFileOrigin
