@@ -7838,11 +7838,29 @@
           state.activeVeTarget = null;
           navigateTo("home");
           break;
-        case "ve-toggle-drag":
+        case "ve-toggle-drag": {
+          // Keep the editor anchored to the same page and inspector position.
+          // renderShell replaces the page and modal DOM; without restoring these
+          // offsets, the browser may jump to a different section after the click.
+          const viewportX = window.scrollX || 0;
+          const viewportY = window.scrollY || 0;
+          const inspector = document.getElementById("ve-inspector-body");
+          const inspectorScrollTop = inspector ? inspector.scrollTop : null;
           state.veDragMode = !state.veDragMode;
           if (state.veDragMode) state.browseOverride = false;
           renderShell({ preserve3D: true });
+          const restoreEditorPosition = () => {
+            window.scrollTo({ left: viewportX, top: viewportY, behavior: "auto" });
+            const refreshedInspector = document.getElementById("ve-inspector-body");
+            if (refreshedInspector && inspectorScrollTop !== null) {
+              refreshedInspector.scrollTop = inspectorScrollTop;
+            }
+          };
+          restoreEditorPosition();
+          window.requestAnimationFrame(restoreEditorPosition);
+          document.querySelector('[data-action="ve-toggle-drag"]')?.focus({ preventScroll: true });
           break;
+        }
         case "ve-toggle-browse":
           state.browseOverride = !state.browseOverride;
           if (state.browseOverride) state.veDragMode = false;
