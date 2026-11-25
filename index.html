@@ -2599,6 +2599,38 @@
       rootStyle.setProperty("--color-on-dark", tc.onDark || "#fbf9f5");
     }
 
+    function getVeBreakpoint() {
+      const width = window.innerWidth || document.documentElement.clientWidth || 1024;
+      if (width < 768) return "mobile";
+      if (width < 1024) return "tablet";
+      return "desktop";
+    }
+    function getVeEffectivePosition(style = {}) {
+      const responsive = style.responsive?.[getVeBreakpoint()] || {};
+      return { x: Number(responsive.x ?? style.x) || 0, y: Number(responsive.y ?? style.y) || 0 };
+    }
+    function setVeResponsivePosition(style = {}, patch = {}) {
+      const responsive = { ...(style.responsive || {}) };
+      const bp = getVeBreakpoint();
+      responsive[bp] = { ...(responsive[bp] || {}), ...patch };
+      return { ...style, responsive };
+    }
+    function clearVeResponsivePosition(style = {}) {
+      const responsive = { ...(style.responsive || {}) };
+      const bp = getVeBreakpoint();
+      if (responsive[bp]) {
+        delete responsive[bp].x; delete responsive[bp].y;
+        if (!Object.keys(responsive[bp]).length) delete responsive[bp];
+      }
+      const next = { ...style };
+      if (Object.keys(responsive).length) next.responsive = responsive; else delete next.responsive;
+      return next;
+    }
+    function hasAnyVePosition(style = {}) {
+      if (Number(style.x) || Number(style.y)) return true;
+      return Object.values(style.responsive || {}).some((pos) => Number(pos?.x) || Number(pos?.y));
+    }
+
     function applyElementStyles(rootEl = document.getElementById("app-root")) {
       applyGlobalTextColors();
       if (!rootEl) return;
@@ -2614,8 +2646,9 @@
           el.classList.remove("ve-has-color");
           el.style.removeProperty("--ve-text-color");
         }
-        const dx = Number(st?.x) || 0;
-        const dy = Number(st?.y) || 0;
+        const position = getVeEffectivePosition(st || {});
+        const dx = position.x;
+        const dy = position.y;
         if (dx !== 0 || dy !== 0) {
           if (getComputedStyle(el).position === "static") {
             el.style.position = "relative";
@@ -6511,8 +6544,13 @@
       const veKey = getVeTargetKey(target);
       const cur = state.settings.elementStyles?.[veKey] || {};
       const curColor = cur.color || "#181715";
-      const curX = Number(cur.x) || 0;
-      const curY = Number(cur.y) || 0;
+      const currentPosition = getVeEffectivePosition(cur);
+      const curX = currentPosition.x;
+      const curY = currentPosition.y;
+      const breakpoint = getVeBreakpoint();
+      const breakpointLabel = lang === "ar"
+        ? ({ desktop: "الكمبيوتر", tablet: "الجهاز اللوحي", mobile: "الهاتف" }[breakpoint])
+        : ({ desktop: "Desktop", tablet: "Tablet", mobile: "Mobile" }[breakpoint]);
       const swatches = ["#181715", "#5c5852", "#b08d57", "#d4b886", "#fbf9f5", "#9a3412", "#14532d", "#1e3a8a"];
 
       const isReorderable = ["activity", "event", "news", "fbPost", "gallery", "metric", "highlight", "aboutValue", "aboutOrg"].includes(target.kind);
@@ -6542,11 +6580,12 @@
           </div>
 
           <div style="padding:0.875rem;border-radius:12px;background:#f3efe7;border:1px solid rgba(24,23,21,0.1);" class="stack-sm">
-            <div class="flex-between">
+            <div class="flex-between" style="gap:0.5rem;flex-wrap:wrap;">
               <span style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.75rem;font-weight:600;color:#181715;">
                 ${icon("move", "icon-sm text-gold")}
                 <span>${escapeHtml(lang === "ar" ? "تحريك وتغيير مكان العنصر" : lang === "fr" ? "Déplacer l'élément" : "Reposition Element (X / Y)")}</span>
               </span>
+              <span class="badge-box" style="font-size:10px;padding:0.2rem 0.45rem;">${escapeHtml(breakpointLabel)} · ${escapeHtml(lang === "ar" ? "إعداد مستقل" : lang === "fr" ? "Réglage indépendant" : "Independent")}</span>
               ${
                 curX !== 0 || curY !== 0
                   ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(lang === "ar" ? "إعادة المكان" : "Reset Pos")}</button>`
@@ -7239,16 +7278,17 @@
       const veKey = editableEl.getAttribute("data-ve-key");
       if (!veKey) return;
       const cur = state.settings.elementStyles?.[veKey] || {};
+      const currentPosition = getVeEffectivePosition(cur);
       activeVeDrag = {
         el: editableEl,
         veKey,
         pointerId: e.pointerId,
         startX: e.clientX,
         startY: e.clientY,
-        baseX: Number(cur.x) || 0,
-        baseY: Number(cur.y) || 0,
-        lastX: Number(cur.x) || 0,
-        lastY: Number(cur.y) || 0,
+        baseX: currentPosition.x,
+        baseY: currentPosition.y,
+        lastX: currentPosition.x,
+        lastY: currentPosition.y,
         moved: false
       };
     }, { capture: true });
@@ -7282,11 +7322,8 @@
         window.setTimeout(() => { veDragJustMoved = false; }, 120);
         const next = structuredClone(state.settings);
         if (!next.elementStyles) next.elementStyles = {};
-        next.elementStyles[drag.veKey] = {
-          ...(next.elementStyles[drag.veKey] || {}),
-          x: drag.lastX,
-          y: drag.lastY
-        };
+        const previous = next.elementStyles[drag.veKey] || {};
+        next.elementStyles[drag.veKey] = setVeResponsivePosition(previous, { x: drag.lastX, y: drag.lastY });
         updateSettings(next);
       }
     };
@@ -7896,7 +7933,7 @@
             if (next.elementStyles?.[veKey]) {
               delete next.elementStyles[veKey].color;
               const s = next.elementStyles[veKey];
-              if (!s.x && !s.y) delete next.elementStyles[veKey];
+              if (!hasAnyVePosition(s)) delete next.elementStyles[veKey];
               updateSettings(next);
               refreshBackgroundShellOnly();
               const body = document.getElementById("ve-inspector-body");
@@ -7913,9 +7950,10 @@
             const next = structuredClone(state.settings);
             if (!next.elementStyles) next.elementStyles = {};
             const prev = next.elementStyles[veKey] || {};
-            const nx = (Number(prev.x) || 0) + dx;
-            const ny = (Number(prev.y) || 0) + dy;
-            next.elementStyles[veKey] = { ...prev, x: nx, y: ny };
+            const currentPosition = getVeEffectivePosition(prev);
+            const nx = currentPosition.x + dx;
+            const ny = currentPosition.y + dy;
+            next.elementStyles[veKey] = setVeResponsivePosition(prev, { x: nx, y: ny });
             updateSettings(next);
             refreshBackgroundShellOnly();
             const body = document.getElementById("ve-inspector-body");
@@ -7927,9 +7965,8 @@
           const veKey = actionEl.getAttribute("data-ve-key");
           if (veKey && state.settings.elementStyles?.[veKey]) {
             const next = structuredClone(state.settings);
-            delete next.elementStyles[veKey].x;
-            delete next.elementStyles[veKey].y;
-            if (!next.elementStyles[veKey].color) delete next.elementStyles[veKey];
+            next.elementStyles[veKey] = clearVeResponsivePosition(next.elementStyles[veKey]);
+            if (!next.elementStyles[veKey].color && !hasAnyVePosition(next.elementStyles[veKey])) delete next.elementStyles[veKey];
             updateSettings(next);
             refreshBackgroundShellOnly();
             const body = document.getElementById("ve-inspector-body");
@@ -7994,6 +8031,17 @@
       }
     });
 
+    window.addEventListener("resize", () => {
+      if (!state.adminUnlocked || !state.visualEditMode || state.activePage === "admin") return;
+      window.requestAnimationFrame(() => {
+        applyElementStyles();
+        if (state.activeVeTarget) {
+          const body = document.getElementById("ve-inspector-body");
+          if (body) body.innerHTML = renderVeInspectorBody(state.activeVeTarget);
+        }
+      });
+    }, { passive: true });
+
     document.addEventListener("input", (e) => {
       const target = e.target;
       if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) return;
@@ -8039,7 +8087,7 @@
         if (veKey) {
           const next = structuredClone(state.settings);
           if (!next.elementStyles) next.elementStyles = {};
-          next.elementStyles[veKey] = { ...(next.elementStyles[veKey] || {}), [vePosAxis]: Number(target.value) || 0 };
+          next.elementStyles[veKey] = setVeResponsivePosition(next.elementStyles[veKey] || {}, { [vePosAxis]: Number(target.value) || 0 });
           updateSettings(next);
           refreshBackgroundShellOnly();
         }
