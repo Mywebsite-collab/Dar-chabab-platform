@@ -3207,15 +3207,21 @@
 
     async function translateArabicBoundField(target) {
       const bindPath = target?.getAttribute?.("data-bind") || "";
-      if (!bindPath.endsWith(".ar") || !target.value.trim() || activeArabicTranslations.has(target)) return;
+      const isUiStringsArabic = bindPath.startsWith("uiStrings.ar.");
+      if ((!bindPath.endsWith(".ar") && !isUiStringsArabic) || !target.value.trim() || activeArabicTranslations.has(target)) return;
       if (!getGeminiApiKey()) return;
 
       const sourceText = target.value.trim();
-      const basePath = bindPath.slice(0, -3);
-      const localeGrid = target.closest(".lang-grid-3");
-      const localeFields = Array.from(localeGrid?.querySelectorAll("[data-bind]") || []);
-      const frField = localeFields.find((field) => field.getAttribute("data-bind") === `${basePath}.fr`);
-      const enField = localeFields.find((field) => field.getAttribute("data-bind") === `${basePath}.en`);
+      const frPath = isUiStringsArabic
+        ? bindPath.replace(/^uiStrings\\.ar\\./, "uiStrings.fr.")
+        : `${bindPath.slice(0, -3)}.fr`;
+      const enPath = isUiStringsArabic
+        ? bindPath.replace(/^uiStrings\\.ar\\./, "uiStrings.en.")
+        : `${bindPath.slice(0, -3)}.en`;
+      const findBoundField = (path) => Array.from(document.querySelectorAll("[data-bind]"))
+        .find((field) => field.getAttribute("data-bind") === path);
+      const frField = findBoundField(frPath);
+      const enField = findBoundField(enPath);
       if (!frField || !enField) return;
 
       const previousFr = frField.value;
@@ -3234,13 +3240,13 @@
                 "Return only valid JSON with exactly two string properties: fr and en.",
                 "Do not include explanations or markdown.",
                 `Arabic source: ${sourceText}`
-              ].join("\\n")
+              ].join("\n")
             }]
           }],
           generationConfig: { responseMimeType: "application/json", temperature: 0.2 }
         }, "ar");
 
-        const raw = extractGeminiText(response).trim().replace(/^\`\`\`(?:json)?\\s*/i, "").replace(/\\s*\`\`\`$/, "");
+        const raw = extractGeminiText(response).trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
         const translated = JSON.parse(raw);
         if (target.value.trim() !== sourceText) return;
         if (frField.value !== previousFr || enField.value !== previousEn) return;
@@ -3248,8 +3254,8 @@
           throw new Error("The translation response was incomplete.");
         }
 
-        applyDataBind(`${basePath}.fr`, translated.fr.trim());
-        applyDataBind(`${basePath}.en`, translated.en.trim());
+        applyDataBind(frPath, translated.fr.trim());
+        applyDataBind(enPath, translated.en.trim());
         frField.value = translated.fr.trim();
         enField.value = translated.en.trim();
         target.dataset.translationStatus = "done";
