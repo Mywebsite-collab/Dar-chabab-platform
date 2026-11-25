@@ -7839,26 +7839,28 @@
           navigateTo("home");
           break;
         case "ve-toggle-drag": {
-          // Keep the editor anchored to the same page and inspector position.
-          // renderShell replaces the page and modal DOM; without restoring these
-          // offsets, the browser may jump to a different section after the click.
-          const viewportX = window.scrollX || 0;
-          const viewportY = window.scrollY || 0;
+          // Toggle drag mode in place. Rebuilding the whole shell here can make
+          // mobile browsers jump to the bottom of the document after a tap.
           const inspector = document.getElementById("ve-inspector-body");
           const inspectorScrollTop = inspector ? inspector.scrollTop : null;
           state.veDragMode = !state.veDragMode;
           if (state.veDragMode) state.browseOverride = false;
-          renderShell({ preserve3D: true });
-          const restoreEditorPosition = () => {
-            window.scrollTo({ left: viewportX, top: viewportY, behavior: "auto" });
+
+          // Update only the page mode class and editor controls; leave the page
+          // content and document scroll position untouched.
+          const appRoot = document.getElementById("app-root");
+          appRoot?.classList.toggle("ve-drag-mode", state.veDragMode && !state.browseOverride);
+          renderVisualOverlay();
+          syncBodyScrollLock();
+
+          const restoreInspectorPosition = () => {
             const refreshedInspector = document.getElementById("ve-inspector-body");
             if (refreshedInspector && inspectorScrollTop !== null) {
               refreshedInspector.scrollTop = inspectorScrollTop;
             }
           };
-          restoreEditorPosition();
-          window.requestAnimationFrame(restoreEditorPosition);
-          document.querySelector('[data-action="ve-toggle-drag"]')?.focus({ preventScroll: true });
+          restoreInspectorPosition();
+          window.requestAnimationFrame(restoreInspectorPosition);
           break;
         }
         case "ve-toggle-browse":
