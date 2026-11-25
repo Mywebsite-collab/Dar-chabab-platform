@@ -7334,6 +7334,26 @@
     document.addEventListener("pointerup", finishVeDrag);
     document.addEventListener("pointercancel", finishVeDrag);
 
+    // Reliable touch selection for the About heading on mobile.
+    // Some mobile browsers deliver the tap target inconsistently for this heading,
+    // so resolve the actual element under the pointer before the click event.
+    document.addEventListener("pointerup", (e) => {
+      if (!state.adminUnlocked || !state.visualEditMode || state.browseOverride || state.veDragMode || state.activePage === "admin") return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      const hit = document.elementFromPoint(e.clientX, e.clientY);
+      if (!(hit instanceof Element)) return;
+      const heading = hit.closest('[data-ve-key="ui:sections.aboutHeading"]');
+      if (!(heading instanceof HTMLElement)) return;
+      const raw = heading.getAttribute("data-ve-target");
+      if (!raw) return;
+      try {
+        state.activeVeTarget = JSON.parse(raw);
+        renderVisualOverlay();
+      } catch {
+        // Ignore malformed editor metadata.
+      }
+    }, { capture: true });
+
     // Visual Click-to-Edit capture interceptor
     document.addEventListener("click", (e) => {
       if (!state.visualEditMode || state.browseOverride || state.activePage === "admin") return;
