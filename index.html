@@ -2608,13 +2608,17 @@
     }
     function getVeEffectivePosition(style = {}, language = state.language) {
       const breakpoint = getVeBreakpoint();
-      // New positions are isolated by both locale and viewport. Legacy responsive
-      // positions remain a fallback so existing saved layouts are not discarded.
+      // French and English desktop layouts must not inherit legacy shared offsets
+      // (which were historically edited while Arabic was active). Their desktop
+      // positions start independently at zero until explicitly adjusted.
+      const isolateDesktopLocale = breakpoint === "desktop" && (language === "fr" || language === "en");
       const localized = style.responsiveByLanguage?.[language]?.[breakpoint] || {};
-      const responsive = style.responsive?.[breakpoint] || {};
+      const responsive = isolateDesktopLocale ? {} : (style.responsive?.[breakpoint] || {});
+      const legacyX = isolateDesktopLocale ? 0 : style.x;
+      const legacyY = isolateDesktopLocale ? 0 : style.y;
       return {
-        x: Number(localized.x ?? responsive.x ?? style.x) || 0,
-        y: Number(localized.y ?? responsive.y ?? style.y) || 0
+        x: Number(localized.x ?? responsive.x ?? legacyX) || 0,
+        y: Number(localized.y ?? responsive.y ?? legacyY) || 0
       };
     }
     function setVeResponsivePosition(style = {}, patch = {}, language = state.language) {
