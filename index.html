@@ -2606,34 +2606,44 @@
       if (width < 1024) return "tablet";
       return "desktop";
     }
-    function getVeEffectivePosition(style = {}) {
-      const responsive = style.responsive?.[getVeBreakpoint()] || {};
-      return { x: Number(responsive.x ?? style.x) || 0, y: Number(responsive.y ?? style.y) || 0 };
+    function getVeEffectivePosition(style = {}, language = state.language) {
+      const breakpoint = getVeBreakpoint();
+      // New positions are isolated by both locale and viewport. Legacy responsive
+      // positions remain a fallback so existing saved layouts are not discarded.
+      const localized = style.responsiveByLanguage?.[language]?.[breakpoint] || {};
+      const responsive = style.responsive?.[breakpoint] || {};
+      return {
+        x: Number(localized.x ?? responsive.x ?? style.x) || 0,
+        y: Number(localized.y ?? responsive.y ?? style.y) || 0
+      };
     }
-    function setVeResponsivePosition(style = {}, patch = {}) {
-      const responsive = { ...(style.responsive || {}) };
-      const bp = getVeBreakpoint();
-      responsive[bp] = { ...(responsive[bp] || {}), ...patch };
-      return { ...style, responsive };
+    function setVeResponsivePosition(style = {}, patch = {}, language = state.language) {
+      const responsiveByLanguage = structuredClone(style.responsiveByLanguage || {});
+      const languagePositions = { ...(responsiveByLanguage[language] || {}) };
+      const breakpoint = getVeBreakpoint();
+      languagePositions[breakpoint] = { ...(languagePositions[breakpoint] || {}), ...patch };
+      responsiveByLanguage[language] = languagePositions;
+      return { ...style, responsiveByLanguage };
     }
-    function clearVeResponsivePosition(style = {}) {
-      const responsive = { ...(style.responsive || {}) };
-      const bp = getVeBreakpoint();
-      if (Number(style.x) || Number(style.y)) {
-        // Legacy coordinates remain available for untouched breakpoints.
-        // An explicit zero override resets only the currently edited breakpoint.
-        responsive[bp] = { x: 0, y: 0 };
-      } else if (responsive[bp]) {
-        delete responsive[bp].x; delete responsive[bp].y;
-        if (!Object.keys(responsive[bp]).length) delete responsive[bp];
-      }
-      const result = { ...style };
-      if (Object.keys(responsive).length) result.responsive = responsive; else delete result.responsive;
-      return result;
+    function clearVeResponsivePosition(style = {}, language = state.language) {
+      // Reset only the current language + device combination. Explicit zeros
+      // prevent a legacy shared position from leaking back into this locale.
+      const responsiveByLanguage = structuredClone(style.responsiveByLanguage || {});
+      const languagePositions = { ...(responsiveByLanguage[language] || {}) };
+      languagePositions[getVeBreakpoint()] = { x: 0, y: 0 };
+      responsiveByLanguage[language] = languagePositions;
+      return { ...style, responsiveByLanguage };
     }
     function hasAnyVePosition(style = {}) {
       if (Number(style.x) || Number(style.y)) return true;
-      return Object.values(style.responsive || {}).some((pos) => pos && (Object.prototype.hasOwnProperty.call(pos, "x") || Object.prototype.hasOwnProperty.call(pos, "y")));
+      const hasPosition = (pos) => pos && (
+        Object.prototype.hasOwnProperty.call(pos, "x") ||
+        Object.prototype.hasOwnProperty.call(pos, "y")
+      );
+      return Object.values(style.responsive || {}).some(hasPosition) ||
+        Object.values(style.responsiveByLanguage || {}).some((byBreakpoint) =>
+          Object.values(byBreakpoint || {}).some(hasPosition)
+        );
     }
 
     function applyElementStyles(rootEl = document.getElementById("app-root")) {
@@ -6710,7 +6720,7 @@
                 ${icon("move", "icon-sm text-gold")}
                 <span>${escapeHtml(lang === "ar" ? "تحريك وتغيير مكان العنصر" : lang === "fr" ? "Déplacer l'élément" : "Reposition Element (X / Y)")}</span>
               </span>
-              <span class="badge-box" style="font-size:10px;padding:0.2rem 0.45rem;">${escapeHtml(breakpointLabel)} · ${escapeHtml(lang === "ar" ? "إعداد مستقل" : lang === "fr" ? "Réglage indépendant" : "Independent")}</span>
+              <span class="badge-box" style="font-size:10px;padding:0.2rem 0.45rem;">${escapeHtml(lang.toUpperCase())} · ${escapeHtml(breakpointLabel)} · ${escapeHtml(lang === "ar" ? "إعداد مستقل" : lang === "fr" ? "Réglage indépendant" : "Independent")}</span>
               ${
                 curX !== 0 || curY !== 0
                   ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(adminText(lang, "إعادة المكان", "Reset Pos"))}</button>`
