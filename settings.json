@@ -119,111 +119,215 @@
   },
   "elementStyles": {
     "settingsField:hero.headline": {
-      "x": -3,
-      "y": -1114
+      "responsive": {
+        "desktop": {
+          "x": -3,
+          "y": -1114
+        }
+      }
     },
     "settingsField:hero.eyebrow": {
-      "x": -23,
-      "y": -1198
+      "responsive": {
+        "desktop": {
+          "x": -23,
+          "y": -1198
+        }
+      }
     },
     "settingsField:hero.description": {
-      "x": -40,
-      "y": -979
+      "responsive": {
+        "desktop": {
+          "x": -40,
+          "y": -979
+        }
+      }
     },
     "ui:sections.aboutKicker": {
-      "x": -1,
-      "y": -100
+      "responsive": {
+        "desktop": {
+          "x": -1,
+          "y": -100
+        }
+      }
     },
     "ui:sections.aboutHeading": {
-      "x": 0,
-      "y": -49
+      "responsive": {
+        "desktop": {
+          "x": 0,
+          "y": -49
+        }
+      }
     },
     "aboutField:mission@home": {
-      "x": -1,
-      "y": -33
+      "responsive": {
+        "desktop": {
+          "x": -1,
+          "y": -33
+        }
+      }
     },
     "aboutField:history.body@home": {
-      "x": 0,
-      "y": -24
+      "responsive": {
+        "desktop": {
+          "x": 0,
+          "y": -24
+        }
+      }
     },
     "aboutField:homeImage@home-about": {
-      "x": 0,
-      "y": -9
+      "responsive": {
+        "desktop": {
+          "x": 0,
+          "y": -9
+        }
+      }
     },
     "ui:model3d.touchInteract": {
-      "x": 609,
-      "y": 187
+      "responsive": {
+        "desktop": {
+          "x": 609,
+          "y": 187
+        }
+      }
     },
     "ui:model3d.touchHint": {
-      "x": 331,
-      "y": 109
+      "responsive": {
+        "desktop": {
+          "x": 331,
+          "y": 109
+        }
+      }
     },
     "ui:model3d.touchScroll": {
-      "x": 621,
-      "y": 148
+      "responsive": {
+        "desktop": {
+          "x": 621,
+          "y": 148
+        }
+      }
     },
     "ui:sections.activitiesKicker@home": {
-      "x": 1,
-      "y": -96
+      "responsive": {
+        "desktop": {
+          "x": 1,
+          "y": -96
+        }
+      }
     },
     "ui:sections.activitiesHeading@home": {
-      "x": 0,
-      "y": -63
+      "responsive": {
+        "desktop": {
+          "x": 0,
+          "y": -63
+        }
+      }
     },
     "ui:sections.galleryKicker@home": {
-      "x": 17,
-      "y": -98
+      "responsive": {
+        "desktop": {
+          "x": 17,
+          "y": -98
+        }
+      }
     },
     "ui:sections.galleryHeading@home": {
-      "x": -100,
-      "y": -39
+      "responsive": {
+        "desktop": {
+          "x": -100,
+          "y": -39
+        }
+      }
     },
     "ui:sections.highlightsHeading": {
       "color": "#9a3412"
     },
     "ui:sections.highlightsKicker": {
-      "x": -4,
-      "y": -34
+      "responsive": {
+        "desktop": {
+          "x": -4,
+          "y": -34
+        }
+      }
     },
     "settingsField:contact.address@footer": {
-      "x": 1,
-      "y": 61
+      "responsive": {
+        "desktop": {
+          "x": 1,
+          "y": 61
+        }
+      }
     },
     "settingsField:contact.hours@footer": {
-      "x": 0,
-      "y": 22
+      "responsive": {
+        "desktop": {
+          "x": 0,
+          "y": 22
+        }
+      }
     },
     "ui:footer.placeholderDisclaimer@footer": {
-      "x": 6,
-      "y": 76
+      "responsive": {
+        "desktop": {
+          "x": 6,
+          "y": 76
+        }
+      }
     },
     "settingsField:institution.subtitle@footer": {
-      "x": 8,
-      "y": 10
+      "responsive": {
+        "desktop": {
+          "x": 8,
+          "y": 10
+        }
+      }
     },
     "ui:nav.gallery@footer": {
-      "x": -2,
-      "y": 75
+      "responsive": {
+        "desktop": {
+          "x": -2,
+          "y": 75
+        }
+      }
     },
     "ui:nav.activities@footer": {
-      "x": 0,
-      "y": 36
+      "responsive": {
+        "desktop": {
+          "x": 0,
+          "y": 36
+        }
+      }
     },
     "ui:nav.events@footer": {
-      "x": 8,
-      "y": 39
+      "responsive": {
+        "desktop": {
+          "x": 8,
+          "y": 39
+        }
+      }
     },
     "ui:footer.navigation@footer": {
-      "x": -4,
-      "y": -35
+      "responsive": {
+        "desktop": {
+          "x": -4,
+          "y": -35
+        }
+      }
     },
     "ui:footer.languages@footer": {
-      "x": 0,
-      "y": -34
+      "responsive": {
+        "desktop": {
+          "x": 0,
+          "y": -34
+        }
+      }
     },
     "settingsField:institution.name@footer": {
-      "x": 14,
-      "y": -45
+      "responsive": {
+        "desktop": {
+          "x": 14,
+          "y": -45
+        }
+      }
     }
   },
   "homeSectionOrder": [
