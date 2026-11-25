@@ -3,6 +3,7 @@ name: Platform quality checks
 on:
   push:
     branches:
+      - Platform
       - "fix/**"
   pull_request:
     branches:
@@ -27,3 +28,5 @@ jobs:
         run: npm run build
       - name: Check local assets and JSON
         run: node scripts/check-assets.mjs
+
+workflow_dispatch:
