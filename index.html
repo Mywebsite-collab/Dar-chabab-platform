@@ -2621,7 +2621,7 @@
       const responsiveByLanguage = structuredClone(style.responsiveByLanguage || {});
       const languagePositions = { ...(responsiveByLanguage[language] || {}) };
       const breakpoint = getVeBreakpoint();
-      languagePositions[breakpoint] = { ...(languagePositions[breakpoint] || {}), ...patch };
+      languagePositions[breakpoint] = { ...getVeEffectivePosition(style, language), ...(languagePositions[breakpoint] || {}), ...patch };
       responsiveByLanguage[language] = languagePositions;
       return { ...style, responsiveByLanguage };
     }
