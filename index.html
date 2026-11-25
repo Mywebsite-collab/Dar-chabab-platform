@@ -6590,11 +6590,7 @@
                 <span>${escapeHtml(lang === "ar" ? "تحريك وتغيير مكان العنصر" : lang === "fr" ? "Déplacer l'élément" : "Reposition Element (X / Y)")}</span>
               </span>
               <span class="badge-box" style="font-size:10px;padding:0.2rem 0.45rem;">${escapeHtml(breakpointLabel)} · ${escapeHtml(lang === "ar" ? "إعداد مستقل" : lang === "fr" ? "Réglage indépendant" : "Independent")}</span>
-              ${
-                curX !== 0 || curY !== 0
-                  ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(lang === "ar" ? "إعادة المكان" : "Reset Pos")}</button>`
-                  : ""
-              }
+              <button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(lang === "ar" ? "استعادة المكان" : lang === "fr" ? "Restaurer la position" : "Restore Position")}</button>
             </div>
             <div class="flex-row-wrap" style="gap:0.5rem;">
               <label style="display:inline-flex;align-items:center;gap:0.35rem;font-size:11px;">
@@ -7987,9 +7983,10 @@
         }
         case "ve-reset-pos": {
           const veKey = actionEl.getAttribute("data-ve-key");
-          if (veKey && state.settings.elementStyles?.[veKey]) {
+          if (veKey) {
             const next = structuredClone(state.settings);
-            next.elementStyles[veKey] = clearVeResponsivePosition(next.elementStyles[veKey]);
+            if (!next.elementStyles) next.elementStyles = {};
+            next.elementStyles[veKey] = clearVeResponsivePosition(next.elementStyles[veKey] || {});
             if (!next.elementStyles[veKey].color && !hasAnyVePosition(next.elementStyles[veKey])) delete next.elementStyles[veKey];
             updateSettings(next);
             refreshBackgroundShellOnly();
