@@ -1,0 +1,122 @@
+{
+  "homeImage": "./images/gallery_courtyard_detail_1794615114519.jpg",
+  "history": {
+    "image": "./images/hero_masra_pavilion_1794615113578.jpg",
+    "badge": {
+      "ar": "التأسيس والهوية [بيانات قابلة للتعديل]",
+      "fr": "IDENTITÉ & ANCRAGE [MODIFIABLE]",
+      "en": "IDENTITY & ROOTS [EDITABLE]"
+    },
+    "title": {
+      "ar": "فضاء عمومي نابض بالحياة في قلب ماسرى",
+      "fr": "Un lieu civique et créatif au cœur de Masra",
+      "en": "A Vibrant Civic & Creative Sanctuary in the Heart of Masra"
+    },
+    "body": {
+      "ar": "تُعد دار الشباب ماسرى مؤسسة تربوية وثقافية جوارية مفتوحة أمام الأطفال والشباب، تهدف إلى توفير بيئة آمنة ومُلهمة لاكتشاف المواهب، تنمية المهارات الرقمية والفنية، وتعزيز روح المواطنة والمبادرة الجماعية. جميع التواريخ والأرقام الإدارية المعلّمة هنا هي نماذج قابلة للتعديل المباشر من ملف about.json.",
+      "fr": "La Maison de Jeunes de Masra est une institution éducative et culturelle de proximité offrant aux jeunes un cadre ouvert pour développer leurs talents artistiques, scientifiques et numériques. Les repères administratifs marqués comme modifiables servent de modèle dans about.json.",
+      "en": "Maison de Jeunes de Masra serves as an open neighborhood civic and cultural sanctuary where young people cultivate artistic expression, digital literacy, athletic discipline, and community leadership. Administrative fields marked editable can be updated directly via about.json."
+    }
+  },
+  "mission": {
+    "ar": "مرافقة الشباب في مسارات التعبير الثقافي، الابتكار الرقمي، والتطوع المجتمعي ضمن ورشات مؤطرة ومنفتحة.",
+    "fr": "Accompagner les jeunes dans l'expression culturelle, l'innovation numérique et l'engagement citoyen à travers des ateliers encadrés.",
+    "en": "To nurture young talent through structured artistic, scientific, digital, and civic programs accessible to all youth in Masra."
+  },
+  "vision": {
+    "ar": "بناء جيل شبابي مبادر، متقن لأدوات العصر، ومرتبط بجذوره الثقافية والجمالية المحلية.",
+    "fr": "Former une génération créative, maîtresse des outils contemporains et fière de son patrimoine local.",
+    "en": "Shaping an inventive generation fluent in contemporary tools while deeply rooted in local cultural heritage."
+  },
+  "values": [
+    {
+      "code": "01",
+      "title": {
+        "ar": "الاحترام والانفتاح",
+        "fr": "Ouverture & Respect",
+        "en": "Openness & Respect"
+      },
+      "desc": {
+        "ar": "فضاء دامج يرحب بكل الشباب بمختلف اهتماماتهم الثقافية والعلمية.",
+        "fr": "Un espace inclusif ouvert à tous les parcours et sensibilités.",
+        "en": "An inclusive cultural forum welcoming diverse youth voices."
+      }
+    },
+    {
+      "code": "02",
+      "title": {
+        "ar": "الإبداع والجودة",
+        "fr": "Exigence & Création",
+        "en": "Craft & Creativity"
+      },
+      "desc": {
+        "ar": "تشجيع الممارسة الجادة في الفنون، العلوم، والتقنيات الحديثة.",
+        "fr": "Valoriser la rigueur artistique, scientifique et numérique.",
+        "en": "Encouraging thoughtful practice across arts, sciences, and media."
+      }
+    },
+    {
+      "code": "03",
+      "title": {
+        "ar": "روح المبادرة",
+        "fr": "Esprit d'Initiative",
+        "en": "Civic Initiative"
+      },
+      "desc": {
+        "ar": "تحفيز العمل الجماعي وقيادة المشاريع المجتمعية والتطوعية.",
+        "fr": "Encourager la prise d'initiative collective et le bénévolat.",
+        "en": "Empowering youth-led neighborhood projects and volunteering."
+      }
+    }
+  ],
+  "organization": [
+    {
+      "role": {
+        "ar": "إدارة المؤسسة [اسم قابل للتعديل]",
+        "fr": "Direction de l'établissement [Nom modifiable]",
+        "en": "Institution Directorate [Editable Name]"
+      },
+      "unit": {
+        "ar": "التنسيق العام والشراكات",
+        "fr": "Coordination générale & partenariats",
+        "en": "General Coordination & Partnerships"
+      }
+    },
+    {
+      "role": {
+        "ar": "خلية النشاط الثقافي والفني",
+        "fr": "Cellule Culturelle & Artistique",
+        "en": "Cultural & Fine Arts Desk"
+      },
+      "unit": {
+        "ar": "المسرح، الرسم، الموسيقى والقراءة",
+        "fr": "Théâtre, beaux-arts, musique & lecture",
+        "en": "Theater, fine arts, music & reading"
+      }
+    },
+    {
+      "role": {
+        "ar": "مخبر الإعلام الآلي والابتكار",
+        "fr": "Pôle Numérique & Innovation",
+        "en": "Digital & Robotics Lab"
+      },
+      "unit": {
+        "ar": "البرمجة، الروبوتيك والإعلام السمعي البصري",
+        "fr": "Code, robotique & média numérique",
+        "en": "Coding, robotics & media production"
+      }
+    },
+    {
+      "role": {
+        "ar": "خلية الإصغاء والأنشطة الرياضية",
+        "fr": "Cellule Écoute, Sport & Initiatives",
+        "en": "Youth Advisory & Sports Unit"
+      },
+      "unit": {
+        "ar": "التوجيه، التطوع والدوريات الشبابية",
+        "fr": "Orientation, volontariat & tournois",
+        "en": "Guidance, volunteering & tournaments"
+      }
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "id": "evt-cultural-forum",
+    "status": "upcoming",
+    "date": "2026-12-05 [Demo Date]",
+    "time": "14:00 – 17:30",
+    "location": {
+      "ar": "قاعة المحاضرات الكبرى · دار الشباب ماسرى",
+      "fr": "Grand Auditorium · Maison de Jeunes de Masra",
+      "en": "Main Auditorium · Masra Youth House"
+    },
+    "category": {
+      "ar": "ملتقى ثقافي",
+      "fr": "Forum Culturel",
+      "en": "Cultural Forum"
+    },
+    "title": {
+      "ar": "المنتدى الشتوي للإبداع الشبابي والابتكار المحلي",
+      "fr": "Forum d'Hiver de la Création Jeunesse & Innovation Locale",
+      "en": "Winter Forum on Youth Creativity & Local Innovation"
+    },
+    "description": {
+      "ar": "يوم مفتوح يجمع عروض الأندية العلمية، معرضاً للوحات التشكيلية، وجلسات نقاش مع فاعلين محليين حول المبادرات الشبابية.",
+      "fr": "Journée portes ouvertes réunissant démonstrations des clubs scientifiques, exposition de peinture et tables rondes locales.",
+      "en": "An open showcase bringing together robotics club demos, fine arts exhibitions, and community roundtables."
+    },
+    "registrationNote": {
+      "ar": "الدخول مجاني بمقر المؤسسة [نموذج تجريبي]",
+      "fr": "Entrée libre sur place [Exemple]",
+      "en": "Free local registration [Demo Entry]"
+    },
+    "image": "./images/event_cultural_forum_1794615114219.jpg"
+  },
+  {
+    "id": "evt-digital-hackathon",
+    "status": "upcoming",
+    "date": "2026-12-19 [Demo Date]",
+    "time": "09:00 – 16:00",
+    "location": {
+      "ar": "مخبر الابتكار الرقمي",
+      "fr": "Laboratoire d'Innovation Numérique",
+      "en": "Digital Innovation Lab"
+    },
+    "category": {
+      "ar": "تحدي تكنولوجي",
+      "fr": "Défi Technologique",
+      "en": "Tech Challenge"
+    },
+    "title": {
+      "ar": "مختبر الأفكار: تصميم حلول رقمية لخدمة بلدية ماسرى",
+      "fr": "Idéathon Masra : Solutions Numériques Citoyennes",
+      "en": "Masra Civic Ideathon: Youth Digital Prototypes"
+    },
+    "description": {
+      "ar": "ورشات عمل مكثفة في فرق شبابية لتصميم نماذج أولية لتطبيقات بيئية وثقافية تخدم المحيط المحلي.",
+      "fr": "Atelier intensif en équipes pour prototyper des services numériques civiques et écologiques.",
+      "en": "Collaborative youth sprint prototyping civic, environmental, and cultural micro-tools."
+    },
+    "registrationNote": {
+      "ar": "التسجيل مفتوح لفرق من 2 إلى 4 شباب",
+      "fr": "Ouvert aux équipes de 2 à 4 jeunes",
+      "en": "Open to teams of 2–4 participants"
+    },
+    "image": "./images/activity_digital_lab_1794615114351.jpg"
+  },
+  {
+    "id": "evt-heritage-exhibition",
+    "status": "past",
+    "date": "2026-10-12 [Demo Archive]",
+    "time": "10:00 – 16:30",
+    "location": {
+      "ar": "بهو العرض والفناء الداخلي",
+      "fr": "Galerie & Patio Central",
+      "en": "Gallery Hall & Courtyard"
+    },
+    "category": {
+      "ar": "أرشيف المعارض",
+      "fr": "Archive Exposition",
+      "en": "Exhibition Archive"
+    },
+    "title": {
+      "ar": "معرض الذاكرة المعمارية والخط العربي",
+      "fr": "Exposition Mémoire Architecturale & Calligraphie",
+      "en": "Architectural Memory & Calligraphy Exhibition"
+    },
+    "description": {
+      "ar": "توثيق الأعمال المنجزة خلال الدورة التكوينية الخريفية بمشاركة أزيد من عشرين شاباً وشابة.",
+      "fr": "Rétrospective des œuvres réalisées durant la session d'automne par les jeunes de l'atelier.",
+      "en": "Retrospective showcasing calligraphy and architectural sketching produced during the autumn studio."
+    },
+    "registrationNote": {
+      "ar": "فعالية مختتمة — متاحة في الأرشيف",
+      "fr": "Événement clôturé — Archive",
+      "en": "Concluded — Archived Highlight"
+    },
+    "image": "./images/gallery_courtyard_detail_1794615114519.jpg"
+  }
+]
