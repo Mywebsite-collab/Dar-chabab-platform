@@ -3213,10 +3213,10 @@
 
       const sourceText = target.value.trim();
       const frPath = isUiStringsArabic
-        ? bindPath.replace(/^uiStrings\\.ar\\./, "uiStrings.fr.")
+        ? bindPath.replace(/^uiStrings\.ar\./, "uiStrings.fr.")
         : `${bindPath.slice(0, -3)}.fr`;
       const enPath = isUiStringsArabic
-        ? bindPath.replace(/^uiStrings\\.ar\\./, "uiStrings.en.")
+        ? bindPath.replace(/^uiStrings\.ar\./, "uiStrings.en.")
         : `${bindPath.slice(0, -3)}.en`;
       const findBoundField = (path) => Array.from(document.querySelectorAll("[data-bind]"))
         .find((field) => field.getAttribute("data-bind") === path);
