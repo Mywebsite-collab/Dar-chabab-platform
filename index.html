@@ -5733,7 +5733,7 @@
                   ${
                     customElCount > 0
                       ? `<button type="button" data-action="admin-reset-element-styles" class="btn" style="padding:0.3rem 0.65rem;background:rgba(154,52,18,0.1);border:1px solid rgba(154,52,18,0.25);color:#9a3412;">
-                          <span>${escapeHtml(lang === "ar" ? `إعادة مواقع وألوان العناصر (${customElCount})` : `Reset Element Offsets (${customElCount})`)}</span>
+                          <span>${escapeHtml(lang === "ar" ? `إعادة مواقع وألوان العناصر (${customElCount})` : lang === "fr" ? `Réinitialiser les positions et couleurs (${customElCount})` : `Reset Element Offsets (${customElCount})`)}</span>
                         </button>`
                       : ""
                   }
@@ -5792,7 +5792,7 @@
                 <div class="flex-between" style="padding:0.55rem 0.75rem;border-radius:8px;background:rgba(24,119,242,0.06);border:1px solid rgba(24,119,242,0.22);font-size:0.75rem;margin-top:0.25rem;">
                   <span style="font-weight:600;color:#181715;">${escapeHtml(lang === "ar" ? "عنصر «آخر منشورات دار الشباب على فيسبوك»" : lang === "fr" ? "Élément « Dernières publications Facebook »" : "«Latest Facebook Posts» Element")}</span>
                   <button type="button" data-action="toggle-fb-setting" data-key="enabled" class="btn-pill ${s.facebookFeed?.enabled !== false ? "is-active" : ""}">
-                    ${escapeHtml(lang === "ar" ? (s.facebookFeed?.enabled !== false ? "ظاهر (اضغط للحذف)" : "محذوف (اضغط للاستعادة)") : (s.facebookFeed?.enabled !== false ? "Visible (Click to Delete)" : "Deleted (Restore)"))}
+                    ${escapeHtml(lang === "ar" ? (s.facebookFeed?.enabled !== false ? "ظاهر (اضغط للحذف)" : "محذوف (اضغط للاستعادة)") : lang === "fr" ? (s.facebookFeed?.enabled !== false ? "Visible (Cliquer pour supprimer)" : "Supprimé (Restaurer)") : (s.facebookFeed?.enabled !== false ? "Visible (Click to Delete)" : "Deleted (Restore)"))}
                   </button>
                 </div>
               </div>
@@ -6045,7 +6045,7 @@
                   </a>
                   <button type="button" data-action="toggle-fb-setting" data-key="enabled" class="btn" style="padding:0.45rem 0.9rem;${fbCfg.enabled !== false ? "background:rgba(154,52,18,0.1);border:1px solid rgba(154,52,18,0.3);color:#9a3412;" : "background:#14532d;color:#fbf9f5;"}">
                     ${fbCfg.enabled !== false ? icon("trash", "icon-sm") : icon("rotateCcw", "icon-sm")}
-                    <span>${escapeHtml(lang === "ar" ? (fbCfg.enabled !== false ? "حذف عنصر فيسبوك من الموقع" : "استعادة عنصر فيسبوك للموقع") : (fbCfg.enabled !== false ? "Delete FB Section" : "Restore FB Section"))}</span>
+                    <span>${escapeHtml(lang === "ar" ? (fbCfg.enabled !== false ? "حذف عنصر فيسبوك من الموقع" : "استعادة عنصر فيسبوك للموقع") : lang === "fr" ? (fbCfg.enabled !== false ? "Supprimer la section Facebook" : "Restaurer la section Facebook") : (fbCfg.enabled !== false ? "Delete FB Section" : "Restore FB Section"))}</span>
                   </button>
                 </div>
               </div>
@@ -6074,7 +6074,7 @@
                   deletedFbCount > 0
                     ? `<button type="button" data-action="restore-fb-deleted" class="btn btn-outline" style="padding:0.35rem 0.75rem;font-size:0.75rem;">
                         ${icon("rotateCcw", "icon-sm")}
-                        <span>${escapeHtml(lang === "ar" ? `استعادة المنشورات المحذوفة (${deletedFbCount})` : `Restore Deleted Posts (${deletedFbCount})`)}</span>
+                        <span>${escapeHtml(lang === "ar" ? `استعادة المنشورات المحذوفة (${deletedFbCount})` : lang === "fr" ? `Restaurer les publications supprimées (${deletedFbCount})` : `Restore Deleted Posts (${deletedFbCount})`)}</span>
                       </button>`
                     : ""
                 }
@@ -6083,7 +6083,7 @@
                 state.fbSync.error
                   ? `<p class="warn-box" style="margin:0;font-size:0.75rem;">${escapeHtml(state.fbSync.error)}</p>`
                   : state.fbNews.length
-                    ? `<p style="margin:0;font-size:0.75rem;color:#14532d;font-weight:500;">${escapeHtml(lang === "ar" ? `تمت مزامنة ${state.fbNews.length} منشورات بنجاح من الصفحة الرسمية.` : `${state.fbNews.length} Facebook posts synced.`)}</p>`
+                    ? `<p style="margin:0;font-size:0.75rem;color:#14532d;font-weight:500;">${escapeHtml(lang === "ar" ? `تمت مزامنة ${state.fbNews.length} منشورات بنجاح من الصفحة الرسمية.` : lang === "fr" ? `${state.fbNews.length} publications Facebook synchronisées.` : `${state.fbNews.length} Facebook posts synced.`)}</p>`
                     : ""
               }
               ${
@@ -6586,8 +6586,8 @@
         case "settingsField": return `settings.${target.field}`;
         case "metric": return adminText(lang, "تعديل مؤشر إحصائي", "Edit Metric");
         case "aboutField": return `about.${target.field}`;
-        case "aboutValue": return lang === "ar" ? `قيمة مؤسساتية #${target.index + 1}` : `Guiding Value #${target.index + 1}`;
-        case "aboutOrg": return lang === "ar" ? `عنصر الهيكلة #${target.index + 1}` : `Org Structure #${target.index + 1}`;
+        case "aboutValue": return lang === "ar" ? `قيمة مؤسساتية #${target.index + 1}` : lang === "fr" ? `Valeur fondamentale #${target.index + 1}` : `Guiding Value #${target.index + 1}`;
+        case "aboutOrg": return lang === "ar" ? `عنصر الهيكلة #${target.index + 1}` : lang === "fr" ? `Élément de structure #${target.index + 1}` : `Org Structure #${target.index + 1}`;
         case "activity": return lang === "ar" ? "تعديل بطاقة نشاط" : lang === "fr" ? "Modifier l'activité" : "Edit Activity";
         case "event": return lang === "ar" ? "تعديل فعالية" : lang === "fr" ? "Modifier l'événement" : "Edit Event";
         case "news": return lang === "ar" ? "تعديل مقال إخباري" : lang === "fr" ? "Modifier l'actualité" : "Edit News";
