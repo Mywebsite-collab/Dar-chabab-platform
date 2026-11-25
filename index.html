@@ -3203,6 +3203,66 @@
         .join("");
     }
 
+    const activeArabicTranslations = new WeakSet();
+
+    async function translateArabicBoundField(target) {
+      const bindPath = target?.getAttribute?.("data-bind") || "";
+      if (!bindPath.endsWith(".ar") || !target.value.trim() || activeArabicTranslations.has(target)) return;
+      if (!getGeminiApiKey()) return;
+
+      const sourceText = target.value.trim();
+      const basePath = bindPath.slice(0, -3);
+      const localeGrid = target.closest(".lang-grid-3");
+      const localeFields = Array.from(localeGrid?.querySelectorAll("[data-bind]") || []);
+      const frField = localeFields.find((field) => field.getAttribute("data-bind") === `${basePath}.fr`);
+      const enField = localeFields.find((field) => field.getAttribute("data-bind") === `${basePath}.en`);
+      if (!frField || !enField) return;
+
+      const previousFr = frField.value;
+      const previousEn = enField.value;
+      activeArabicTranslations.add(target);
+      target.dataset.translationStatus = "loading";
+
+      try {
+        const response = await callGeminiRest("gemini-4-hydrogen", {
+          contents: [{
+            role: "user",
+            parts: [{
+              text: [
+                "Translate the Arabic source text into natural, accurate French and English.",
+                "Preserve the meaning, names, numbers, punctuation, and formatting.",
+                "Return only valid JSON with exactly two string properties: fr and en.",
+                "Do not include explanations or markdown.",
+                `Arabic source: ${sourceText}`
+              ].join("\\n")
+            }]
+          }],
+          generationConfig: { responseMimeType: "application/json", temperature: 0.2 }
+        }, "ar");
+
+        const raw = extractGeminiText(response).trim().replace(/^\`\`\`(?:json)?\\s*/i, "").replace(/\\s*\`\`\`$/, "");
+        const translated = JSON.parse(raw);
+        if (target.value.trim() !== sourceText) return;
+        if (frField.value !== previousFr || enField.value !== previousEn) return;
+        if (typeof translated.fr !== "string" || typeof translated.en !== "string" || !translated.fr.trim() || !translated.en.trim()) {
+          throw new Error("The translation response was incomplete.");
+        }
+
+        applyDataBind(`${basePath}.fr`, translated.fr.trim());
+        applyDataBind(`${basePath}.en`, translated.en.trim());
+        frField.value = translated.fr.trim();
+        enField.value = translated.en.trim();
+        target.dataset.translationStatus = "done";
+        if (state.activeVeTarget) refreshBackgroundShellOnly();
+        flashAdminSaved();
+      } catch (error) {
+        target.dataset.translationStatus = "error";
+        console.warn("Arabic field translation failed:", error);
+      } finally {
+        activeArabicTranslations.delete(target);
+      }
+    }
+
     function getMissingKeyMessage(language) {
       if (language === "ar") {
         return "مفتاح Gemini API غير مضبوط. لتمكين ميزات الذكاء الاصطناعي والبحث الموثق، افتح لوحة الإدارة (انقر 3 مرات أسفل الفوتر) وأضف مفتاح Gemini API في تبويب الإعدادات.";
@@ -7132,7 +7192,7 @@
       if (parts[0] === "ve" && parts[1] === "ui") {
         const [, , section, field, langKey] = parts;
         const next = structuredClone(state.uiStrings);
-        const targetLanguages = langKey === "ar" ? ["ar", "fr", "en"] : [langKey];
+        const targetLanguages = [langKey];
         targetLanguages.forEach((lc) => {
           if (!next[lc][section]) next[lc][section] = {};
           next[lc][section][field] = val;
@@ -7144,7 +7204,7 @@
       if (parts[0] === "uiStrings") {
         const [, lc, sec, a, b] = parts;
         const next = structuredClone(state.uiStrings);
-        const targetLanguages = lc === "ar" ? ["ar", "fr", "en"] : [lc];
+        const targetLanguages = [lc];
         targetLanguages.forEach((targetLang) => {
           if (sec === "highlights") {
             const idx = Number(a);
@@ -7182,18 +7242,9 @@
         if (!cursor) return null;
       }
       const lastKey = parts[parts.length - 1];
-      // Arabic is the master text: edits to an Arabic localized field are mirrored
-      // to French and English. Editing FR or EN remains independent.
-      if (
-        lastKey === "ar" &&
-        cursor &&
-        typeof cursor === "object" &&
-        ("fr" in cursor || "en" in cursor)
-      ) {
-        cursor.ar = val;
-        cursor.fr = val;
-        cursor.en = val;
-      } else if (Array.isArray(cursor)) cursor[Number(lastKey)] = val;
+      // Keep each locale independent. Arabic edits are translated asynchronously
+      // by translateArabicBoundField() instead of copying Arabic into FR/EN.
+      if (Array.isArray(cursor)) cursor[Number(lastKey)] = val;
       else cursor[lastKey] = val;
 
       if (bindPath === "settings.facebookFeed.pageUrl" && String(val || "").trim() !== String(state.settings?.facebookFeed?.pageUrl || "").trim()) {
@@ -8222,6 +8273,13 @@
         }
       }
     });
+
+    document.addEventListener("focusout", (e) => {
+      const target = e.target;
+      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+        void translateArabicBoundField(target);
+      }
+    }, true);
 
     document.addEventListener("change", async (e) => {
       const target = e.target;
