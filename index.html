@@ -8041,7 +8041,24 @@
         applyElementStyles();
         if (state.activeVeTarget) {
           const body = document.getElementById("ve-inspector-body");
-          if (body) body.innerHTML = renderVeInspectorBody(state.activeVeTarget);
+          const focusedElement = document.activeElement;
+          const isEditingInspectorField = Boolean(
+            body &&
+            focusedElement &&
+            body.contains(focusedElement) &&
+            (
+              focusedElement instanceof HTMLInputElement ||
+              focusedElement instanceof HTMLTextAreaElement ||
+              focusedElement instanceof HTMLSelectElement ||
+              focusedElement.isContentEditable
+            )
+          );
+
+          // Mobile virtual keyboards trigger resize. Do not rebuild the inspector
+          // while a field is focused, otherwise the active field loses focus.
+          if (body && !isEditingInspectorField) {
+            body.innerHTML = renderVeInspectorBody(state.activeVeTarget);
+          }
         }
       });
     }, { passive: true });
