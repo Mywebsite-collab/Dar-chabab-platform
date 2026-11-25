@@ -8351,7 +8351,47 @@
       renderShell({ preserve3D: false });
     });
 
-    function initApp() {
+    async function loadPublishedContentBundle() {
+      const files = {
+        settings: "settings.json",
+        about: "about.json",
+        activities: "activities.json",
+        events: "events.json",
+        news: "news.json",
+        gallery: "gallery.json",
+        uiStrings: "ui-strings.json"
+      };
+      const loaded = {};
+      await Promise.all(Object.entries(files).map(async ([key, filename]) => {
+        try {
+          const response = await fetch(new URL(filename, document.baseURI), { cache: "no-store" });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          loaded[key] = await response.json();
+        } catch (error) {
+          console.warn(`Unable to load published ${filename}; using built-in defaults.`, error);
+        }
+      }));
+
+      if (loaded.settings && typeof loaded.settings === "object") {
+        const defaults = deepMergeDefaults(DEFAULT_SETTINGS, loaded.settings);
+        state.settings = readLocalJson("mjm_settings", defaults);
+      }
+      if (loaded.about && typeof loaded.about === "object") {
+        state.about = readLocalJson("mjm_about", deepMergeDefaults(DEFAULT_ABOUT, loaded.about));
+      }
+      if (Array.isArray(loaded.activities)) state.activities = readLocalJson("mjm_activities", loaded.activities);
+      if (Array.isArray(loaded.events)) state.events = readLocalJson("mjm_events", loaded.events);
+      if (Array.isArray(loaded.news)) state.news = readLocalJson("mjm_news", loaded.news);
+      if (Array.isArray(loaded.gallery)) state.gallery = readLocalJson("mjm_gallery", loaded.gallery);
+      if (loaded.uiStrings && typeof loaded.uiStrings === "object") {
+        state.uiStrings = readLocalJson("mjm_ui_strings", deepMergeDefaults(DEFAULT_UI_STRINGS, loaded.uiStrings));
+      }
+      syncDocumentLanguage();
+    }
+
+    async function initApp() {
+      // Load repository JSON content before the first public render.
+      await loadPublishedContentBundle();
       // Clear any previously cached API posts before the first render.
       syncFacebookNewsFeed({ silent: true });
       renderShell({ preserve3D: false });
