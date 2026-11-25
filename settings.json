@@ -119,215 +119,111 @@
   },
   "elementStyles": {
     "settingsField:hero.headline": {
-      "responsive": {
-        "desktop": {
-          "x": -3,
-          "y": -1114
-        }
-      }
+      "x": -3,
+      "y": -1114
     },
     "settingsField:hero.eyebrow": {
-      "responsive": {
-        "desktop": {
-          "x": -23,
-          "y": -1198
-        }
-      }
+      "x": -23,
+      "y": -1198
     },
     "settingsField:hero.description": {
-      "responsive": {
-        "desktop": {
-          "x": -40,
-          "y": -979
-        }
-      }
+      "x": -40,
+      "y": -979
     },
     "ui:sections.aboutKicker": {
-      "responsive": {
-        "desktop": {
-          "x": -1,
-          "y": -100
-        }
-      }
+      "x": -1,
+      "y": -100
     },
     "ui:sections.aboutHeading": {
-      "responsive": {
-        "desktop": {
-          "x": 0,
-          "y": -49
-        }
-      }
+      "x": 0,
+      "y": -49
     },
     "aboutField:mission@home": {
-      "responsive": {
-        "desktop": {
-          "x": -1,
-          "y": -33
-        }
-      }
+      "x": -1,
+      "y": -33
     },
     "aboutField:history.body@home": {
-      "responsive": {
-        "desktop": {
-          "x": 0,
-          "y": -24
-        }
-      }
+      "x": 0,
+      "y": -24
     },
     "aboutField:homeImage@home-about": {
-      "responsive": {
-        "desktop": {
-          "x": 0,
-          "y": -9
-        }
-      }
+      "x": 0,
+      "y": -9
     },
     "ui:model3d.touchInteract": {
-      "responsive": {
-        "desktop": {
-          "x": 609,
-          "y": 187
-        }
-      }
+      "x": 609,
+      "y": 187
     },
     "ui:model3d.touchHint": {
-      "responsive": {
-        "desktop": {
-          "x": 331,
-          "y": 109
-        }
-      }
+      "x": 331,
+      "y": 109
     },
     "ui:model3d.touchScroll": {
-      "responsive": {
-        "desktop": {
-          "x": 621,
-          "y": 148
-        }
-      }
+      "x": 621,
+      "y": 148
     },
     "ui:sections.activitiesKicker@home": {
-      "responsive": {
-        "desktop": {
-          "x": 1,
-          "y": -96
-        }
-      }
+      "x": 1,
+      "y": -96
     },
     "ui:sections.activitiesHeading@home": {
-      "responsive": {
-        "desktop": {
-          "x": 0,
-          "y": -63
-        }
-      }
+      "x": 0,
+      "y": -63
     },
     "ui:sections.galleryKicker@home": {
-      "responsive": {
-        "desktop": {
-          "x": 17,
-          "y": -98
-        }
-      }
+      "x": 17,
+      "y": -98
     },
     "ui:sections.galleryHeading@home": {
-      "responsive": {
-        "desktop": {
-          "x": -100,
-          "y": -39
-        }
-      }
+      "x": -100,
+      "y": -39
     },
     "ui:sections.highlightsHeading": {
       "color": "#9a3412"
     },
     "ui:sections.highlightsKicker": {
-      "responsive": {
-        "desktop": {
-          "x": -4,
-          "y": -34
-        }
-      }
+      "x": -4,
+      "y": -34
     },
     "settingsField:contact.address@footer": {
-      "responsive": {
-        "desktop": {
-          "x": 1,
-          "y": 61
-        }
-      }
+      "x": 1,
+      "y": 61
     },
     "settingsField:contact.hours@footer": {
-      "responsive": {
-        "desktop": {
-          "x": 0,
-          "y": 22
-        }
-      }
+      "x": 0,
+      "y": 22
     },
     "ui:footer.placeholderDisclaimer@footer": {
-      "responsive": {
-        "desktop": {
-          "x": 6,
-          "y": 76
-        }
-      }
+      "x": 6,
+      "y": 76
     },
     "settingsField:institution.subtitle@footer": {
-      "responsive": {
-        "desktop": {
-          "x": 8,
-          "y": 10
-        }
-      }
+      "x": 8,
+      "y": 10
     },
     "ui:nav.gallery@footer": {
-      "responsive": {
-        "desktop": {
-          "x": -2,
-          "y": 75
-        }
-      }
+      "x": -2,
+      "y": 75
     },
     "ui:nav.activities@footer": {
-      "responsive": {
-        "desktop": {
-          "x": 0,
-          "y": 36
-        }
-      }
+      "x": 0,
+      "y": 36
     },
     "ui:nav.events@footer": {
-      "responsive": {
-        "desktop": {
-          "x": 8,
-          "y": 39
-        }
-      }
+      "x": 8,
+      "y": 39
     },
     "ui:footer.navigation@footer": {
-      "responsive": {
-        "desktop": {
-          "x": -4,
-          "y": -35
-        }
-      }
+      "x": -4,
+      "y": -35
     },
     "ui:footer.languages@footer": {
-      "responsive": {
-        "desktop": {
-          "x": 0,
-          "y": -34
-        }
-      }
+      "x": 0,
+      "y": -34
     },
     "settingsField:institution.name@footer": {
-      "responsive": {
-        "desktop": {
-          "x": 14,
-          "y": -45
-        }
-      }
+      "x": 14,
+      "y": -45
     }
   },
   "homeSectionOrder": [
