@@ -6590,7 +6590,11 @@
                 <span>${escapeHtml(lang === "ar" ? "تحريك وتغيير مكان العنصر" : lang === "fr" ? "Déplacer l'élément" : "Reposition Element (X / Y)")}</span>
               </span>
               <span class="badge-box" style="font-size:10px;padding:0.2rem 0.45rem;">${escapeHtml(breakpointLabel)} · ${escapeHtml(lang === "ar" ? "إعداد مستقل" : lang === "fr" ? "Réglage indépendant" : "Independent")}</span>
-              <button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(lang === "ar" ? "استعادة المكان" : lang === "fr" ? "Restaurer la position" : "Restore Position")}</button>
+              ${
+                curX !== 0 || curY !== 0
+                  ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(lang === "ar" ? "إعادة المكان" : "Reset Pos")}</button>`
+                  : ""
+              }
             </div>
             <div class="flex-row-wrap" style="gap:0.5rem;">
               <label style="display:inline-flex;align-items:center;gap:0.35rem;font-size:11px;">
@@ -7330,26 +7334,6 @@
     document.addEventListener("pointerup", finishVeDrag);
     document.addEventListener("pointercancel", finishVeDrag);
 
-    // Reliable touch selection for the About heading on mobile.
-    // Some mobile browsers deliver the tap target inconsistently for this heading,
-    // so resolve the actual element under the pointer before the click event.
-    document.addEventListener("pointerup", (e) => {
-      if (!state.adminUnlocked || !state.visualEditMode || state.browseOverride || state.veDragMode || state.activePage === "admin") return;
-      if (e.pointerType === "mouse" && e.button !== 0) return;
-      const hit = document.elementFromPoint(e.clientX, e.clientY);
-      if (!(hit instanceof Element)) return;
-      const heading = hit.closest('[data-ve-key="ui:sections.aboutHeading"]');
-      if (!(heading instanceof HTMLElement)) return;
-      const raw = heading.getAttribute("data-ve-target");
-      if (!raw) return;
-      try {
-        state.activeVeTarget = JSON.parse(raw);
-        renderVisualOverlay();
-      } catch {
-        // Ignore malformed editor metadata.
-      }
-    }, { capture: true });
-
     // Visual Click-to-Edit capture interceptor
     document.addEventListener("click", (e) => {
       if (!state.visualEditMode || state.browseOverride || state.activePage === "admin") return;
@@ -7983,10 +7967,9 @@
         }
         case "ve-reset-pos": {
           const veKey = actionEl.getAttribute("data-ve-key");
-          if (veKey) {
+          if (veKey && state.settings.elementStyles?.[veKey]) {
             const next = structuredClone(state.settings);
-            if (!next.elementStyles) next.elementStyles = {};
-            next.elementStyles[veKey] = clearVeResponsivePosition(next.elementStyles[veKey] || {});
+            next.elementStyles[veKey] = clearVeResponsivePosition(next.elementStyles[veKey]);
             if (!next.elementStyles[veKey].color && !hasAnyVePosition(next.elementStyles[veKey])) delete next.elementStyles[veKey];
             updateSettings(next);
             refreshBackgroundShellOnly();
@@ -8351,47 +8334,7 @@
       renderShell({ preserve3D: false });
     });
 
-    async function loadPublishedContentBundle() {
-      const files = {
-        settings: "settings.json",
-        about: "about.json",
-        activities: "activities.json",
-        events: "events.json",
-        news: "news.json",
-        gallery: "gallery.json",
-        uiStrings: "ui-strings.json"
-      };
-      const loaded = {};
-      await Promise.all(Object.entries(files).map(async ([key, filename]) => {
-        try {
-          const response = await fetch(new URL(filename, document.baseURI), { cache: "no-store" });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          loaded[key] = await response.json();
-        } catch (error) {
-          console.warn(`Unable to load published ${filename}; using built-in defaults.`, error);
-        }
-      }));
-
-      if (loaded.settings && typeof loaded.settings === "object") {
-        const defaults = deepMergeDefaults(DEFAULT_SETTINGS, loaded.settings);
-        state.settings = readLocalJson("mjm_settings", defaults);
-      }
-      if (loaded.about && typeof loaded.about === "object") {
-        state.about = readLocalJson("mjm_about", deepMergeDefaults(DEFAULT_ABOUT, loaded.about));
-      }
-      if (Array.isArray(loaded.activities)) state.activities = readLocalJson("mjm_activities", loaded.activities);
-      if (Array.isArray(loaded.events)) state.events = readLocalJson("mjm_events", loaded.events);
-      if (Array.isArray(loaded.news)) state.news = readLocalJson("mjm_news", loaded.news);
-      if (Array.isArray(loaded.gallery)) state.gallery = readLocalJson("mjm_gallery", loaded.gallery);
-      if (loaded.uiStrings && typeof loaded.uiStrings === "object") {
-        state.uiStrings = readLocalJson("mjm_ui_strings", deepMergeDefaults(DEFAULT_UI_STRINGS, loaded.uiStrings));
-      }
-      syncDocumentLanguage();
-    }
-
-    async function initApp() {
-      // Load repository JSON content before the first public render.
-      await loadPublishedContentBundle();
+    function initApp() {
       // Clear any previously cached API posts before the first render.
       syncFacebookNewsFeed({ silent: true });
       renderShell({ preserve3D: false });
