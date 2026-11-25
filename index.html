@@ -2989,6 +2989,60 @@
       return `<img src="${escapeHtml(resolved)}" alt="${escapeHtml(alt)}" loading="${priority ? "eager" : "lazy"}" decoding="${priority ? "sync" : "async"}" referrerpolicy="no-referrer" data-safe-img="true" class="${escapeHtml(className)}" />`;
     }
 
+
+    function adminText(lang, ar, en) {
+      const french = {
+        "Hero Image": "Image de couverture",
+        "Reset Colors": "Réinitialiser les couleurs",
+        "Default Order": "Ordre par défaut",
+        "Hero Eyebrow": "Surtitre principal",
+        "Hero Headline": "Titre principal",
+        "Hero Description": "Description principale",
+        "Social Channels": "Réseaux sociaux",
+        "Institutional Metrics": "Indicateurs institutionnels",
+        "Save Key": "Enregistrer la clé",
+        "Clear": "Effacer",
+        "History Badge": "Badge historique",
+        "History Title": "Titre de l’historique",
+        "History Body": "Présentation historique",
+        "Institutional Mission": "Mission institutionnelle",
+        "Strategic Vision": "Vision stratégique",
+        "Guiding Values": "Valeurs fondamentales",
+        "Organizational Structure": "Structure organisationnelle",
+        "The Facebook Posts element is currently removed/hidden. Click Restore above to re-enable it.": "La section des publications Facebook est actuellement masquée. Cliquez sur Restaurer ci-dessus pour la réactiver.",
+        "Official Facebook Page URL": "URL de la page Facebook officielle",
+        "Facebook Feed Title": "Titre de la section Facebook",
+        "Facebook Feed Subtitle": "Sous-titre de la section Facebook",
+        "Edit Metric": "Modifier l’indicateur",
+        "Reset Color": "Réinitialiser la couleur",
+        "Reset Pos": "Réinitialiser la position",
+        "Move Earlier": "Déplacer vers le haut",
+        "Move Later": "Déplacer vers le bas",
+        "Institution Name": "Nom de l’institution",
+        "Institution Subtitle": "Description de l’institution",
+        "Main Hero Banner Image": "Image principale de la page d’accueil",
+        "Address": "Adresse",
+        "Opening Hours": "Horaires d’ouverture",
+        "About Page Image": "Image de la page À propos",
+        "Home About Section Image": "Image de la section À propos (accueil)",
+        "Activity Image": "Image de l’activité",
+        "Event Poster": "Affiche de l’événement",
+        "Article Image": "Image de l’article",
+        "Kicker": "Surtitre",
+        "Title": "Titre",
+        "Subtitle": "Sous-titre",
+        "Facebook Page URL": "URL de la page Facebook",
+        "Post Image": "Image de la publication",
+        "Gallery Image": "Image de la galerie",
+        "Browse": "Parcourir",
+        "Drag Mode": "Mode déplacement",
+        "Click-to-Edit": "Cliquer pour modifier",
+        "Dashboard": "Tableau de bord",
+        "Exit": "Quitter"
+      };
+      return lang === "ar" ? ar : lang === "fr" ? (french[en] || en) : en;
+    }
+
     function renderLocalizedFieldGrid(label, value, { multiline = false, rows = 2, bindPrefix = "" } = {}) {
       const fields = [
         { key: "ar", tag: "AR", dir: "rtl" },
@@ -4689,7 +4743,7 @@
                   isVe
                     ? `<button type="button"${veAttr({ kind: "settingsField", field: "hero.heroImage" }, "hero")} class="btn btn-gold" style="padding:0.375rem 0.75rem;">
                         ${icon("image", "icon-sm")}
-                        <span>${lang === "ar" ? "تغيير صورة الخلفية" : "Hero Image"}</span>
+                        <span>${adminText(lang, "تغيير صورة الخلفية", "Hero Image")}</span>
                       </button>`
                     : ""
                 }
@@ -5674,7 +5728,7 @@
                 <div class="flex-row-wrap" style="gap:0.4rem;">
                   <button type="button" data-action="admin-reset-text-colors" class="btn btn-outline" style="padding:0.3rem 0.65rem;">
                     ${icon("rotateCcw", "icon-sm")}
-                    <span>${escapeHtml(lang === "ar" ? "إعادة الألوان الأصلية" : "Reset Colors")}</span>
+                    <span>${escapeHtml(adminText(lang, "إعادة الألوان الأصلية", "Reset Colors"))}</span>
                   </button>
                   ${
                     customElCount > 0
@@ -5716,7 +5770,7 @@
                 </div>
                 <button type="button" data-action="reset-home-sections" class="btn btn-outline" style="padding:0.3rem 0.65rem;">
                   ${icon("rotateCcw", "icon-sm")}
-                  <span>${escapeHtml(lang === "ar" ? "الترتيب الافتراضي" : "Default Order")}</span>
+                  <span>${escapeHtml(adminText(lang, "الترتيب الافتراضي", "Default Order"))}</span>
                 </button>
               </div>
               <div class="stack-xs">
@@ -5745,9 +5799,9 @@
             </div>
 
             <div class="hairline-t stack-md">
-              ${renderLocalizedFieldGrid(lang === "ar" ? "السطر التمهيدي (Hero Eyebrow)" : "Hero Eyebrow", s.hero.eyebrow, { bindPrefix: "settings.hero.eyebrow" })}
-              ${renderLocalizedFieldGrid(lang === "ar" ? "العنوان الرئيسي (Hero Headline)" : "Hero Headline", s.hero.headline, { bindPrefix: "settings.hero.headline" })}
-              ${renderLocalizedFieldGrid(lang === "ar" ? "النص الافتتاحي (Hero Description)" : "Hero Description", s.hero.description, { multiline: true, bindPrefix: "settings.hero.description" })}
+              ${renderLocalizedFieldGrid(adminText(lang, "السطر التمهيدي (Hero Eyebrow)", "Hero Eyebrow"), s.hero.eyebrow, { bindPrefix: "settings.hero.eyebrow" })}
+              ${renderLocalizedFieldGrid(adminText(lang, "العنوان الرئيسي (Hero Headline)", "Hero Headline"), s.hero.headline, { bindPrefix: "settings.hero.headline" })}
+              ${renderLocalizedFieldGrid(adminText(lang, "النص الافتتاحي (Hero Description)", "Hero Description"), s.hero.description, { multiline: true, bindPrefix: "settings.hero.description" })}
               ${renderAdminImageControl({
                 language: lang,
                 label: lang === "ar" ? "صورة الواجهة الرئيسية (Hero Background)" : lang === "fr" ? "Image d'accueil principale (Hero)" : "Main Hero Banner Image",
@@ -5767,7 +5821,7 @@
 
               <div class="stack-xs">
                 <div class="flex-between">
-                  <p style="font-size:0.75rem;font-weight:500;color:#5c5852;margin:0;">${escapeHtml(lang === "ar" ? "روابط التواصل الاجتماعي" : "Social Channels")}</p>
+                  <p style="font-size:0.75rem;font-weight:500;color:#5c5852;margin:0;">${escapeHtml(adminText(lang, "روابط التواصل الاجتماعي", "Social Channels"))}</p>
                   <button type="button" data-action="add-social" class="text-gold-hover" style="font-size:0.75rem;font-weight:600;">+ Add</button>
                 </div>
                 ${s.contact.socialLinks
@@ -5784,7 +5838,7 @@
             </div>
 
             <div class="hairline-t stack-md">
-              <p style="font-size:0.75rem;font-weight:500;color:#5c5852;margin:0;">${escapeHtml(lang === "ar" ? "الأرقام والإحصائيات الرئيسية" : "Institutional Metrics")}</p>
+              <p style="font-size:0.75rem;font-weight:500;color:#5c5852;margin:0;">${escapeHtml(adminText(lang, "الأرقام والإحصائيات الرئيسية", "Institutional Metrics"))}</p>
               ${s.metrics
                 .map(
                   (m, idx) => `
@@ -5807,8 +5861,8 @@
               </div>
               <div class="flex-row-wrap">
                 <input type="password" dir="ltr" id="admin-gemini-key-input" value="${escapeHtml(state.geminiApiKey)}" placeholder="AIza..." class="input-field font-mono-tabular" style="flex:1;min-width:220px;" />
-                <button type="button" data-action="save-gemini-key" class="btn btn-gold">${escapeHtml(lang === "ar" ? "حفظ المفتاح" : "Save Key")}</button>
-                ${state.geminiApiKey ? `<button type="button" data-action="clear-gemini-key" class="btn btn-outline">${escapeHtml(lang === "ar" ? "مسح" : "Clear")}</button>` : ""}
+                <button type="button" data-action="save-gemini-key" class="btn btn-gold">${escapeHtml(adminText(lang, "حفظ المفتاح", "Save Key"))}</button>
+                ${state.geminiApiKey ? `<button type="button" data-action="clear-gemini-key" class="btn btn-outline">${escapeHtml(adminText(lang, "مسح", "Clear"))}</button>` : ""}
               </div>
               <p class="text-subtle" style="font-size:11px;margin:0;">${escapeHtml(lang === "ar" ? "لا يُدرج هذا المفتاح داخل ملف settings.json عند التصدير حفاظاً على الخصوصية." : lang === "fr" ? "Cette clé n'est jamais incluse dans l'export settings.json." : "This key is never included in exported JSON files.")}</p>
             </div>
@@ -5906,11 +5960,11 @@
         const ab = state.about;
         tabBody = `
           <form data-action="admin-save-about" class="card-surface p-card stack-lg">
-            ${renderLocalizedFieldGrid(lang === "ar" ? "الوسم التمهيدي" : "History Badge", ab.history.badge, { bindPrefix: "about.history.badge" })}
-            ${renderLocalizedFieldGrid(lang === "ar" ? "عنوان صفحة من نحن" : "History Title", ab.history.title, { bindPrefix: "about.history.title" })}
-            ${renderLocalizedFieldGrid(lang === "ar" ? "التعريف التاريخي بالمؤسسة" : "History Body", ab.history.body, { multiline: true, rows: 3, bindPrefix: "about.history.body" })}
-            ${renderLocalizedFieldGrid(lang === "ar" ? "الرسالة المؤسساتية" : "Institutional Mission", ab.mission, { multiline: true, bindPrefix: "about.mission" })}
-            ${renderLocalizedFieldGrid(lang === "ar" ? "الرؤية المستقبلية" : "Strategic Vision", ab.vision, { multiline: true, bindPrefix: "about.vision" })}
+            ${renderLocalizedFieldGrid(adminText(lang, "الوسم التمهيدي", "History Badge"), ab.history.badge, { bindPrefix: "about.history.badge" })}
+            ${renderLocalizedFieldGrid(adminText(lang, "عنوان صفحة من نحن", "History Title"), ab.history.title, { bindPrefix: "about.history.title" })}
+            ${renderLocalizedFieldGrid(adminText(lang, "التعريف التاريخي بالمؤسسة", "History Body"), ab.history.body, { multiline: true, rows: 3, bindPrefix: "about.history.body" })}
+            ${renderLocalizedFieldGrid(adminText(lang, "الرسالة المؤسساتية", "Institutional Mission"), ab.mission, { multiline: true, bindPrefix: "about.mission" })}
+            ${renderLocalizedFieldGrid(adminText(lang, "الرؤية المستقبلية", "Strategic Vision"), ab.vision, { multiline: true, bindPrefix: "about.vision" })}
 
             <div class="hairline-t grid-2" style="gap:1rem;">
               ${renderAdminImageControl({
@@ -5929,7 +5983,7 @@
 
             <div class="hairline-t stack-md">
               <div class="flex-between">
-                <p style="font-size:0.75rem;font-weight:500;color:#5c5852;margin:0;">${escapeHtml(lang === "ar" ? "القيم الأساسية" : "Guiding Values")}</p>
+                <p style="font-size:0.75rem;font-weight:500;color:#5c5852;margin:0;">${escapeHtml(adminText(lang, "القيم الأساسية", "Guiding Values"))}</p>
                 <button type="button" data-action="add-about-value" class="text-gold-hover" style="font-size:0.75rem;font-weight:600;">+ Add</button>
               </div>
               ${ab.values
@@ -5949,7 +6003,7 @@
 
             <div class="hairline-t stack-md">
               <div class="flex-between">
-                <p style="font-size:0.75rem;font-weight:500;color:#5c5852;margin:0;">${escapeHtml(lang === "ar" ? "الهيكلة التنظيمية" : "Organizational Structure")}</p>
+                <p style="font-size:0.75rem;font-weight:500;color:#5c5852;margin:0;">${escapeHtml(adminText(lang, "الهيكلة التنظيمية", "Organizational Structure"))}</p>
                 <button type="button" data-action="add-about-org" class="text-gold-hover" style="font-size:0.75rem;font-weight:600;">+ Add</button>
               </div>
               ${ab.organization
@@ -5998,7 +6052,7 @@
               <p class="notice-box" style="margin:0;font-size:0.75rem;">
                 ${escapeHtml(
                   fbCfg.enabled === false
-                    ? (lang === "ar" ? "عنصر «آخر منشورات دار الشباب على فيسبوك» محذوف/مخفي حالياً من صفحات المنصة. اضغط «استعادة عنصر فيسبوك للموقع» أعلاه لإعادته في أي وقت." : "The Facebook Posts element is currently removed/hidden. Click Restore above to re-enable it.")
+                    ? (adminText(lang, "عنصر «آخر منشورات دار الشباب على فيسبوك» محذوف/مخفي حالياً من صفحات المنصة. اضغط «استعادة عنصر فيسبوك للموقع» أعلاه لإعادته في أي وقت.", "The Facebook Posts element is currently removed/hidden. Click Restore above to re-enable it."))
                     : (lang === "ar"
                       ? "يتم عرض موجز الصفحة العامة عبر أداة Facebook الرسمية. لا يحتاج الموقع إلى رمز وصول أو إعداد Cloudflare. قد يطلب فيسبوك تسجيل الدخول، كما أن شكل المنشورات داخل الإطار تحدده Meta."
                       : lang === "fr"
@@ -6008,12 +6062,12 @@
               </p>
               <div class="grid-2" style="gap:0.75rem;">
                 <label class="stack-xs" style="font-size:0.75rem;">
-                  <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط الصفحة الرسمية على فيسبوك" : "Official Facebook Page URL")}</span>
+                  <span class="text-muted">${escapeHtml(adminText(lang, "رابط الصفحة الرسمية على فيسبوك", "Official Facebook Page URL"))}</span>
                   <input type="url" dir="ltr" value="${escapeHtml(fbCfg.pageUrl || "https://www.facebook.com/mjmesra")}" data-bind="settings.facebookFeed.pageUrl" class="input-field font-mono-tabular" />
                 </label>
               </div>
-              ${renderLocalizedFieldGrid(lang === "ar" ? "عنوان عنصر منشورات فيسبوك" : "Facebook Feed Title", { ar: fbUiAr.fbFeedTitle || "", fr: fbUiFr.fbFeedTitle || "", en: fbUiEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
-              ${renderLocalizedFieldGrid(lang === "ar" ? "الوصف الفرعي لعنصر فيسبوك" : "Facebook Feed Subtitle", { ar: fbUiAr.fbFeedSubtitle || "", fr: fbUiFr.fbFeedSubtitle || "", en: fbUiEn.fbFeedSubtitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
+              ${renderLocalizedFieldGrid(adminText(lang, "عنوان عنصر منشورات فيسبوك", "Facebook Feed Title"), { ar: fbUiAr.fbFeedTitle || "", fr: fbUiFr.fbFeedTitle || "", en: fbUiEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
+              ${renderLocalizedFieldGrid(adminText(lang, "الوصف الفرعي لعنصر فيسبوك", "Facebook Feed Subtitle"), { ar: fbUiAr.fbFeedSubtitle || "", fr: fbUiFr.fbFeedSubtitle || "", en: fbUiEn.fbFeedSubtitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
               <div class="flex-row-wrap" style="gap:0.75rem;">
                 
                 ${
@@ -6530,7 +6584,7 @@
         case "ui": return `${target.section}.${target.field}`;
         case "highlight": return lang === "ar" ? `شهادة مجتمعية #${target.index + 1}` : lang === "fr" ? `Témoignage #${target.index + 1}` : `Testimonial #${target.index + 1}`;
         case "settingsField": return `settings.${target.field}`;
-        case "metric": return lang === "ar" ? "تعديل مؤشر إحصائي" : "Edit Metric";
+        case "metric": return adminText(lang, "تعديل مؤشر إحصائي", "Edit Metric");
         case "aboutField": return `about.${target.field}`;
         case "aboutValue": return lang === "ar" ? `قيمة مؤسساتية #${target.index + 1}` : `Guiding Value #${target.index + 1}`;
         case "aboutOrg": return lang === "ar" ? `عنصر الهيكلة #${target.index + 1}` : `Org Structure #${target.index + 1}`;
@@ -6570,7 +6624,7 @@
               </span>
               ${
                 cur.color
-                  ? `<button type="button" data-action="ve-reset-color" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(lang === "ar" ? "إعادة اللون" : "Reset Color")}</button>`
+                  ? `<button type="button" data-action="ve-reset-color" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(adminText(lang, "إعادة اللون", "Reset Color"))}</button>`
                   : ""
               }
             </div>
@@ -6593,7 +6647,7 @@
               <span class="badge-box" style="font-size:10px;padding:0.2rem 0.45rem;">${escapeHtml(breakpointLabel)} · ${escapeHtml(lang === "ar" ? "إعداد مستقل" : lang === "fr" ? "Réglage indépendant" : "Independent")}</span>
               ${
                 curX !== 0 || curY !== 0
-                  ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(lang === "ar" ? "إعادة المكان" : "Reset Pos")}</button>`
+                  ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(adminText(lang, "إعادة المكان", "Reset Pos"))}</button>`
                   : ""
               }
             </div>
@@ -6618,8 +6672,8 @@
                 ? `<div class="flex-between" style="padding-top:0.5rem;border-top:1px solid rgba(24,23,21,0.08);">
                     <span class="text-muted" style="font-size:11px;">${escapeHtml(lang === "ar" ? "تغيير الترتيب في القائمة:" : lang === "fr" ? "Réorganiser dans la liste :" : "Reorder in list:")}</span>
                     <span style="display:inline-flex;gap:0.35rem;">
-                      <button type="button" data-action="ve-move-item" data-dir="-1" class="btn btn-outline" style="padding:0.25rem 0.6rem;font-size:11px;">${escapeHtml(lang === "ar" ? "تقديم" : "Move Earlier")}</button>
-                      <button type="button" data-action="ve-move-item" data-dir="1" class="btn btn-outline" style="padding:0.25rem 0.6rem;font-size:11px;">${escapeHtml(lang === "ar" ? "تأخير" : "Move Later")}</button>
+                      <button type="button" data-action="ve-move-item" data-dir="-1" class="btn btn-outline" style="padding:0.25rem 0.6rem;font-size:11px;">${escapeHtml(adminText(lang, "تقديم", "Move Earlier"))}</button>
+                      <button type="button" data-action="ve-move-item" data-dir="1" class="btn btn-outline" style="padding:0.25rem 0.6rem;font-size:11px;">${escapeHtml(adminText(lang, "تأخير", "Move Later"))}</button>
                     </span>
                   </div>`
                 : ""
@@ -6668,14 +6722,14 @@
       } else if (target.kind === "settingsField") {
         const s = state.settings;
         switch (target.field) {
-          case "institution.name": coreHtml = renderLocalizedFieldGrid(lang === "ar" ? "اسم المؤسسة" : "Institution Name", s.institution.name, { bindPrefix: "settings.institution.name" }); break;
-          case "institution.subtitle": coreHtml = renderLocalizedFieldGrid(lang === "ar" ? "الوصف المختصر" : "Institution Subtitle", s.institution.subtitle, { multiline: true, bindPrefix: "settings.institution.subtitle" }); break;
+          case "institution.name": coreHtml = renderLocalizedFieldGrid(adminText(lang, "اسم المؤسسة", "Institution Name"), s.institution.name, { bindPrefix: "settings.institution.name" }); break;
+          case "institution.subtitle": coreHtml = renderLocalizedFieldGrid(adminText(lang, "الوصف المختصر", "Institution Subtitle"), s.institution.subtitle, { multiline: true, bindPrefix: "settings.institution.subtitle" }); break;
           case "hero.eyebrow": coreHtml = renderLocalizedFieldGrid("Hero Eyebrow", s.hero.eyebrow, { bindPrefix: "settings.hero.eyebrow" }); break;
-          case "hero.headline": coreHtml = renderLocalizedFieldGrid(lang === "ar" ? "العنوان الرئيسي" : "Hero Headline", s.hero.headline, { multiline: true, rows: 2, bindPrefix: "settings.hero.headline" }); break;
-          case "hero.description": coreHtml = renderLocalizedFieldGrid(lang === "ar" ? "النص الافتتاحي" : "Hero Description", s.hero.description, { multiline: true, rows: 3, bindPrefix: "settings.hero.description" }); break;
-          case "hero.heroImage": coreHtml = renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة الواجهة الرئيسية" : "Main Hero Banner Image", value: s.hero.heroImage, bindKey: "settings.hero.heroImage" }); break;
-          case "contact.address": coreHtml = renderLocalizedFieldGrid(lang === "ar" ? "العنوان" : "Address", s.contact.address, { bindPrefix: "settings.contact.address" }); break;
-          case "contact.hours": coreHtml = renderLocalizedFieldGrid(lang === "ar" ? "أوقات العمل" : "Opening Hours", s.contact.hours, { bindPrefix: "settings.contact.hours" }); break;
+          case "hero.headline": coreHtml = renderLocalizedFieldGrid(adminText(lang, "العنوان الرئيسي", "Hero Headline"), s.hero.headline, { multiline: true, rows: 2, bindPrefix: "settings.hero.headline" }); break;
+          case "hero.description": coreHtml = renderLocalizedFieldGrid(adminText(lang, "النص الافتتاحي", "Hero Description"), s.hero.description, { multiline: true, rows: 3, bindPrefix: "settings.hero.description" }); break;
+          case "hero.heroImage": coreHtml = renderAdminImageControl({ language: lang, label: adminText(lang, "صورة الواجهة الرئيسية", "Main Hero Banner Image"), value: s.hero.heroImage, bindKey: "settings.hero.heroImage" }); break;
+          case "contact.address": coreHtml = renderLocalizedFieldGrid(adminText(lang, "العنوان", "Address"), s.contact.address, { bindPrefix: "settings.contact.address" }); break;
+          case "contact.hours": coreHtml = renderLocalizedFieldGrid(adminText(lang, "أوقات العمل", "Opening Hours"), s.contact.hours, { bindPrefix: "settings.contact.hours" }); break;
           case "contact.phone": coreHtml = `<label class="stack-xs" style="font-size:0.75rem;"><span class="text-muted">Phone</span><input type="text" dir="ltr" value="${escapeHtml(s.contact.phone)}" data-bind="settings.contact.phone" class="input-field" /></label>`; break;
           case "contact.email": coreHtml = `<label class="stack-xs" style="font-size:0.75rem;"><span class="text-muted">Email</span><input type="text" dir="ltr" value="${escapeHtml(s.contact.email)}" data-bind="settings.contact.email" class="input-field" /></label>`; break;
         }
@@ -6701,8 +6755,8 @@
           case "history.body": coreHtml = renderLocalizedFieldGrid("History Body", ab.history.body, { multiline: true, rows: 4, bindPrefix: "about.history.body" }); break;
           case "mission": coreHtml = renderLocalizedFieldGrid("Mission", ab.mission, { multiline: true, rows: 3, bindPrefix: "about.mission" }); break;
           case "vision": coreHtml = renderLocalizedFieldGrid("Vision", ab.vision, { multiline: true, rows: 3, bindPrefix: "about.vision" }); break;
-          case "history.image": coreHtml = renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة صفحة من نحن" : "About Page Image", value: ab.history?.image || "./images/hero_masra_pavilion_1794615113578.jpg", bindKey: "about.history.image" }); break;
-          case "homeImage": coreHtml = renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة قسم من نحن (الرئيسية)" : "Home About Section Image", value: ab.homeImage || "./images/gallery_courtyard_detail_1794615114519.jpg", bindKey: "about.homeImage" }); break;
+          case "history.image": coreHtml = renderAdminImageControl({ language: lang, label: adminText(lang, "صورة صفحة من نحن", "About Page Image"), value: ab.history?.image || "./images/hero_masra_pavilion_1794615113578.jpg", bindKey: "about.history.image" }); break;
+          case "homeImage": coreHtml = renderAdminImageControl({ language: lang, label: adminText(lang, "صورة قسم من نحن (الرئيسية)", "Home About Section Image"), value: ab.homeImage || "./images/gallery_courtyard_detail_1794615114519.jpg", bindKey: "about.homeImage" }); break;
         }
       } else if (target.kind === "aboutValue") {
         const idx = target.index;
@@ -6747,7 +6801,7 @@
               ${renderLocalizedFieldGrid("Full Details", item.details, { multiline: true, rows: 3, bindPrefix: `activities.${idx}.details` })}
               ${renderLocalizedFieldGrid("Schedule", item.schedule, { bindPrefix: `activities.${idx}.schedule` })}
               ${renderLocalizedFieldGrid("Space", item.space, { bindPrefix: `activities.${idx}.space` })}
-              ${renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة النشاط" : "Activity Image", value: item.image, bindKey: `activities.${idx}.image` })}
+              ${renderAdminImageControl({ language: lang, label: adminText(lang, "صورة النشاط", "Activity Image"), value: item.image, bindKey: `activities.${idx}.image` })}
             </div>
           `;
         }
@@ -6772,7 +6826,7 @@
               ${renderLocalizedFieldGrid("Location", evt.location, { bindPrefix: `events.${idx}.location` })}
               ${renderLocalizedFieldGrid("Description", evt.description, { multiline: true, bindPrefix: `events.${idx}.description` })}
               ${renderLocalizedFieldGrid("Registration Note", evt.registrationNote, { bindPrefix: `events.${idx}.registrationNote` })}
-              ${renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة الفعالية" : "Event Poster", value: evt.image, bindKey: `events.${idx}.image` })}
+              ${renderAdminImageControl({ language: lang, label: adminText(lang, "صورة الفعالية", "Event Poster"), value: evt.image, bindKey: `events.${idx}.image` })}
             </div>
           `;
         }
@@ -6790,7 +6844,7 @@
               ${renderLocalizedFieldGrid("Title", item.title, { bindPrefix: `news.${idx}.title` })}
               ${renderLocalizedFieldGrid("Summary", item.summary, { multiline: true, bindPrefix: `news.${idx}.summary` })}
               ${renderLocalizedFieldGrid("Full Body", item.body, { multiline: true, rows: 4, bindPrefix: `news.${idx}.body` })}
-              ${renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة المقال" : "Article Image", value: item.image, bindKey: `news.${idx}.image` })}
+              ${renderAdminImageControl({ language: lang, label: adminText(lang, "صورة المقال", "Article Image"), value: item.image, bindKey: `news.${idx}.image` })}
             </div>
           `;
         }
@@ -6801,12 +6855,12 @@
         const nEn = ui.en.newsPage || {};
         coreHtml = `
           <div class="stack-md">
-            ${renderLocalizedFieldGrid(lang === "ar" ? "الوسم التعريفي (Kicker)" : "Kicker", { ar: nAr.fbFeedKicker || "", fr: nFr.fbFeedKicker || "", en: nEn.fbFeedKicker || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedKicker" })}
-            ${renderLocalizedFieldGrid(lang === "ar" ? "عنوان عنصر فيسبوك" : "Title", { ar: nAr.fbFeedTitle || "", fr: nFr.fbFeedTitle || "", en: nEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
-            ${renderLocalizedFieldGrid(lang === "ar" ? "الوصف الفرعي" : "Subtitle", { ar: nAr.fbFeedSubtitle || "", fr: nFr.fbFeedSubtitle || "", en: nEn.fbFeedSubtitle || "" }, { multiline: true, rows: 2, bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
+            ${renderLocalizedFieldGrid(adminText(lang, "الوسم التعريفي (Kicker)", "Kicker"), { ar: nAr.fbFeedKicker || "", fr: nFr.fbFeedKicker || "", en: nEn.fbFeedKicker || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedKicker" })}
+            ${renderLocalizedFieldGrid(adminText(lang, "عنوان عنصر فيسبوك", "Title"), { ar: nAr.fbFeedTitle || "", fr: nFr.fbFeedTitle || "", en: nEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
+            ${renderLocalizedFieldGrid(adminText(lang, "الوصف الفرعي", "Subtitle"), { ar: nAr.fbFeedSubtitle || "", fr: nFr.fbFeedSubtitle || "", en: nEn.fbFeedSubtitle || "" }, { multiline: true, rows: 2, bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
             <div class="grid-2" style="gap:0.75rem;">
               <label class="stack-xs" style="font-size:0.75rem;">
-                <span class="text-muted">${escapeHtml(lang === "ar" ? "رابط الصفحة الرسمية على فيسبوك" : "Facebook Page URL")}</span>
+                <span class="text-muted">${escapeHtml(adminText(lang, "رابط الصفحة الرسمية على فيسبوك", "Facebook Page URL"))}</span>
                 <input type="url" dir="ltr" value="${escapeHtml(fbCfg.pageUrl || "https://www.facebook.com/mjmesra")}" data-bind="settings.facebookFeed.pageUrl" class="input-field font-mono-tabular" />
               </label>
             </div>
@@ -6838,7 +6892,7 @@
               ${renderLocalizedFieldGrid("Title", item.title, { bindPrefix: `fbNews.${idx}.title` })}
               ${renderLocalizedFieldGrid("Summary", item.summary, { multiline: true, bindPrefix: `fbNews.${idx}.summary` })}
               ${renderLocalizedFieldGrid("Full Post Body", item.body, { multiline: true, rows: 4, bindPrefix: `fbNews.${idx}.body` })}
-              ${renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة المنشور" : "Post Image", value: item.image, bindKey: `fbNews.${idx}.image` })}
+              ${renderAdminImageControl({ language: lang, label: adminText(lang, "صورة المنشور", "Post Image"), value: item.image, bindKey: `fbNews.${idx}.image` })}
               <div class="hairline-t" style="padding-top:0.85rem;display:flex;justify-content:flex-end;">
                 <button type="button" data-action="ve-delete-fb-post" data-id="${escapeHtml(item.id)}" class="btn" style="padding:0.5rem 0.95rem;background:rgba(154,52,18,0.12);border:1px solid rgba(154,52,18,0.35);color:#9a3412;font-weight:600;">
                   ${icon("trash", "icon-sm")}
@@ -6857,7 +6911,7 @@
               ${renderLocalizedFieldGrid("Album / Category", item.category, { bindPrefix: `gallery.${idx}.category` })}
               ${renderLocalizedFieldGrid("Title", item.title, { bindPrefix: `gallery.${idx}.title` })}
               ${renderLocalizedFieldGrid("Caption", item.caption, { multiline: true, bindPrefix: `gallery.${idx}.caption` })}
-              ${renderAdminImageControl({ language: lang, label: lang === "ar" ? "صورة المعرض" : "Gallery Image", value: item.image, bindKey: `gallery.${idx}.image` })}
+              ${renderAdminImageControl({ language: lang, label: adminText(lang, "صورة المعرض", "Gallery Image"), value: item.image, bindKey: `gallery.${idx}.image` })}
             </div>
           `;
         }
@@ -6876,9 +6930,9 @@
           ? lang === "ar" ? "وضع التحريك: اسحب أي عنصر لتغيير مكانه" : lang === "fr" ? "Mode Déplacement : glissez tout élément" : "Drag-to-Move Active: drag any element to reposition"
           : lang === "ar" ? "وضع التعديل المباشر: انقر على أي عنصر لتعديله" : lang === "fr" ? "Mode Édition Visuelle : cliquez sur n'importe quel élément" : "Visual Click-to-Edit Active: click any element to edit";
       const shortLabel = state.browseOverride
-        ? lang === "ar" ? "وضع التصفح" : "Browse"
+        ? adminText(lang, "وضع التصفح", "Browse")
         : isDrag
-          ? lang === "ar" ? "وضع السحب" : "Drag Mode"
+          ? adminText(lang, "وضع السحب", "Drag Mode")
           : lang === "ar" ? "النقر للتعديل" : lang === "fr" ? "Édition" : "Click-to-Edit";
 
       return `
@@ -6897,7 +6951,7 @@
               </button>
               <button type="button" data-action="ve-toggle-browse" class="btn" style="border:1px solid ${state.browseOverride ? "#fbf9f5" : "rgba(251,249,245,0.25)"};background:${state.browseOverride ? "#fbf9f5" : "transparent"};color:${state.browseOverride ? "#111110" : "#fbf9f5"};">
                 ${state.browseOverride ? icon("mousePointerClick", "icon-sm") : icon("eye", "icon-sm")}
-                <span>${escapeHtml(state.browseOverride ? (lang === "ar" ? "تفعيل النقر" : "Click-to-Edit") : (lang === "ar" ? "تصفح عادي" : "Browse"))}</span>
+                <span>${escapeHtml(state.browseOverride ? (adminText(lang, "تفعيل النقر", "Click-to-Edit")) : (adminText(lang, "تصفح عادي", "Browse")))}</span>
               </button>
               <button type="button" data-action="export-all-json" class="btn" style="background:rgba(176,141,87,0.2);border:1px solid rgba(176,141,87,0.5);color:#d4b886;">
                 ${icon("download", "icon-sm")}
@@ -6905,11 +6959,11 @@
               </button>
               <button type="button" data-action="return-admin" class="btn" style="background:#252320;border:1px solid rgba(251,249,245,0.15);color:#fbf9f5;">
                 ${icon("layoutDashboard", "icon-sm")}
-                <span>${escapeHtml(lang === "ar" ? "لوحة القوائم" : "Dashboard")}</span>
+                <span>${escapeHtml(adminText(lang, "لوحة القوائم", "Dashboard"))}</span>
               </button>
               <button type="button" data-action="lock-admin" class="btn" style="background:rgba(154,52,18,0.3);border:1px solid rgba(154,52,18,0.5);color:#fdba74;">
                 ${icon("lock", "icon-sm")}
-                <span>${escapeHtml(lang === "ar" ? "إغلاق" : "Exit")}</span>
+                <span>${escapeHtml(adminText(lang, "إغلاق", "Exit"))}</span>
               </button>
             </div>
           </div>
@@ -7078,8 +7132,11 @@
       if (parts[0] === "ve" && parts[1] === "ui") {
         const [, , section, field, langKey] = parts;
         const next = structuredClone(state.uiStrings);
-        if (!next[langKey][section]) next[langKey][section] = {};
-        next[langKey][section][field] = val;
+        const targetLanguages = langKey === "ar" ? ["ar", "fr", "en"] : [langKey];
+        targetLanguages.forEach((lc) => {
+          if (!next[lc][section]) next[lc][section] = {};
+          next[lc][section][field] = val;
+        });
         updateUiStrings(next);
         return "live-page";
       }
@@ -7087,13 +7144,16 @@
       if (parts[0] === "uiStrings") {
         const [, lc, sec, a, b] = parts;
         const next = structuredClone(state.uiStrings);
-        if (sec === "highlights") {
-          const idx = Number(a);
-          if (next[lc].highlights[idx]) next[lc].highlights[idx][b] = val;
-        } else {
-          if (!next[lc][sec]) next[lc][sec] = {};
-          next[lc][sec][a] = val;
-        }
+        const targetLanguages = lc === "ar" ? ["ar", "fr", "en"] : [lc];
+        targetLanguages.forEach((targetLang) => {
+          if (sec === "highlights") {
+            const idx = Number(a);
+            if (next[targetLang]?.highlights?.[idx]) next[targetLang].highlights[idx][b] = val;
+          } else {
+            if (!next[targetLang][sec]) next[targetLang][sec] = {};
+            next[targetLang][sec][a] = val;
+          }
+        });
         updateUiStrings(next);
         return "live-page";
       }
@@ -7122,7 +7182,18 @@
         if (!cursor) return null;
       }
       const lastKey = parts[parts.length - 1];
-      if (Array.isArray(cursor)) cursor[Number(lastKey)] = val;
+      // Arabic is the master text: edits to an Arabic localized field are mirrored
+      // to French and English. Editing FR or EN remains independent.
+      if (
+        lastKey === "ar" &&
+        cursor &&
+        typeof cursor === "object" &&
+        ("fr" in cursor || "en" in cursor)
+      ) {
+        cursor.ar = val;
+        cursor.fr = val;
+        cursor.en = val;
+      } else if (Array.isArray(cursor)) cursor[Number(lastKey)] = val;
       else cursor[lastKey] = val;
 
       if (bindPath === "settings.facebookFeed.pageUrl" && String(val || "").trim() !== String(state.settings?.facebookFeed?.pageUrl || "").trim()) {
