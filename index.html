@@ -2618,17 +2618,21 @@
     function clearVeResponsivePosition(style = {}) {
       const responsive = { ...(style.responsive || {}) };
       const bp = getVeBreakpoint();
-      if (responsive[bp]) {
+      if (Number(style.x) || Number(style.y)) {
+        // Legacy coordinates remain available for untouched breakpoints.
+        // An explicit zero override resets only the currently edited breakpoint.
+        responsive[bp] = { x: 0, y: 0 };
+      } else if (responsive[bp]) {
         delete responsive[bp].x; delete responsive[bp].y;
         if (!Object.keys(responsive[bp]).length) delete responsive[bp];
       }
-      const next = { ...style };
-      if (Object.keys(responsive).length) next.responsive = responsive; else delete next.responsive;
-      return next;
+      const result = { ...style };
+      if (Object.keys(responsive).length) result.responsive = responsive; else delete result.responsive;
+      return result;
     }
     function hasAnyVePosition(style = {}) {
       if (Number(style.x) || Number(style.y)) return true;
-      return Object.values(style.responsive || {}).some((pos) => Number(pos?.x) || Number(pos?.y));
+      return Object.values(style.responsive || {}).some((pos) => pos && (Object.prototype.hasOwnProperty.call(pos, "x") || Object.prototype.hasOwnProperty.call(pos, "y")));
     }
 
     function applyElementStyles(rootEl = document.getElementById("app-root")) {
