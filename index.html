@@ -2605,6 +2605,33 @@
       if (width < 1024) return "tablet";
       return "desktop";
     }
+    function migrateLegacyVePositions(settings = {}) {
+      const styles = settings?.elementStyles;
+      if (!styles || typeof styles !== "object") return { settings, changed: false };
+      let changed = false;
+      const nextStyles = { ...styles };
+      for (const [key, original] of Object.entries(styles)) {
+        if (!original || typeof original !== "object") continue;
+        const hasLegacyX = Object.prototype.hasOwnProperty.call(original, "x");
+        const hasLegacyY = Object.prototype.hasOwnProperty.call(original, "y");
+        if (!hasLegacyX && !hasLegacyY) continue;
+        const style = { ...original };
+        const responsive = { ...(style.responsive || {}) };
+        const desktop = { ...(responsive.desktop || {}) };
+        if (hasLegacyX && !Object.prototype.hasOwnProperty.call(desktop, "x")) desktop.x = Number(style.x) || 0;
+        if (hasLegacyY && !Object.prototype.hasOwnProperty.call(desktop, "y")) desktop.y = Number(style.y) || 0;
+        responsive.desktop = desktop;
+        style.responsive = responsive;
+        delete style.x;
+        delete style.y;
+        nextStyles[key] = style;
+        changed = true;
+      }
+      return changed
+        ? { settings: { ...settings, elementStyles: nextStyles }, changed: true }
+        : { settings, changed: false };
+    }
+
     function getVeEffectivePosition(style = {}) {
       const responsive = style.responsive?.[getVeBreakpoint()] || {};
       return { x: Number(responsive.x ?? style.x) || 0, y: Number(responsive.y ?? style.y) || 0 };
@@ -8375,6 +8402,13 @@
       if (loaded.settings && typeof loaded.settings === "object") {
         const defaults = deepMergeDefaults(DEFAULT_SETTINGS, loaded.settings);
         state.settings = readLocalJson("mjm_settings", defaults);
+        // One-time migration: legacy shared X/Y coordinates become desktop-only.
+        // Mobile and tablet then start from their own neutral positions.
+        const migrated = migrateLegacyVePositions(state.settings);
+        if (migrated.changed) {
+          state.settings = migrated.settings;
+          writeLocalJson("mjm_settings", state.settings);
+        }
       }
       if (loaded.about && typeof loaded.about === "object") {
         state.about = readLocalJson("mjm_about", deepMergeDefaults(DEFAULT_ABOUT, loaded.about));
