@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - Platform
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -29,4 +30,3 @@ jobs:
       - name: Check local assets and JSON
         run: node scripts/check-assets.mjs
 
-workflow_dispatch:
