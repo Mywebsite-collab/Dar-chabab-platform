@@ -549,12 +549,25 @@
     .model3d-section {
       position: relative;
       width: 100%;
-      height: clamp(440px, 68vh, 560px);
-      min-height: 420px;
+      height: 420px;
+      min-height: 280px;
       background: #13151a;
       overflow: hidden;
       border-block: 1px solid rgba(24, 23, 21, 0.15);
-      transition: background-color 220ms ease;
+      transition: background-color 220ms ease, height 220ms ease;
+    }
+    /* Match the map viewport dimensions; Auto can be enabled independently per breakpoint. */
+    @media (max-width: 767px) {
+      .model3d-section { height: 300px; }
+      .model3d-section.model3d-auto-mobile { height: 300px; }
+    }
+    @media (min-width: 768px) and (max-width: 1199px) {
+      .model3d-section { height: 360px; }
+      .model3d-section.model3d-auto-tablet { height: clamp(280px, 38vw, 420px); }
+    }
+    @media (min-width: 1200px) {
+      .model3d-section { height: 420px; }
+      .model3d-section.model3d-auto-desktop { height: clamp(280px, 38vw, 420px); }
     }
     .model3d-section.theme-dark { background: #13151a; }
     .model3d-section.theme-studio { background: #262421; }
@@ -569,8 +582,6 @@
       pointer-events: none;
       z-index: 30;
     }
-    @media (min-width: 768px) { .model3d-section { height: clamp(540px, 74vh, 760px); } }
-    @media (min-width: 1280px) { .model3d-section { height: clamp(600px, 76vh, 800px); } }
     .model3d-canvas-mount {
       position: relative;
       width: 100%;
@@ -1487,6 +1498,7 @@
         rotateSpeed: 1.5,
         exposure: 1.15,
         bgTheme: "dark",
+        frameAuto: { mobile: true, tablet: true, desktop: true },
         playAnimations: true
       }
     };
@@ -5365,7 +5377,7 @@
           </section>`,
 
         model3d: () => `
-          <section id="model-3d" class="model3d-section theme-${escapeHtml(m3dCfg.bgTheme || "dark")}">
+          <section id="model-3d" class="model3d-section theme-${escapeHtml(m3dCfg.bgTheme || "dark")}${m3dCfg.frameAuto?.mobile !== false ? " model3d-auto-mobile" : ""}${m3dCfg.frameAuto?.tablet !== false ? " model3d-auto-tablet" : ""}${m3dCfg.frameAuto?.desktop !== false ? " model3d-auto-desktop" : ""}">
             <div id="model3d-canvas-mount" class="model3d-canvas-mount${model3dRuntime.webglError ? " is-fallback" : ""}"></div>
             <div id="model3d-ui-overlay">${renderModel3DOverlayHtml()}</div>
           </section>`,
@@ -6442,6 +6454,14 @@
               <div class="flex-row-wrap" style="gap:0.5rem;">
                 <input type="text" dir="ltr" id="model3d-url-input" value="${escapeHtml(cfg.url || "")}" placeholder="${escapeHtml(mt.urlPlaceholder)}" class="input-field font-mono-tabular" style="flex:1;min-width:220px;" />
                 <button type="button" data-action="3d-load-url" class="btn btn-dark">${escapeHtml(mt.loadUrlBtn)}</button>
+              </div>
+            </div>
+
+            <div class="stack-sm" style="padding:1rem;border:1px solid rgba(176,141,87,0.28);border-radius:12px;background:#fbf9f5;">
+              <p style="margin:0;font-size:0.8rem;font-weight:700;color:#181715;">${escapeHtml(lang === "ar" ? "أبعاد إطار دار الشباب حسب الشاشة" : lang === "fr" ? "Dimensions du cadre selon l’écran" : "Frame dimensions per screen")}</p>
+              <p style="margin:0;font-size:0.7rem;color:#5c5852;">${escapeHtml(lang === "ar" ? "Auto يطابق ارتفاع الخريطة تلقائياً. أوقفه لأي شاشة لاستخدام الارتفاع الثابت." : lang === "fr" ? "Auto adapte la hauteur à celle de la carte. Désactivez-le pour utiliser une hauteur fixe." : "Auto matches the map height. Turn it off on a screen to use a fixed height.")}</p>
+              <div class="flex-row-wrap" style="gap:0.5rem;">
+                ${[{id:"mobile",ar:"الهاتف",fr:"Mobile",en:"Mobile"},{id:"tablet",ar:"اللوحي",fr:"Tablette",en:"Tablet"},{id:"desktop",ar:"الكمبيوتر",fr:"Bureau",en:"Desktop"}].map(x => `<button type="button" data-action="3d-toggle-auto-height" data-screen="${x.id}" class="btn-pill ${cfg.frameAuto?.[x.id] !== false ? "is-active" : ""}">${escapeHtml(x[lang] || x.en)} · ${escapeHtml(lang === "ar" ? (cfg.frameAuto?.[x.id] !== false ? "Auto" : "ثابت") : (cfg.frameAuto?.[x.id] !== false ? "Auto" : "Fixed"))}</button>`).join("")}
               </div>
             </div>
 
@@ -8106,6 +8126,24 @@
           model3dRuntime.settingsOpen = !model3dRuntime.settingsOpen;
           syncModel3DOverlayOnly();
           break;
+        case "3d-toggle-auto-height": {
+          const screen = actionEl.getAttribute("data-screen");
+          if (!["mobile", "tablet", "desktop"].includes(screen)) break;
+          const next = structuredClone(state.settings);
+          next.model3d = {
+            ...(next.model3d || DEFAULT_SETTINGS.model3d),
+            frameAuto: {
+              mobile: next.model3d?.frameAuto?.mobile !== false,
+              tablet: next.model3d?.frameAuto?.tablet !== false,
+              desktop: next.model3d?.frameAuto?.desktop !== false,
+              [screen]: next.model3d?.frameAuto?.[screen] === false
+            }
+          };
+          updateSettings(next);
+          if (state.activePage === "admin") renderShell({ preserve3D: true });
+          else renderShell({ preserve3D: true });
+          break;
+        }
         case "3d-toggle-rotate": {
           const next = structuredClone(state.settings);
           next.model3d = { ...(next.model3d || DEFAULT_SETTINGS.model3d), autoRotate: !next.model3d?.autoRotate };
