@@ -3260,7 +3260,7 @@
       const seen = new Set();
       try {
         for (const file of files) {
-          const normalizedName = file.name.toLowerCase().replace(/\\s*\\(\\d+\\)(?=\\.json$)/, "");
+          const normalizedName = file.name.toLowerCase().replace(/\s*\(\d+\)(?=\.json$)/, "");
           if (seen.has(normalizedName)) throw new Error(`تم اختيار الملف نفسه أكثر من مرة: ${file.name}`);
           seen.add(normalizedName);
           const raw = JSON.parse(await file.text());
