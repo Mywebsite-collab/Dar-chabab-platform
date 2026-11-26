@@ -1124,6 +1124,10 @@
 
     /* Official Facebook Page Live News Widget */
     .fb-feed-panel {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
       border-radius: 16px;
       overflow: hidden;
       padding: 1.25rem;
@@ -1239,6 +1243,8 @@
     }
     @media (max-width: 760px) {
       .fb-feed-panel {
+        width: 100% !important;
+        max-width: 100% !important;
         grid-template-columns: minmax(0, 1fr);
         gap: 1rem;
         padding: 1rem;
@@ -1397,7 +1403,8 @@
         showTimelineEmbed: false,
         autoMergeSynced: true,
         syncLimit: 6,
-        deletedPostIds: []
+        deletedPostIds: [],
+        desktopWidth: 100
       },
       metrics: [
         {
@@ -2921,7 +2928,8 @@
       // Match the embed width to the current viewport so mobile users do not
       // get a clipped desktop-width timeline.
       const viewportWidth = Math.max(280, (window.innerWidth || 500) - 40);
-      const width = Math.min(500, viewportWidth);
+      const width = Math.max(180, Math.min(500, viewportWidth));
+      const desktopWidth = Math.max(50, Math.min(100, Number(cfg.desktopWidth) || 100));
       const height = compact ? 560 : 680; // Reduced height keeps the timeline focused on recent posts.
       const pluginUrl = "https://www.facebook.com/plugins/page.php"
         + "?href=" + encodeURIComponent(pageUrl)
@@ -2936,7 +2944,7 @@
           : "If posts do not appear, browser privacy settings may block the embed. Open the official page directly.";
 
       return `
-        <div class="fb-feed-panel ${isDark ? "is-dark" : "is-light"}"${veAttr({ kind: "fbFeedSection" }, veSlot)}>
+        <div class="fb-feed-panel ${isDark ? "is-dark" : "is-light"}" style="width:${desktopWidth}%;max-width:100%;margin-inline:auto;"${veAttr({ kind: "fbFeedSection" }, veSlot)}>
           ${isVe ? `<div class="ve-studio-chrome flex-between" style="padding:0.45rem 0.7rem;border-radius:10px;background:rgba(176,141,87,0.16);border:1px dashed rgba(176,141,87,0.65);gap:0.5rem;">
             <span style="font-size:11px;font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
               ${escapeHtml(lang === "ar" ? "عنصر صفحة فيسبوك — قابل للتعديل أو الحذف" : lang === "fr" ? "Section Facebook — modifiable ou supprimable" : "Facebook Page — Editable or Deletable")}
@@ -6321,6 +6329,11 @@
                 <label class="stack-xs" style="font-size:0.75rem;">
                   <span class="text-muted">${escapeHtml(adminText(lang, "رابط الصفحة الرسمية على فيسبوك", "Official Facebook Page URL"))}</span>
                   <input type="url" dir="ltr" value="${escapeHtml(fbCfg.pageUrl || "https://www.facebook.com/mjmesra")}" data-bind="settings.facebookFeed.pageUrl" class="input-field font-mono-tabular" />
+                </label>
+                <label class="stack-xs" style="font-size:0.75rem;">
+                  <span class="text-muted">${escapeHtml(adminText(lang, "عرض البطاقة على الكمبيوتر (%)", "Desktop card width (%)"))}</span>
+                  <input type="number" inputmode="numeric" min="50" max="100" step="5" value="${Math.max(50, Math.min(100, Number(fbCfg.desktopWidth) || 100))}" data-bind="settings.facebookFeed.desktopWidth" data-type="number" class="input-field font-mono-tabular" />
+                  <small class="text-muted">${escapeHtml(adminText(lang, "اختر 100% لجعل البطاقة تملأ كامل العرض المتاح. الهاتف يبقى بعرض تلقائي.", "Set 100% to fill the available desktop width. Mobile stays responsive."))}</small>
                 </label>
               </div>
               ${renderLocalizedFieldGrid(adminText(lang, "عنوان عنصر منشورات فيسبوك", "Facebook Feed Title"), { ar: fbUiAr.fbFeedTitle || "", fr: fbUiFr.fbFeedTitle || "", en: fbUiEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
