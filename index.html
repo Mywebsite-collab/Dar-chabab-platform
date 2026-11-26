@@ -7180,8 +7180,8 @@
               </span>
               <span class="badge-box" style="font-size:10px;padding:0.2rem 0.45rem;">${escapeHtml(lang.toUpperCase())} · ${escapeHtml(breakpointLabel)} · ${escapeHtml(lang === "ar" ? "إعداد مستقل" : lang === "fr" ? "Réglage indépendant" : "Independent")}</span>
               ${
-                curX !== 0 || curY !== 0
-                  ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(adminText(lang, "إعادة المكان", "Reset Pos"))}</button>`
+                (target.kind === "settingsField" && target.field === "hero.eyebrow") || curX !== 0 || curY !== 0
+                  ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(target.kind === "settingsField" && target.field === "hero.eyebrow" ? (lang === "ar" ? "استعادة الموضع الأصلي" : lang === "fr" ? "Restaurer la position d’origine" : "Restore Original Position") : adminText(lang, "إعادة المكان", "Reset Pos"))}</button>`
                   : ""
               }
             </div>
@@ -8653,9 +8653,10 @@
         }
         case "ve-reset-pos": {
           const veKey = actionEl.getAttribute("data-ve-key");
-          if (veKey && state.settings.elementStyles?.[veKey]) {
+          if (veKey) {
             const next = structuredClone(state.settings);
-            next.elementStyles[veKey] = clearVeResponsivePosition(next.elementStyles[veKey]);
+            if (!next.elementStyles) next.elementStyles = {};
+            next.elementStyles[veKey] = clearVeResponsivePosition(next.elementStyles[veKey] || {});
             if (!next.elementStyles[veKey].color && !hasAnyVePosition(next.elementStyles[veKey])) delete next.elementStyles[veKey];
             updateSettings(next);
             refreshBackgroundShellOnly();
