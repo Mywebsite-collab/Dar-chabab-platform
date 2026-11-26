@@ -3299,6 +3299,7 @@
 
         Object.assign(state, staged);
         state.storageWarning = false;
+        schedulePlatformAutoPublish();
         applyGlobalTextColors();
         updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
         flashAdminSaved();
@@ -4492,31 +4493,32 @@
       state.settings = next;
       state.storageWarning = !writeLocalJson("mjm_settings", next);
       updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
+      schedulePlatformAutoPublish();
     }
-
     function updateAbout(next) {
       state.about = next;
       state.storageWarning = !writeLocalJson("mjm_about", next);
+      schedulePlatformAutoPublish();
     }
-
     function updateActivities(next) {
       state.activities = next;
       state.storageWarning = !writeLocalJson("mjm_activities", next);
+      schedulePlatformAutoPublish();
     }
-
     function updateEvents(next) {
       state.events = next;
       state.storageWarning = !writeLocalJson("mjm_events", next);
+      schedulePlatformAutoPublish();
     }
-
     function updateNews(next) {
       state.news = next;
       state.storageWarning = !writeLocalJson("mjm_news", next);
+      schedulePlatformAutoPublish();
     }
-
     function updateGallery(next) {
       state.gallery = next;
       state.storageWarning = !writeLocalJson("mjm_gallery", next);
+      schedulePlatformAutoPublish();
     }
 
     function updateUiStrings(next) {
@@ -4524,8 +4526,76 @@
       const ok = writeLocalJson("mjm_ui_strings", next);
       state.storageWarning = !ok;
       updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
+      if (ok) schedulePlatformAutoPublish();
       return ok;
     }
+    
+    // Shared publishing: public visitors read the central copy from Cloudflare KV.
+    const PLATFORM_SYNC_API = "https://dar-chabab-platform-publisher.achirbilal27.workers.dev";
+    const PLATFORM_PUBLISH_SESSION_KEY = "mjm_platform_publish_key";
+    let platformPublishTimer = null;
+    let platformPublishBusy = false;
+    function collectPlatformData() {
+      return { settings:state.settings, about:state.about, activities:state.activities, events:state.events, news:state.news, gallery:state.gallery, uiStrings:state.uiStrings };
+    }
+    function getPlatformPublishKey() {
+      try { return sessionStorage.getItem(PLATFORM_PUBLISH_SESSION_KEY) || ""; } catch { return ""; }
+    }
+    async function sendPlatformData(key) {
+      const response = await fetch(PLATFORM_SYNC_API + "/publish", {
+        method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+        body:JSON.stringify({format:"mjm-platform-data-v1",data:collectPlatformData()})
+      });
+      const result = await response.json().catch(()=>({}));
+      if (!response.ok || !result.ok) {
+        if (response.status===401) { try { sessionStorage.removeItem(PLATFORM_PUBLISH_SESSION_KEY); } catch {} throw new Error("مفتاح النشر غير صحيح أو لم تتم إضافته إلى Cloudflare."); }
+        throw new Error(result.error || "تعذر نشر التعديلات.");
+      }
+      return result;
+    }
+    async function enablePlatformAutoPublish() {
+      const key=window.prompt("أدخل مفتاح النشر الذي أضفته في Cloudflare (PUBLISH_KEY):");
+      if (!key || !key.trim()) return;
+      try {
+        await sendPlatformData(key.trim());
+        try { sessionStorage.setItem(PLATFORM_PUBLISH_SESSION_KEY,key.trim()); } catch {}
+        window.alert("تم تفعيل النشر التلقائي بنجاح. أصبحت بيانات المنصة مشتركة بين جميع الزوار.");
+      } catch(error) { window.alert(error instanceof Error ? error.message : "فشل تفعيل النشر التلقائي."); }
+    }
+    function schedulePlatformAutoPublish() {
+      if (!getPlatformPublishKey()) return;
+      if (platformPublishTimer) window.clearTimeout(platformPublishTimer);
+      platformPublishTimer=window.setTimeout(async()=>{
+        if(platformPublishBusy){schedulePlatformAutoPublish();return;}
+        platformPublishBusy=true;
+        try { await sendPlatformData(getPlatformPublishKey()); }
+        catch(error) {
+          if(state.activePage==="admin") window.alert((error instanceof Error?error.message:"تعذر نشر التعديلات.")+" أعد تفعيل النشر من لوحة الإدارة.");
+        } finally { platformPublishBusy=false; }
+      },1000);
+    }
+    async function loadPublishedPlatformData() {
+      try {
+        const response=await fetch(PLATFORM_SYNC_API+"/data",{cache:"no-store"});
+        if(!response.ok)return false;
+        const result=await response.json(), data=result?.data;
+        if(!data || typeof data!=="object")return false;
+        const next={};
+        if(data.settings && typeof data.settings==="object" && !Array.isArray(data.settings)) next.settings=deepMergeDefaults(DEFAULT_SETTINGS,data.settings);
+        if(data.about && typeof data.about==="object" && !Array.isArray(data.about)) next.about=deepMergeDefaults(DEFAULT_ABOUT,data.about);
+        for(const key of ["activities","events","news","gallery"]) if(Array.isArray(data[key])) next[key]=data[key];
+        if(data.uiStrings && typeof data.uiStrings==="object" && !Array.isArray(data.uiStrings)) next.uiStrings=deepMergeDefaults(DEFAULT_UI_STRINGS,data.uiStrings);
+        if(!Object.keys(next).length)return false;
+        Object.assign(state,next);
+        const storageKeys={settings:"mjm_settings",about:"mjm_about",activities:"mjm_activities",events:"mjm_events",news:"mjm_news",gallery:"mjm_gallery",uiStrings:"mjm_ui_strings"};
+        for(const [key,value] of Object.entries(next)){try{localStorage.setItem(storageKeys[key],JSON.stringify(value));}catch{}}
+        updateSeoHead(state.language,state.activePage,state.settings,state.uiStrings);
+        applyGlobalTextColors();
+        renderShell({preserve3D:true});
+        return true;
+      } catch { return false; }
+    }
+
 
     function resetAllPlatformData() {
       removeLocalKeys([
@@ -6568,6 +6638,9 @@
                   ${icon("mousePointerClick", "icon-svg")}
                   <span>${escapeHtml(lang === "ar" ? "تعديل بصري مباشر (انقر على أي عنصر)" : lang === "fr" ? "Édition Visuelle (Cliquer pour modifier)" : "Visual Click-to-Edit Mode")}</span>
                 </button>
+                <button type="button" data-action="enable-platform-auto-publish" class="btn btn-gold">
+                  <span>${escapeHtml(lang === "ar" ? "تفعيل النشر التلقائي للجميع" : lang === "fr" ? "Activer la publication automatique" : "Enable automatic publishing")}</span>
+                </button>
                 <button type="button" data-action="export-all-json" class="btn btn-dark">
                   ${icon("download", "icon-svg")}
                   <span>${escapeHtml(t.exportJson)}</span>
@@ -7667,6 +7740,9 @@
       const action = actionEl.getAttribute("data-action");
 
       switch (action) {
+        case "enable-platform-auto-publish":
+          await enablePlatformAutoPublish();
+          break;
         case "nav":
           state.selectedArticleId = null;
           state.selectedActivityId = null;
@@ -8644,10 +8720,11 @@
     });
 
     function initApp() {
-      // Clear any previously cached API posts before the first render.
+      // Load the shared published dataset so every visitor sees the same content.
       syncFacebookNewsFeed({ silent: true });
       renderShell({ preserve3D: false });
       mountCustomCursor();
+      void loadPublishedPlatformData();
     }
 
     initApp();
