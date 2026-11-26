@@ -3335,6 +3335,17 @@
       staged[spec.key] = normalizePlatformJsonValue(rawData, spec, fileName);
     }
 
+    function readPlatformJsonFile(file) {
+      if (typeof file?.text === "function") return file.text();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error(`تعذرت قراءة الملف: ${file?.name || "JSON"}`));
+        reader.onabort = () => reject(new Error(`تم إلغاء قراءة الملف: ${file?.name || "JSON"}`));
+        reader.readAsText(file, "UTF-8");
+      });
+    }
+
     async function importPlatformJsonFiles(fileList) {
       const files = Array.from(fileList || []);
       if (!files.length) return;
@@ -3345,7 +3356,7 @@
           const normalizedName = file.name.toLowerCase().replace(/\s*\(\d+\)(?=\.json$)/, "");
           if (seen.has(normalizedName)) throw new Error(`تم اختيار الملف نفسه أكثر من مرة: ${file.name}`);
           seen.add(normalizedName);
-          const raw = JSON.parse(await file.text());
+          const raw = JSON.parse(await readPlatformJsonFile(file));
           preparePlatformJsonImport(raw, normalizedName, staged);
         }
         if (!Object.keys(staged).length) throw new Error("لم يتم العثور على بيانات قابلة للاستيراد.");
@@ -8749,9 +8760,10 @@
       if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
 
       if (target.id === "admin-json-import-input" && target instanceof HTMLInputElement) {
-        const selectedFiles = target.files;
+        // Snapshot the FileList before clearing the input; some browsers expose it as a live list.
+        const selectedFiles = Array.from(target.files || []);
         target.value = "";
-        if (selectedFiles?.length) await importPlatformJsonFiles(selectedFiles);
+        if (selectedFiles.length) await importPlatformJsonFiles(selectedFiles);
         return;
       }
 
