@@ -688,10 +688,19 @@
       color: #fbf9f5;
     }
 
-    /* Hide 3D control dock on phones only */
+    /* Keep the 3D model unobstructed on phones; controls remain available on larger screens. */
     @media (max-width: 767px) {
-      .model3d-dock-wrap {
+      .model3d-dock-wrap,
+      .model3d-touch-controls {
         display: none !important;
+      }
+      .model3d-top-overlay {
+        top: 0.5rem;
+        inset-inline: 0.5rem;
+      }
+      .model3d-title-card {
+        max-width: min(22rem, 100%);
+        padding: 0.5rem 0.7rem;
       }
     }
 
@@ -5142,7 +5151,7 @@
             <p style="font-size:0.75rem;color:rgba(251,249,245,0.75);margin:0.25rem 0 0;line-height:1.55;"${veAttr({ kind: "ui", section: "model3d", field: "subtitle" })}>${escapeHtml(t.subtitle)}</p>
           </div>
 
-          <div style="pointer-events:auto;display:flex;flex-direction:column;align-items:flex-end;gap:0.375rem;">
+          <div class="model3d-touch-controls" style="pointer-events:auto;display:flex;flex-direction:column;align-items:flex-end;gap:0.375rem;">
             <button type="button" data-action="3d-toggle-touch"${veAttr({ kind: "ui", section: "model3d", field: model3dRuntime.touchOrbitActive ? "touchScroll" : "touchInteract" })} class="btn" style="padding:0.5rem 0.875rem;border:1px solid ${model3dRuntime.touchOrbitActive ? "#d4b886" : "rgba(251,249,245,0.25)"};background:${model3dRuntime.touchOrbitActive ? "#b08d57" : "rgba(17,17,16,0.9)"};color:${model3dRuntime.touchOrbitActive ? "#111110" : "#fbf9f5"};">
               ${model3dRuntime.touchOrbitActive ? icon("lock", "icon-sm") : icon("hand", "icon-sm text-gold-light")}
               <span>${escapeHtml(model3dRuntime.touchOrbitActive ? t.touchScroll : t.touchInteract)}</span>
