@@ -1124,6 +1124,7 @@
 
     /* Official Facebook Page Live News Widget */
     .fb-feed-panel {
+      position: relative;
       box-sizing: border-box;
       width: 100%;
       max-width: 100%;
@@ -1139,6 +1140,36 @@
     .fb-feed-panel > .ve-studio-chrome {
       grid-column: 1 / -1;
     }
+    .fb-feed-resize-handle {
+      position: absolute;
+      z-index: 45;
+      top: 50%;
+      right: -10px;
+      width: 22px;
+      height: 58px;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(212,168,79,0.9);
+      border-radius: 999px;
+      background: #b08d57;
+      color: #181715;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.28);
+      cursor: ew-resize;
+      touch-action: none;
+      user-select: none;
+    }
+    .fb-feed-resize-handle::before {
+      content: "";
+      width: 3px;
+      height: 26px;
+      border-left: 1px solid currentColor;
+      border-right: 1px solid currentColor;
+      opacity: 0.8;
+    }
+    .fb-feed-resize-handle:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+    .fb-feed-panel.is-resizing { transition: none !important; }
     .fb-feed-frame {
       grid-column: 2;
       grid-row: 1;
@@ -1242,6 +1273,7 @@
       color: rgba(251,249,245,0.78);
     }
     @media (max-width: 760px) {
+      .fb-feed-resize-handle { display: none !important; }
       .fb-feed-panel {
         width: 100% !important;
         max-width: 100% !important;
@@ -2945,6 +2977,7 @@
 
       return `
         <div class="fb-feed-panel ${isDark ? "is-dark" : "is-light"}" style="width:${desktopWidth}%;max-width:100%;margin-inline:auto;"${veAttr({ kind: "fbFeedSection" }, veSlot)}>
+          ${isVe && getVeBreakpoint() === "desktop" ? `<button type="button" class="fb-feed-resize-handle" data-fb-resize-handle aria-label="${escapeHtml(lang === "ar" ? "اسحب لتغيير عرض البطاقة" : lang === "fr" ? "Glisser pour redimensionner la carte" : "Drag to resize card")}" title="${escapeHtml(lang === "ar" ? "اسحب الحافة لتغيير العرض" : lang === "fr" ? "Glissez le bord pour redimensionner" : "Drag edge to resize")}"></button>` : ""}
           ${isVe ? `<div class="ve-studio-chrome flex-between" style="padding:0.45rem 0.7rem;border-radius:10px;background:rgba(176,141,87,0.16);border:1px dashed rgba(176,141,87,0.65);gap:0.5rem;">
             <span style="font-size:11px;font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
               ${escapeHtml(lang === "ar" ? "عنصر صفحة فيسبوك — قابل للتعديل أو الحذف" : lang === "fr" ? "Section Facebook — modifiable ou supprimable" : "Facebook Page — Editable or Deletable")}
@@ -6330,11 +6363,6 @@
                   <span class="text-muted">${escapeHtml(adminText(lang, "رابط الصفحة الرسمية على فيسبوك", "Official Facebook Page URL"))}</span>
                   <input type="url" dir="ltr" value="${escapeHtml(fbCfg.pageUrl || "https://www.facebook.com/mjmesra")}" data-bind="settings.facebookFeed.pageUrl" class="input-field font-mono-tabular" />
                 </label>
-                <label class="stack-xs" style="font-size:0.75rem;">
-                  <span class="text-muted">${escapeHtml(adminText(lang, "عرض البطاقة على الكمبيوتر (%)", "Desktop card width (%)"))}</span>
-                  <input type="number" inputmode="numeric" min="50" max="100" step="5" value="${Math.max(50, Math.min(100, Number(fbCfg.desktopWidth) || 100))}" data-bind="settings.facebookFeed.desktopWidth" data-type="number" class="input-field font-mono-tabular" />
-                  <small class="text-muted">${escapeHtml(adminText(lang, "اختر 100% لجعل البطاقة تملأ كامل العرض المتاح. الهاتف يبقى بعرض تلقائي.", "Set 100% to fill the available desktop width. Mobile stays responsive."))}</small>
-                </label>
               </div>
               ${renderLocalizedFieldGrid(adminText(lang, "عنوان عنصر منشورات فيسبوك", "Facebook Feed Title"), { ar: fbUiAr.fbFeedTitle || "", fr: fbUiFr.fbFeedTitle || "", en: fbUiEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
               ${renderLocalizedFieldGrid(adminText(lang, "الوصف الفرعي لعنصر فيسبوك", "Facebook Feed Subtitle"), { ar: fbUiAr.fbFeedSubtitle || "", fr: fbUiFr.fbFeedSubtitle || "", en: fbUiEn.fbFeedSubtitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
@@ -7133,6 +7161,7 @@
         const nEn = ui.en.newsPage || {};
         coreHtml = `
           <div class="stack-md">
+            <p class="notice-box" style="margin:0;font-size:0.75rem;">${escapeHtml(lang === "ar" ? "لتغيير عرض البطاقة على الكمبيوتر، اسحب المقبض الذهبي الموجود على حافتها مباشرة أثناء وضع التعديل المباشر. لا يؤثر ذلك على الهاتف." : lang === "fr" ? "En mode édition directe, faites glisser la poignée dorée sur le bord de la carte pour modifier sa largeur sur ordinateur. Le mobile reste inchangé." : "In live edit mode, drag the gold handle on the card edge to resize it on desktop. Mobile remains unchanged.")}</p>
             ${renderLocalizedFieldGrid(adminText(lang, "الوسم التعريفي (Kicker)", "Kicker"), { ar: nAr.fbFeedKicker || "", fr: nFr.fbFeedKicker || "", en: nEn.fbFeedKicker || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedKicker" })}
             ${renderLocalizedFieldGrid(adminText(lang, "عنوان عنصر فيسبوك", "Title"), { ar: nAr.fbFeedTitle || "", fr: nFr.fbFeedTitle || "", en: nEn.fbFeedTitle || "" }, { bindPrefix: "ve.ui.newsPage.fbFeedTitle" })}
             ${renderLocalizedFieldGrid(adminText(lang, "الوصف الفرعي", "Subtitle"), { ar: nAr.fbFeedSubtitle || "", fr: nFr.fbFeedSubtitle || "", en: nEn.fbFeedSubtitle || "" }, { multiline: true, rows: 2, bindPrefix: "ve.ui.newsPage.fbFeedSubtitle" })}
@@ -7613,7 +7642,28 @@
     let veDragJustMoved = false;
     let activeVeDrag = null;
 
+    let activeFbResize = null;
+
     document.addEventListener("pointerdown", (e) => {
+      const resizeHandle = e.target instanceof Element ? e.target.closest("[data-fb-resize-handle]") : null;
+      if (resizeHandle && state.adminUnlocked && state.visualEditMode && !state.browseOverride && state.activePage !== "admin" && getVeBreakpoint() === "desktop") {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        const panel = resizeHandle.closest(".fb-feed-panel");
+        if (!(panel instanceof HTMLElement)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        activeFbResize = {
+          panel,
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startWidth: Math.max(50, Math.min(100, Number(state.settings?.facebookFeed?.desktopWidth) || 100)),
+          containerWidth: Math.max(1, panel.parentElement?.clientWidth || panel.clientWidth),
+          lastWidth: Math.max(50, Math.min(100, Number(state.settings?.facebookFeed?.desktopWidth) || 100))
+        };
+        panel.classList.add("is-resizing");
+        resizeHandle.setPointerCapture?.(e.pointerId);
+        return;
+      }
       if (!state.adminUnlocked || !state.visualEditMode || !state.veDragMode || state.browseOverride || state.activePage === "admin" || state.activeVeTarget) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
       const targetEl = e.target;
@@ -7639,6 +7689,13 @@
     }, { capture: true });
 
     document.addEventListener("pointermove", (e) => {
+      if (activeFbResize && e.pointerId === activeFbResize.pointerId) {
+        const dx = e.clientX - activeFbResize.startX;
+        activeFbResize.lastWidth = Math.max(50, Math.min(100, activeFbResize.startWidth + (dx * 2 / activeFbResize.containerWidth) * 100));
+        activeFbResize.panel.style.width = `${activeFbResize.lastWidth}%`;
+        e.preventDefault();
+        return;
+      }
       if (!activeVeDrag || e.pointerId !== activeVeDrag.pointerId) return;
       const dx = e.clientX - activeVeDrag.startX;
       const dy = e.clientY - activeVeDrag.startY;
@@ -7658,6 +7715,17 @@
     });
 
     const finishVeDrag = (e) => {
+      if (activeFbResize && (e.pointerId === undefined || e.pointerId === activeFbResize.pointerId)) {
+        const resize = activeFbResize;
+        activeFbResize = null;
+        resize.panel.classList.remove("is-resizing");
+        const next = structuredClone(state.settings);
+        next.facebookFeed = { ...(next.facebookFeed || DEFAULT_SETTINGS.facebookFeed), desktopWidth: Math.round(resize.lastWidth) };
+        updateSettings(next);
+        veDragJustMoved = true;
+        window.setTimeout(() => { veDragJustMoved = false; }, 120);
+        return;
+      }
       if (!activeVeDrag || (e.pointerId !== undefined && e.pointerId !== activeVeDrag.pointerId)) return;
       const drag = activeVeDrag;
       activeVeDrag = null;
