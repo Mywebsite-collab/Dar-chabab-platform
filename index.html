@@ -4053,6 +4053,31 @@
         loader.setDRACOLoader(dracoLoader);
       }
 
+      const parseGlbWithTimeout = (buffer, basePath = "", timeoutMs = 25000) => new Promise((resolve, reject) => {
+        let settled = false;
+        const finish = (ok, value) => {
+          if (settled) {
+            if (ok && value?.scene) disposeObject3D(value.scene);
+            return;
+          }
+          settled = true;
+          window.clearTimeout(parseTimer);
+          if (ok) resolve(value);
+          else reject(value instanceof Error ? value : new Error(String(value || "Invalid GLB/GLTF file.")));
+        };
+        const parseTimer = window.setTimeout(() => finish(false, new Error("GLB parsing timed out.")), timeoutMs);
+        try {
+          loader.parse(
+            buffer,
+            basePath,
+            (gltf) => finish(true, gltf),
+            (error) => finish(false, error || new Error("Invalid GLB/GLTF file."))
+          );
+        } catch (error) {
+          finish(false, error);
+        }
+      });
+
       const applyVisualSettings = () => {
         const cfg = state.settings.model3d || DEFAULT_SETTINGS.model3d;
         const s = Math.max(0.15, Math.min(4, Number(cfg.scale) || 1));
@@ -4220,18 +4245,12 @@
               onStateSync();
               return;
             }
-            loader.parse(
-              record.buffer,
-              "",
-              (gltf) => attachLoadedGltf(gltf),
-              (err) => {
-                if (disposed || mySeq !== model3dRuntime.mountSeq) return;
-                model3dRuntime.loading = false;
-                model3dRuntime.hasModel = false;
-                model3dRuntime.loadError = err?.message || "Invalid GLB/GLTF binary.";
-                onStateSync();
-              }
-            );
+            const storedGltf = await parseGlbWithTimeout(record.buffer, "");
+            if (disposed || mySeq !== model3dRuntime.mountSeq) {
+              disposeObject3D(storedGltf.scene);
+              return;
+            }
+            attachLoadedGltf(storedGltf);
           } else if (activeSourceType === "url" && activeUrl) {
             const isFileOrigin = window.location.protocol === "file:";
             const localBundled = "./images/model.glb";
@@ -4286,26 +4305,7 @@
                 }
 
                 const basePath = new URL(".", new URL(candidate, document.baseURI)).href;
-                const gltf = await new Promise((resolve, reject) => {
-                  const parseTimer = window.setTimeout(() => reject(new Error("GLB parsing timed out.")), 25000);
-                  try {
-                    loader.parse(
-                      buffer,
-                      basePath,
-                      (result) => {
-                        window.clearTimeout(parseTimer);
-                        resolve(result);
-                      },
-                      (error) => {
-                        window.clearTimeout(parseTimer);
-                        reject(error || new Error("Invalid GLB/GLTF file."));
-                      }
-                    );
-                  } catch (error) {
-                    window.clearTimeout(parseTimer);
-                    reject(error);
-                  }
-                });
+                const gltf = await parseGlbWithTimeout(buffer, basePath);
 
                 if (disposed || mySeq !== model3dRuntime.mountSeq) {
                   disposeObject3D(gltf.scene);
