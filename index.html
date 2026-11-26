@@ -197,6 +197,12 @@
       outline-offset: 4px;
       box-shadow: 0 0 0 4px rgba(176, 141, 87, 0.16);
     }
+    .ve-drag-toggle.is-active {
+      background: #b08d57 !important;
+      border-color: #d4b886 !important;
+      color: #111110 !important;
+      box-shadow: 0 0 0 2px rgba(212,184,134,0.22), 0 3px 12px rgba(176,141,87,0.24);
+    }
     .ve-drag-mode [data-ve-target] {
       cursor: grab !important;
       touch-action: none !important;
@@ -7522,7 +7528,7 @@
             </span>
 
             <div class="ve-ribbon-actions">
-              <button type="button" data-action="ve-toggle-drag" class="btn" style="border:1px solid ${isDrag ? "#d4b886" : "rgba(251,249,245,0.25)"};background:${isDrag ? "#b08d57" : "transparent"};color:${isDrag ? "#111110" : "#fbf9f5"};">
+              <button type="button" data-action="ve-toggle-drag" class="btn ve-drag-toggle${isDrag ? " is-active" : ""}" aria-pressed="${isDrag ? "true" : "false"}" style="border:1px solid rgba(251,249,245,0.25);background:transparent;color:#fbf9f5;">
                 ${icon("move", "icon-sm")}
                 <span>${escapeHtml(lang === "ar" ? "تحريك العناصر" : lang === "fr" ? "Déplacer" : "Drag Mode")}</span>
               </button>
@@ -8430,6 +8436,9 @@
           // content and document scroll position untouched.
           const appRoot = document.getElementById("app-root");
           appRoot?.classList.toggle("ve-drag-mode", state.veDragMode && !state.browseOverride);
+          const dragToggleButton = document.querySelector('[data-action="ve-toggle-drag"]');
+          dragToggleButton?.classList.toggle("is-active", state.veDragMode && !state.browseOverride);
+          dragToggleButton?.setAttribute("aria-pressed", state.veDragMode && !state.browseOverride ? "true" : "false");
           renderVisualOverlay();
           syncBodyScrollLock();
 
