@@ -2078,9 +2078,9 @@
           emptyHint: "اختر وضعاً وأدخل سؤالك للحصول على إجابة منظمة وموثقة."
         },
         adminPage: {
-          kicker: "الإدارة المحلية الخفيفة",
-          title: "لوحة تحرير المحتوى المحلي وتصدير ملفات JSON",
-          notice: "تعمل هذه الواجهة محلياً بالكامل دون قاعدة بيانات خارجية: تُحفظ التعديلات في متصفحك فوراً، ويمكنك تصدير ملفات JSON المحدثة ووضعها في مجلد src/data/ لحفظها نهائياً في المشروع.",
+          kicker: "إدارة المنصة والنشر المشترك",
+          title: "لوحة إدارة محتوى المنصة",
+          notice: "تُحمّل بيانات الموقع من المصدر المشترك وتُنشر التعديلات لجميع الزوار عبر خدمة المنصة. تصدير JSON مخصص للنسخ الاحتياطي أو النقل فقط.",
           tabSettings: "الإعدادات والواجهة",
           tabModel3d: "المجسم 3D (.glb)",
           tabAbout: "من نحن",
@@ -2091,8 +2091,8 @@
           tabInterface: "كافة نصوص المنصة",
           exportJson: "تحميل ملف JSON المحدث",
           resetDefaults: "استعادة الملفات الأصلية",
-          saveChanges: "حفظ التعديلات محلياً",
-          savedNotice: "تم الحفظ محلياً بنجاح.",
+          saveChanges: "نشر التعديلات",
+          savedNotice: "تم إرسال التعديلات للنشر المشترك.",
           aiAssistTitle: "صياغة محتوى بثلاث لغات",
           aiTopicPlaceholder: "اكتب فكرة الخبر أو الفعالية لصياغتها بالعربية والفرنسية والإنجليزية...",
           aiDraftBtn: "توليد مسودة ثلاثية اللغات",
@@ -2272,9 +2272,9 @@
           emptyHint: "Sélectionnez un mode et formulez votre requête."
         },
         adminPage: {
-          kicker: "GESTION LOCALE MODULAIRE",
-          title: "Studio d'Édition Locale & Export JSON",
-          notice: "Interface légère sans base de données complexe : vos modifications sont enregistrées dans votre navigateur et exportables en fichiers JSON prêts à remplacer ceux du dossier src/data/.",
+          kicker: "GESTION ET PUBLICATION DE LA PLATEFORME",
+          title: "Gestion du contenu de la plateforme",
+          notice: "Le contenu est chargé depuis la source partagée et les modifications sont publiées pour tous les visiteurs. L’export JSON sert uniquement à la sauvegarde ou au transfert.",
           tabSettings: "Paramètres & Accueil",
           tabModel3d: "Modèle 3D (.glb)",
           tabAbout: "À propos",
@@ -2285,8 +2285,8 @@
           tabInterface: "Tous les textes UI",
           exportJson: "Télécharger les JSON mis à jour",
           resetDefaults: "Réinitialiser aux fichiers source",
-          saveChanges: "Enregistrer localement",
-          savedNotice: "Modifications enregistrées localement.",
+          saveChanges: "Publier les modifications",
+          savedNotice: "Modifications envoyées pour publication partagée.",
           aiAssistTitle: "Assistant Rédactionnel Trilingue",
           aiTopicPlaceholder: "Décrivez brièvement une annonce ou activité pour générer les versions AR / FR / EN...",
           aiDraftBtn: "Générer le brouillon trilingue",
@@ -2466,9 +2466,9 @@
           emptyHint: "Choose a capability tab and enter a prompt above."
         },
         adminPage: {
-          kicker: "LIGHTWEIGHT LOCAL CMS",
-          title: "Local Content Studio & JSON Exporter",
-          notice: "Zero external database required: edits apply immediately in your browser storage, and you can export clean .json files to drop directly into src/data/ for permanent local updates.",
+          kicker: "SHARED PLATFORM MANAGEMENT",
+          title: "Platform Content Management",
+          notice: "Site content loads from the shared platform source, and edits are published for all visitors. JSON export is provided for backup and transfer only.",
           tabSettings: "Settings & Hero",
           tabModel3d: "3D Model (.glb)",
           tabAbout: "About",
@@ -2479,8 +2479,8 @@
           tabInterface: "All Interface Texts",
           exportJson: "Download Updated JSON",
           resetDefaults: "Restore Source JSON",
-          saveChanges: "Save Locally",
-          savedNotice: "Changes saved locally.",
+          saveChanges: "Publish Changes",
+          savedNotice: "Changes sent for shared publication.",
           aiAssistTitle: "Trilingual Editorial Draft Assistant",
           aiTopicPlaceholder: "Enter a brief topic to generate Arabic, French, and English drafts...",
           aiDraftBtn: "Generate Trilingual Draft",
@@ -3365,18 +3365,6 @@
         if (!Object.keys(staged).length) throw new Error("لم يتم العثور على بيانات قابلة للاستيراد.");
 
         // Imported JSON is applied in memory and published centrally; no browser-local copy is kept.
-        Object.assign(state, staged);
-        state.storageWarning = false;
-        schedulePlatformAutoPublish();
-        applyGlobalTextColors();
-        updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
-        flashAdminSaved();
-        renderShell({ preserve3D: true });
-        window.alert(`تم استيراد ${files.length} ملف JSON وتحديث بيانات المنصة بنجاح.`);
-      } catch (error) {
-        window.alert(error instanceof Error ? error.message : "تعذر استيراد ملفات JSON.");
-      }
-    }
 
     function cleanJsonString(rawText) {
       const trimmed = (rawText || "").trim();
