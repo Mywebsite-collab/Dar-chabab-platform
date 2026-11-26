@@ -688,6 +688,13 @@
       color: #fbf9f5;
     }
 
+    /* Hide 3D control dock on phones only */
+    @media (max-width: 767px) {
+      .model3d-dock-wrap {
+        display: none !important;
+      }
+    }
+
     /* Masonry Gallery */
     .masonry-grid { columns: 1; column-gap: 1.5rem; }
     @media (min-width: 640px) { .masonry-grid { columns: 2; } }
