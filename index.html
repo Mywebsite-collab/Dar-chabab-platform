@@ -8676,6 +8676,32 @@
       });
     }, { passive: true });
 
+    function applyColorPickerValue(target) {
+      if (!(target instanceof HTMLInputElement) || target.type !== "color") return false;
+
+      const globalColorKey = target.getAttribute("data-global-color");
+      if (globalColorKey) {
+        const next = structuredClone(state.settings);
+        next.textColors = { ...(next.textColors || DEFAULT_SETTINGS.textColors), [globalColorKey]: target.value };
+        updateSettings(next);
+        applyGlobalTextColors();
+        const hexSpan = target.closest("label")?.querySelector(".font-mono-tabular");
+        if (hexSpan) hexSpan.textContent = target.value;
+        return true;
+      }
+
+      const veColorKey = target.getAttribute("data-ve-color-input");
+      if (veColorKey) {
+        const next = structuredClone(state.settings);
+        if (!next.elementStyles) next.elementStyles = {};
+        next.elementStyles[veColorKey] = { ...(next.elementStyles[veColorKey] || {}), color: target.value };
+        updateSettings(next);
+        refreshBackgroundShellOnly();
+        return true;
+      }
+      return false;
+    }
+
     document.addEventListener("input", (e) => {
       const target = e.target;
       if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) return;
@@ -8694,26 +8720,7 @@
         return;
       }
 
-      const globalColorKey = target.getAttribute("data-global-color");
-      if (globalColorKey) {
-        const next = structuredClone(state.settings);
-        next.textColors = { ...(next.textColors || DEFAULT_SETTINGS.textColors), [globalColorKey]: target.value };
-        updateSettings(next);
-        applyGlobalTextColors();
-        const hexSpan = target.closest("label")?.querySelector(".font-mono-tabular");
-        if (hexSpan) hexSpan.textContent = target.value;
-        return;
-      }
-
-      const veColorKey = target.getAttribute("data-ve-color-input");
-      if (veColorKey) {
-        const next = structuredClone(state.settings);
-        if (!next.elementStyles) next.elementStyles = {};
-        next.elementStyles[veColorKey] = { ...(next.elementStyles[veColorKey] || {}), color: target.value };
-        updateSettings(next);
-        refreshBackgroundShellOnly();
-        return;
-      }
+      if (applyColorPickerValue(target)) return;
 
       const vePosAxis = target.getAttribute("data-ve-pos-axis");
       if (vePosAxis) {
@@ -8774,6 +8781,10 @@
     document.addEventListener("change", async (e) => {
       const target = e.target;
       if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
+
+      // Mobile color pickers may commit a selection through "change" without
+      // emitting the same sequence of "input" events as desktop browsers.
+      if (applyColorPickerValue(target)) return;
 
       if (target.id === "admin-json-import-input" && target instanceof HTMLInputElement) {
         // Snapshot the FileList before clearing the input; some browsers expose it as a live list.
