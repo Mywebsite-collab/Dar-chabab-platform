@@ -50,8 +50,8 @@
   <script type="importmap">
   {
     "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"
     }
   }
   </script>
@@ -3876,9 +3876,9 @@
         return { THREE: threeMod, OrbitControls: orbitMod.OrbitControls, RoomEnvironment: envMod.RoomEnvironment, GLTFLoader: gltfMod.GLTFLoader, DRACOLoader: dracoMod?.DRACOLoader || null };
       } catch {
         const bases = [
-          "https://esm.sh/three@0.172.0",
-          "https://cdn.jsdelivr.net/npm/three@0.172.0",
-          "https://unpkg.com/three@0.172.0"
+          "https://esm.sh/three@0.160.1",
+          "https://cdn.jsdelivr.net/npm/three@0.160.1",
+          "https://unpkg.com/three@0.160.1"
         ];
         let lastErr = null;
         for (const base of bases) {
