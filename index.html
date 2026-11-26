@@ -2748,9 +2748,8 @@
       if (clean.startsWith("images/")) {
         return "./" + clean;
       }
-      if (window.location.protocol !== "file:" && /^https:\/\/[^/]*(?:fbcdn\.net|fbsbx\.com)\//i.test(clean)) {
-        return `/api/fb-image?url=${encodeURIComponent(clean)}`;
-      }
+      // GitHub Pages has no /api/fb-image route. Keep public CDN image URLs
+      // intact instead of rewriting them to a nonexistent same-origin endpoint.
       return clean;
     }
 
