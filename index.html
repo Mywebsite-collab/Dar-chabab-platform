@@ -2816,6 +2816,17 @@
       }
     }
 
+    // One-time cleanup of legacy browser-local copies. Shared site content now lives in Cloudflare.
+    removeLocalKeys([
+      "mjm_settings",
+      "mjm_about",
+      "mjm_activities",
+      "mjm_events",
+      "mjm_news",
+      "mjm_gallery",
+      "mjm_ui_strings"
+    ]);
+
     function getGeminiApiKey() {
       try {
         const sessionKey = (sessionStorage.getItem(GEMINI_KEY_STORAGE) || "").trim();
@@ -3264,13 +3275,13 @@
     }
 
     const PLATFORM_JSON_IMPORTS = {
-      "settings.json": { key: "settings", storageKey: "mjm_settings", type: "object" },
-      "about.json": { key: "about", storageKey: "mjm_about", type: "object" },
-      "activities.json": { key: "activities", storageKey: "mjm_activities", type: "array" },
-      "events.json": { key: "events", storageKey: "mjm_events", type: "array" },
-      "news.json": { key: "news", storageKey: "mjm_news", type: "array" },
-      "gallery.json": { key: "gallery", storageKey: "mjm_gallery", type: "array" },
-      "ui-strings.json": { key: "uiStrings", storageKey: "mjm_ui_strings", type: "object" }
+      "settings.json": { key: "settings", type: "object" },
+      "about.json": { key: "about", type: "object" },
+      "activities.json": { key: "activities", type: "array" },
+      "events.json": { key: "events", type: "array" },
+      "news.json": { key: "news", type: "array" },
+      "gallery.json": { key: "gallery", type: "array" },
+      "ui-strings.json": { key: "uiStrings", type: "object" }
     };
 
     function validatePlatformCollection(value, key, sourceLabel = key) {
