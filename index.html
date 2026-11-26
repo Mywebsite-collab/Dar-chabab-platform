@@ -4226,23 +4226,82 @@
               candidates.push(activeUrl);
             }
 
-            const tryLoadIdx = (idx, lastErr) => {
+            const tryLoadIdx = async (idx, lastErr) => {
               if (disposed || mySeq !== model3dRuntime.mountSeq) return;
               if (idx >= candidates.length) {
                 model3dRuntime.loading = false;
                 model3dRuntime.hasModel = false;
-                model3dRuntime.loadError = lastErr?.message || "Failed to load GLB model.";
+                const detail = lastErr?.message ? ` (${lastErr.message})` : "";
+                model3dRuntime.loadError = (state.language === "ar"
+                  ? "تعذر تحميل ملف المجسم. تحقق من اتصال الإنترنت أو جرّب رفع ملف GLB من لوحة التحكم."
+                  : state.language === "fr"
+                    ? "Impossible de charger le modèle. Vérifiez la connexion ou importez un fichier GLB depuis le panneau."
+                    : "Unable to load the model. Check the connection or upload a GLB file from the admin panel.") + detail;
                 onStateSync();
                 return;
               }
-              loader.load(
-                candidates[idx],
-                (gltf) => attachLoadedGltf(gltf),
-                undefined,
-                (err) => tryLoadIdx(idx + 1, err || lastErr)
-              );
+
+              const candidate = candidates[idx];
+              const controller = new AbortController();
+              let fetchTimer = 0;
+              try {
+                // Fetch with a hard timeout so a stalled remote host cannot leave
+                // the viewer in its loading state forever.
+                fetchTimer = window.setTimeout(() => controller.abort(), 20000);
+                const response = await fetch(candidate, {
+                  method: "GET",
+                  mode: "cors",
+                  credentials: "omit",
+                  cache: "no-cache",
+                  signal: controller.signal
+                });
+                if (!response.ok) {
+                  throw new Error(`HTTP ${response.status} while loading ${candidate}`);
+                }
+                const buffer = await response.arrayBuffer();
+                window.clearTimeout(fetchTimer);
+                fetchTimer = 0;
+
+                if (disposed || mySeq !== model3dRuntime.mountSeq) return;
+                if (!buffer || buffer.byteLength < 20) {
+                  throw new Error("The GLB file is empty or incomplete.");
+                }
+
+                const basePath = new URL(".", new URL(candidate, document.baseURI)).href;
+                const gltf = await new Promise((resolve, reject) => {
+                  const parseTimer = window.setTimeout(() => reject(new Error("GLB parsing timed out.")), 25000);
+                  try {
+                    loader.parse(
+                      buffer,
+                      basePath,
+                      (result) => {
+                        window.clearTimeout(parseTimer);
+                        resolve(result);
+                      },
+                      (error) => {
+                        window.clearTimeout(parseTimer);
+                        reject(error || new Error("Invalid GLB/GLTF file."));
+                      }
+                    );
+                  } catch (error) {
+                    window.clearTimeout(parseTimer);
+                    reject(error);
+                  }
+                });
+
+                if (disposed || mySeq !== model3dRuntime.mountSeq) {
+                  disposeObject3D(gltf.scene);
+                  return;
+                }
+                attachLoadedGltf(gltf);
+              } catch (err) {
+                window.clearTimeout(fetchTimer);
+                if (disposed || mySeq !== model3dRuntime.mountSeq) return;
+                // A failed custom/remote URL falls through to the bundled model.
+                await tryLoadIdx(idx + 1, err || lastErr);
+              }
             };
-            tryLoadIdx(0, null);
+            void tryLoadIdx(0, null);
           }
         } catch (err) {
           if (disposed || mySeq !== model3dRuntime.mountSeq) return;
