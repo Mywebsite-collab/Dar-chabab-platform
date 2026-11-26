@@ -2813,7 +2813,15 @@
 
     function getGeminiApiKey() {
       try {
-        return (localStorage.getItem(GEMINI_KEY_STORAGE) || "").trim();
+        const sessionKey = (sessionStorage.getItem(GEMINI_KEY_STORAGE) || "").trim();
+        if (sessionKey) return sessionKey;
+        // Migrate older saved keys out of persistent localStorage.
+        const legacyKey = (localStorage.getItem(GEMINI_KEY_STORAGE) || "").trim();
+        if (legacyKey) {
+          sessionStorage.setItem(GEMINI_KEY_STORAGE, legacyKey);
+          localStorage.removeItem(GEMINI_KEY_STORAGE);
+        }
+        return legacyKey;
       } catch {
         return "";
       }
@@ -2822,10 +2830,11 @@
     function setGeminiApiKey(nextKey) {
       try {
         const trimmed = (nextKey || "").trim();
-        if (!trimmed) localStorage.removeItem(GEMINI_KEY_STORAGE);
-        else localStorage.setItem(GEMINI_KEY_STORAGE, trimmed);
+        if (!trimmed) sessionStorage.removeItem(GEMINI_KEY_STORAGE);
+        else sessionStorage.setItem(GEMINI_KEY_STORAGE, trimmed);
+        try { localStorage.removeItem(GEMINI_KEY_STORAGE); } catch {}
       } catch {
-        // Ignore privacy restrictions
+        // Ignore browser storage restrictions.
       }
     }
 
@@ -3022,7 +3031,7 @@
             <div class="fb-feed-qr-card">
               <p>${escapeHtml(lang === "ar" ? "امسح الرمز للوصول السريع إلى صفحتنا الرسمية" : lang === "fr" ? "Scannez pour accéder à notre page officielle" : "Scan to visit our official page")}</p>
               <a href="https://www.facebook.com/mjmesra" target="_blank" rel="noopener noreferrer" aria-label="Open official Facebook page">
-                <img src="https://raw.githubusercontent.com/Mywebsite-collab/Dar-chabab-platform/fix/platform-stability-audit/file_00000000cdcc81f49d55235738fa813a.png" alt="الرمز الرسمي لصفحة دار الشباب سي سالم" loading="lazy" decoding="async">
+                <img src="./images/facebook-page-qr.svg" alt="رمز QR لفتح صفحة دار الشباب ماسرى على فيسبوك" loading="lazy" decoding="async">
               </a>
             </div>
           </aside>
@@ -3447,12 +3456,21 @@
       if (!apiKey) {
         throw new Error(getMissingKeyMessage(language));
       }
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 45000);
+      let res;
+      try {
+        res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+          cache: "no-store"
+        });
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = json?.error?.message || `Gemini API error (${res.status})`;
@@ -6214,14 +6232,14 @@
             <div class="hairline-t stack-sm" style="padding:1rem;border-radius:12px;background:#fbf9f5;border:1px solid rgba(176,141,87,0.35);">
               <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;font-weight:600;color:#181715;">
                 ${icon("key", "icon-sm text-gold")}
-                <span>${escapeHtml(lang === "ar" ? "مفتاح Gemini API (محفوظ في متصفحك فقط لتشغيل الذكاء الاصطناعي والبحث)" : lang === "fr" ? "Clé Gemini API (stockée localement pour l'assistant IA)" : "Gemini API Key (saved only in your browser for AI & Grounded Search)")}</span>
+                <span>${escapeHtml(lang === "ar" ? "مفتاح Gemini API (محفوظ في جلسة المتصفح الحالية فقط)" : lang === "fr" ? "Clé Gemini API (stockée uniquement pendant cette session)" : "Gemini API Key (stored only for this browser session)")}</span>
               </div>
               <div class="flex-row-wrap">
                 <input type="password" dir="ltr" id="admin-gemini-key-input" value="${escapeHtml(state.geminiApiKey)}" placeholder="AIza..." class="input-field font-mono-tabular" style="flex:1;min-width:220px;" />
                 <button type="button" data-action="save-gemini-key" class="btn btn-gold">${escapeHtml(adminText(lang, "حفظ المفتاح", "Save Key"))}</button>
                 ${state.geminiApiKey ? `<button type="button" data-action="clear-gemini-key" class="btn btn-outline">${escapeHtml(adminText(lang, "مسح", "Clear"))}</button>` : ""}
               </div>
-              <p class="text-subtle" style="font-size:11px;margin:0;">${escapeHtml(lang === "ar" ? "لا يُدرج هذا المفتاح داخل ملف settings.json عند التصدير حفاظاً على الخصوصية." : lang === "fr" ? "Cette clé n'est jamais incluse dans l'export settings.json." : "This key is never included in exported JSON files.")}</p>
+              <p class="text-subtle" style="font-size:11px;margin:0;">${escapeHtml(lang === "ar" ? "يُحفظ المفتاح في جلسة المتصفح الحالية فقط ولا يُدرج في ملفات التصدير." : lang === "fr" ? "Cette clé reste dans la session du navigateur et n'est jamais exportée." : "This key stays in the current browser session and is never exported.")}</p>
             </div>
 
             <div>
