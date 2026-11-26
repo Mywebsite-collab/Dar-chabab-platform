@@ -2078,9 +2078,9 @@
           emptyHint: "اختر وضعاً وأدخل سؤالك للحصول على إجابة منظمة وموثقة."
         },
         adminPage: {
-          kicker: "إدارة المنصة والنشر المشترك",
-          title: "لوحة إدارة محتوى المنصة",
-          notice: "تُحمّل بيانات الموقع من المصدر المشترك وتُنشر التعديلات لجميع الزوار عبر خدمة المنصة. تصدير JSON مخصص للنسخ الاحتياطي أو النقل فقط.",
+          kicker: "الإدارة المحلية الخفيفة",
+          title: "لوحة تحرير المحتوى المحلي وتصدير ملفات JSON",
+          notice: "تعمل هذه الواجهة محلياً بالكامل دون قاعدة بيانات خارجية: تُحفظ التعديلات في متصفحك فوراً، ويمكنك تصدير ملفات JSON المحدثة ووضعها في مجلد src/data/ لحفظها نهائياً في المشروع.",
           tabSettings: "الإعدادات والواجهة",
           tabModel3d: "المجسم 3D (.glb)",
           tabAbout: "من نحن",
@@ -2091,8 +2091,8 @@
           tabInterface: "كافة نصوص المنصة",
           exportJson: "تحميل ملف JSON المحدث",
           resetDefaults: "استعادة الملفات الأصلية",
-          saveChanges: "نشر التعديلات",
-          savedNotice: "تم إرسال التعديلات للنشر المشترك.",
+          saveChanges: "حفظ التعديلات محلياً",
+          savedNotice: "تم الحفظ محلياً بنجاح.",
           aiAssistTitle: "صياغة محتوى بثلاث لغات",
           aiTopicPlaceholder: "اكتب فكرة الخبر أو الفعالية لصياغتها بالعربية والفرنسية والإنجليزية...",
           aiDraftBtn: "توليد مسودة ثلاثية اللغات",
@@ -2272,9 +2272,9 @@
           emptyHint: "Sélectionnez un mode et formulez votre requête."
         },
         adminPage: {
-          kicker: "GESTION ET PUBLICATION DE LA PLATEFORME",
-          title: "Gestion du contenu de la plateforme",
-          notice: "Le contenu est chargé depuis la source partagée et les modifications sont publiées pour tous les visiteurs. L’export JSON sert uniquement à la sauvegarde ou au transfert.",
+          kicker: "GESTION LOCALE MODULAIRE",
+          title: "Studio d'Édition Locale & Export JSON",
+          notice: "Interface légère sans base de données complexe : vos modifications sont enregistrées dans votre navigateur et exportables en fichiers JSON prêts à remplacer ceux du dossier src/data/.",
           tabSettings: "Paramètres & Accueil",
           tabModel3d: "Modèle 3D (.glb)",
           tabAbout: "À propos",
@@ -2285,8 +2285,8 @@
           tabInterface: "Tous les textes UI",
           exportJson: "Télécharger les JSON mis à jour",
           resetDefaults: "Réinitialiser aux fichiers source",
-          saveChanges: "Publier les modifications",
-          savedNotice: "Modifications envoyées pour publication partagée.",
+          saveChanges: "Enregistrer localement",
+          savedNotice: "Modifications enregistrées localement.",
           aiAssistTitle: "Assistant Rédactionnel Trilingue",
           aiTopicPlaceholder: "Décrivez brièvement une annonce ou activité pour générer les versions AR / FR / EN...",
           aiDraftBtn: "Générer le brouillon trilingue",
@@ -2466,9 +2466,9 @@
           emptyHint: "Choose a capability tab and enter a prompt above."
         },
         adminPage: {
-          kicker: "SHARED PLATFORM MANAGEMENT",
-          title: "Platform Content Management",
-          notice: "Site content loads from the shared platform source, and edits are published for all visitors. JSON export is provided for backup and transfer only.",
+          kicker: "LIGHTWEIGHT LOCAL CMS",
+          title: "Local Content Studio & JSON Exporter",
+          notice: "Zero external database required: edits apply immediately in your browser storage, and you can export clean .json files to drop directly into src/data/ for permanent local updates.",
           tabSettings: "Settings & Hero",
           tabModel3d: "3D Model (.glb)",
           tabAbout: "About",
@@ -2479,8 +2479,8 @@
           tabInterface: "All Interface Texts",
           exportJson: "Download Updated JSON",
           resetDefaults: "Restore Source JSON",
-          saveChanges: "Publish Changes",
-          savedNotice: "Changes sent for shared publication.",
+          saveChanges: "Save Locally",
+          savedNotice: "Changes saved locally.",
           aiAssistTitle: "Trilingual Editorial Draft Assistant",
           aiTopicPlaceholder: "Enter a brief topic to generate Arabic, French, and English drafts...",
           aiDraftBtn: "Generate Trilingual Draft",
@@ -2816,8 +2816,6 @@
       }
     }
 
-
-
     function getGeminiApiKey() {
       try {
         const sessionKey = (sessionStorage.getItem(GEMINI_KEY_STORAGE) || "").trim();
@@ -2846,7 +2844,7 @@
     }
 
     function loadInitialSettings() {
-      const s = structuredClone(DEFAULT_SETTINGS);
+      const s = readLocalJson("mjm_settings", DEFAULT_SETTINGS);
       if (Array.isArray(s?.contact?.socialLinks) && s.contact.socialLinks[0]?.url === "#social-facebook") {
         s.contact.socialLinks[0].url = "https://www.facebook.com/mjmesra";
       }
@@ -3266,13 +3264,13 @@
     }
 
     const PLATFORM_JSON_IMPORTS = {
-      "settings.json": { key: "settings", type: "object" },
-      "about.json": { key: "about", type: "object" },
-      "activities.json": { key: "activities", type: "array" },
-      "events.json": { key: "events", type: "array" },
-      "news.json": { key: "news", type: "array" },
-      "gallery.json": { key: "gallery", type: "array" },
-      "ui-strings.json": { key: "uiStrings", type: "object" }
+      "settings.json": { key: "settings", storageKey: "mjm_settings", type: "object" },
+      "about.json": { key: "about", storageKey: "mjm_about", type: "object" },
+      "activities.json": { key: "activities", storageKey: "mjm_activities", type: "array" },
+      "events.json": { key: "events", storageKey: "mjm_events", type: "array" },
+      "news.json": { key: "news", storageKey: "mjm_news", type: "array" },
+      "gallery.json": { key: "gallery", storageKey: "mjm_gallery", type: "array" },
+      "ui-strings.json": { key: "uiStrings", storageKey: "mjm_ui_strings", type: "object" }
     };
 
     function validatePlatformCollection(value, key, sourceLabel = key) {
@@ -3366,7 +3364,47 @@
         }
         if (!Object.keys(staged).length) throw new Error("لم يتم العثور على بيانات قابلة للاستيراد.");
 
-        // Imported JSON is applied in memory and published centrally; no browser-local copy is kept.
+        const storageKeys = {
+          settings: "mjm_settings",
+          about: "mjm_about",
+          activities: "mjm_activities",
+          events: "mjm_events",
+          news: "mjm_news",
+          gallery: "mjm_gallery",
+          uiStrings: "mjm_ui_strings"
+        };
+        const previousStorage = {};
+        for (const dataKey of Object.keys(staged)) {
+          const storageKey = storageKeys[dataKey];
+          previousStorage[storageKey] = localStorage.getItem(storageKey);
+        }
+
+        try {
+          for (const [dataKey, value] of Object.entries(staged)) {
+            localStorage.setItem(storageKeys[dataKey], JSON.stringify(value));
+          }
+        } catch {
+          for (const [storageKey, previousValue] of Object.entries(previousStorage)) {
+            try {
+              if (previousValue === null) localStorage.removeItem(storageKey);
+              else localStorage.setItem(storageKey, previousValue);
+            } catch { /* Best-effort rollback if browser storage is full. */ }
+          }
+          throw new Error("تعذر الحفظ: مساحة التخزين في المتصفح غير كافية. لم تُعتمد البيانات المستوردة.");
+        }
+
+        Object.assign(state, staged);
+        state.storageWarning = false;
+        schedulePlatformAutoPublish();
+        applyGlobalTextColors();
+        updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
+        flashAdminSaved();
+        renderShell({ preserve3D: true });
+        window.alert(`تم استيراد ${files.length} ملف JSON وتحديث بيانات المنصة بنجاح.`);
+      } catch (error) {
+        window.alert(error instanceof Error ? error.message : "تعذر استيراد ملفات JSON.");
+      }
+    }
 
     function cleanJsonString(rawText) {
       const trimmed = (rawText || "").trim();
@@ -4613,12 +4651,12 @@
       activeVeTarget: null,
 
       settings: loadInitialSettings(),
-      about: structuredClone(DEFAULT_ABOUT),
-      activities: structuredClone(DEFAULT_ACTIVITIES),
-      events: structuredClone(DEFAULT_EVENTS),
-      news: structuredClone(DEFAULT_NEWS),
-      gallery: structuredClone(DEFAULT_GALLERY),
-      uiStrings: structuredClone(DEFAULT_UI_STRINGS),
+      about: readLocalJson("mjm_about", DEFAULT_ABOUT),
+      activities: readLocalJson("mjm_activities", DEFAULT_ACTIVITIES),
+      events: readLocalJson("mjm_events", DEFAULT_EVENTS),
+      news: readLocalJson("mjm_news", DEFAULT_NEWS),
+      gallery: readLocalJson("mjm_gallery", DEFAULT_GALLERY),
+      uiStrings: readLocalJson("mjm_ui_strings", DEFAULT_UI_STRINGS),
       geminiApiKey: getGeminiApiKey(),
       footerTap: { count: 0, lastAt: 0 }
     };
@@ -4652,42 +4690,43 @@
 
     function updateSettings(next) {
       state.settings = next;
-      state.storageWarning = false;
+      state.storageWarning = !writeLocalJson("mjm_settings", next);
       updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
       schedulePlatformAutoPublish();
     }
     function updateAbout(next) {
       state.about = next;
-      state.storageWarning = false;
+      state.storageWarning = !writeLocalJson("mjm_about", next);
       schedulePlatformAutoPublish();
     }
     function updateActivities(next) {
       state.activities = next;
-      state.storageWarning = false;
+      state.storageWarning = !writeLocalJson("mjm_activities", next);
       schedulePlatformAutoPublish();
     }
     function updateEvents(next) {
       state.events = next;
-      state.storageWarning = false;
+      state.storageWarning = !writeLocalJson("mjm_events", next);
       schedulePlatformAutoPublish();
     }
     function updateNews(next) {
       state.news = next;
-      state.storageWarning = false;
+      state.storageWarning = !writeLocalJson("mjm_news", next);
       schedulePlatformAutoPublish();
     }
     function updateGallery(next) {
       state.gallery = next;
-      state.storageWarning = false;
+      state.storageWarning = !writeLocalJson("mjm_gallery", next);
       schedulePlatformAutoPublish();
     }
 
     function updateUiStrings(next) {
       state.uiStrings = next;
-      state.storageWarning = false;
+      const ok = writeLocalJson("mjm_ui_strings", next);
+      state.storageWarning = !ok;
       updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
-      schedulePlatformAutoPublish();
-      return true;
+      if (ok) schedulePlatformAutoPublish();
+      return ok;
     }
     
     // Shared publishing: public visitors read the central copy from Cloudflare KV.
@@ -4791,13 +4830,11 @@
         }
         if(data.uiStrings && typeof data.uiStrings==="object" && !Array.isArray(data.uiStrings)) next.uiStrings=deepMergeDefaults(DEFAULT_UI_STRINGS,data.uiStrings);
         if(!Object.keys(next).length)return false;
-        const hasCompleteSharedDataset = ["settings","about","activities","events","news","gallery","uiStrings"].every((key) => Object.prototype.hasOwnProperty.call(next, key));
         const previousModelConfig = JSON.stringify(state.settings?.model3d || null);
         Object.assign(state,next);
-        // Remove obsolete local copies only after a complete shared dataset was fetched successfully.
-        if (hasCompleteSharedDataset) removeLocalKeys(["mjm_settings","mjm_about","mjm_activities","mjm_events","mjm_news","mjm_gallery","mjm_ui_strings"]);
         const modelConfigChanged = JSON.stringify(state.settings?.model3d || null) !== previousModelConfig;
-        // Cloudflare is the sole source of truth for shared site content; never cache it in localStorage.
+        const storageKeys={settings:"mjm_settings",about:"mjm_about",activities:"mjm_activities",events:"mjm_events",news:"mjm_news",gallery:"mjm_gallery",uiStrings:"mjm_ui_strings"};
+        for(const [key,value] of Object.entries(next)){try{localStorage.setItem(storageKeys[key],JSON.stringify(value));}catch{}}
         updateSeoHead(state.language,state.activePage,state.settings,state.uiStrings);
         applyGlobalTextColors();
         renderShell({preserve3D:true});
