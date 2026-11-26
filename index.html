@@ -1187,10 +1187,19 @@
     .fb-feed-frame {
       grid-column: 2;
       grid-row: 1;
+      display: block;
+      box-sizing: border-box;
       width: 100%;
-      max-width: 100%;
+      max-width: none;
+      min-width: 0;
+      min-height: 480px;
+      margin: 0;
       justify-self: stretch;
       align-self: stretch;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #fff;
+      isolation: isolate;
     }
     .fb-feed-aside {
       grid-column: 1;
@@ -1261,8 +1270,8 @@
     }
     .fb-feed-frame iframe {
       display: block;
-      width: 100%;
-      max-width: 500px;
+      width: 100% !important;
+      max-width: none !important;
       min-width: 0;
       border: 0;
       background: #fff;
@@ -3002,8 +3011,8 @@
           : "If posts do not appear, browser privacy settings may block the embed. Open the official page directly.";
 
       return `
-        <div class="fb-feed-panel ${isDark ? "is-dark" : "is-light"}" style="width:${desktopWidth}%;max-width:100%;margin-inline:auto;"${veAttr({ kind: "fbFeedSection" }, veSlot)}>
-          ${isVe && getVeBreakpoint() === "desktop" ? `<button type="button" class="fb-feed-resize-handle" data-fb-resize-handle aria-label="${escapeHtml(lang === "ar" ? "اسحب لتغيير عرض البطاقة" : lang === "fr" ? "Glisser pour redimensionner la carte" : "Drag to resize card")}" title="${escapeHtml(lang === "ar" ? "اسحب الحافة لتغيير العرض" : lang === "fr" ? "Glissez le bord pour redimensionner" : "Drag edge to resize")}"></button>` : ""}
+        <div class="fb-feed-panel ${isDark ? "is-dark" : "is-light"}" style="width:100%;max-width:100%;margin-inline:auto;box-sizing:border-box;"${veAttr({ kind: "fbFeedSection" }, veSlot)}>
+
           ${isVe ? `<div class="ve-studio-chrome flex-between" style="padding:0.45rem 0.7rem;border-radius:10px;background:rgba(176,141,87,0.16);border:1px dashed rgba(176,141,87,0.65);gap:0.5rem;">
             <span style="font-size:11px;font-weight:600;color:${isDark ? "#d4b886" : "#967542"};">
               ${escapeHtml(lang === "ar" ? "عنصر صفحة فيسبوك — قابل للتعديل أو الحذف" : lang === "fr" ? "Section Facebook — modifiable ou supprimable" : "Facebook Page — Editable or Deletable")}
