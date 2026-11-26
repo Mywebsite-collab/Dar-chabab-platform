@@ -4253,8 +4253,8 @@
       const loadCurrentModel = async () => {
         if (disposed || mySeq !== model3dRuntime.mountSeq) return;
         const cfg = state.settings.model3d || DEFAULT_SETTINGS.model3d;
-        const activeSourceType = cfg.sourceType && cfg.sourceType !== "none" ? cfg.sourceType : "url";
-        const activeUrl = cfg.url || DEFAULT_SETTINGS.model3d.url;
+        const activeSourceType = cfg.sourceType || (cfg.url ? "url" : "none");
+        const activeUrl = cfg.url || "";
 
         if (activeSourceType === "none" || (activeSourceType === "url" && !activeUrl)) {
           if (loadedScene) {
@@ -4830,12 +4830,21 @@
         }
         if(data.uiStrings && typeof data.uiStrings==="object" && !Array.isArray(data.uiStrings)) next.uiStrings=deepMergeDefaults(DEFAULT_UI_STRINGS,data.uiStrings);
         if(!Object.keys(next).length)return false;
+        const previousModelConfig = JSON.stringify(state.settings?.model3d || null);
         Object.assign(state,next);
+        const modelConfigChanged = JSON.stringify(state.settings?.model3d || null) !== previousModelConfig;
         const storageKeys={settings:"mjm_settings",about:"mjm_about",activities:"mjm_activities",events:"mjm_events",news:"mjm_news",gallery:"mjm_gallery",uiStrings:"mjm_ui_strings"};
         for(const [key,value] of Object.entries(next)){try{localStorage.setItem(storageKeys[key],JSON.stringify(value));}catch{}}
         updateSeoHead(state.language,state.activePage,state.settings,state.uiStrings);
         applyGlobalTextColors();
         renderShell({preserve3D:true});
+        // The canvas is intentionally preserved during shared-data refreshes.
+        // Reload the GLB explicitly when the published model settings change,
+        // otherwise the preserved viewer keeps displaying its previous source.
+        if (modelConfigChanged && state.activePage === "home" && model3dRuntime.loadCurrentModel) {
+          model3dRuntime.applyVisualSettings?.();
+          void model3dRuntime.loadCurrentModel();
+        }
         return true;
       } catch { return false; }
     }
