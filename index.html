@@ -2844,7 +2844,7 @@
     }
 
     function loadInitialSettings() {
-      const s = readLocalJson("mjm_settings", DEFAULT_SETTINGS);
+      const s = structuredClone(DEFAULT_SETTINGS);
       if (Array.isArray(s?.contact?.socialLinks) && s.contact.socialLinks[0]?.url === "#social-facebook") {
         s.contact.socialLinks[0].url = "https://www.facebook.com/mjmesra";
       }
@@ -3364,35 +3364,7 @@
         }
         if (!Object.keys(staged).length) throw new Error("لم يتم العثور على بيانات قابلة للاستيراد.");
 
-        const storageKeys = {
-          settings: "mjm_settings",
-          about: "mjm_about",
-          activities: "mjm_activities",
-          events: "mjm_events",
-          news: "mjm_news",
-          gallery: "mjm_gallery",
-          uiStrings: "mjm_ui_strings"
-        };
-        const previousStorage = {};
-        for (const dataKey of Object.keys(staged)) {
-          const storageKey = storageKeys[dataKey];
-          previousStorage[storageKey] = localStorage.getItem(storageKey);
-        }
-
-        try {
-          for (const [dataKey, value] of Object.entries(staged)) {
-            localStorage.setItem(storageKeys[dataKey], JSON.stringify(value));
-          }
-        } catch {
-          for (const [storageKey, previousValue] of Object.entries(previousStorage)) {
-            try {
-              if (previousValue === null) localStorage.removeItem(storageKey);
-              else localStorage.setItem(storageKey, previousValue);
-            } catch { /* Best-effort rollback if browser storage is full. */ }
-          }
-          throw new Error("تعذر الحفظ: مساحة التخزين في المتصفح غير كافية. لم تُعتمد البيانات المستوردة.");
-        }
-
+        // Imported JSON is applied in memory and published centrally; no browser-local copy is kept.
         Object.assign(state, staged);
         state.storageWarning = false;
         schedulePlatformAutoPublish();
@@ -4651,12 +4623,12 @@
       activeVeTarget: null,
 
       settings: loadInitialSettings(),
-      about: readLocalJson("mjm_about", DEFAULT_ABOUT),
-      activities: readLocalJson("mjm_activities", DEFAULT_ACTIVITIES),
-      events: readLocalJson("mjm_events", DEFAULT_EVENTS),
-      news: readLocalJson("mjm_news", DEFAULT_NEWS),
-      gallery: readLocalJson("mjm_gallery", DEFAULT_GALLERY),
-      uiStrings: readLocalJson("mjm_ui_strings", DEFAULT_UI_STRINGS),
+      about: structuredClone(DEFAULT_ABOUT),
+      activities: structuredClone(DEFAULT_ACTIVITIES),
+      events: structuredClone(DEFAULT_EVENTS),
+      news: structuredClone(DEFAULT_NEWS),
+      gallery: structuredClone(DEFAULT_GALLERY),
+      uiStrings: structuredClone(DEFAULT_UI_STRINGS),
       geminiApiKey: getGeminiApiKey(),
       footerTap: { count: 0, lastAt: 0 }
     };
@@ -4690,43 +4662,42 @@
 
     function updateSettings(next) {
       state.settings = next;
-      state.storageWarning = !writeLocalJson("mjm_settings", next);
+      state.storageWarning = false;
       updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
       schedulePlatformAutoPublish();
     }
     function updateAbout(next) {
       state.about = next;
-      state.storageWarning = !writeLocalJson("mjm_about", next);
+      state.storageWarning = false;
       schedulePlatformAutoPublish();
     }
     function updateActivities(next) {
       state.activities = next;
-      state.storageWarning = !writeLocalJson("mjm_activities", next);
+      state.storageWarning = false;
       schedulePlatformAutoPublish();
     }
     function updateEvents(next) {
       state.events = next;
-      state.storageWarning = !writeLocalJson("mjm_events", next);
+      state.storageWarning = false;
       schedulePlatformAutoPublish();
     }
     function updateNews(next) {
       state.news = next;
-      state.storageWarning = !writeLocalJson("mjm_news", next);
+      state.storageWarning = false;
       schedulePlatformAutoPublish();
     }
     function updateGallery(next) {
       state.gallery = next;
-      state.storageWarning = !writeLocalJson("mjm_gallery", next);
+      state.storageWarning = false;
       schedulePlatformAutoPublish();
     }
 
     function updateUiStrings(next) {
       state.uiStrings = next;
-      const ok = writeLocalJson("mjm_ui_strings", next);
-      state.storageWarning = !ok;
+      state.storageWarning = false;
       updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
-      if (ok) schedulePlatformAutoPublish();
-      return ok;
+      schedulePlatformAutoPublish();
+      return true;
     }
     
     // Shared publishing: public visitors read the central copy from Cloudflare KV.
@@ -4833,8 +4804,7 @@
         const previousModelConfig = JSON.stringify(state.settings?.model3d || null);
         Object.assign(state,next);
         const modelConfigChanged = JSON.stringify(state.settings?.model3d || null) !== previousModelConfig;
-        const storageKeys={settings:"mjm_settings",about:"mjm_about",activities:"mjm_activities",events:"mjm_events",news:"mjm_news",gallery:"mjm_gallery",uiStrings:"mjm_ui_strings"};
-        for(const [key,value] of Object.entries(next)){try{localStorage.setItem(storageKeys[key],JSON.stringify(value));}catch{}}
+        // Cloudflare is the sole source of truth for shared site content; never cache it in localStorage.
         updateSeoHead(state.language,state.activePage,state.settings,state.uiStrings);
         applyGlobalTextColors();
         renderShell({preserve3D:true});
