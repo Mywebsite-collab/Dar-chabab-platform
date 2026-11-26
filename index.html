@@ -4488,6 +4488,16 @@
       };
     }
 
+    function readFileAsArrayBuffer(file) {
+      if (typeof file.arrayBuffer === "function") return file.arrayBuffer();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error || new Error("تعذرت قراءة ملف المجسم."));
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
     async function handleGlbFileUpload(file) {
       if (!file) return;
       const lower = (file.name || "").toLowerCase();
@@ -4505,15 +4515,40 @@
         model3dRuntime.loading = true;
         model3dRuntime.loadError = "";
         syncModel3DOverlayOnly();
-        const buf = await file.arrayBuffer();
-        await saveGlbToDb(buf, { fileName: file.name, fileSize: file.size });
+        if (!lower.endsWith(".glb")) {
+          throw new Error(state.language === "ar"
+            ? "للمشاركة بين الأجهزة، ارفع ملف GLB فقط. ملفات GLTF التي تعتمد على ملفات خارجية استخدم لها رابطاً عاماً."
+            : state.language === "fr"
+              ? "Pour le partage entre appareils, téléversez uniquement un fichier GLB. Pour GLTF avec fichiers externes, utilisez une URL publique."
+              : "For cross-device sharing, upload a single GLB file. For GLTF files with external dependencies, use a public URL.");
+        }
+        if (file.size > 16 * 1024 * 1024) {
+          throw new Error(state.language === "ar" ? "الحد الأقصى لحجم المجسم هو 16 ميغابايت." : "The maximum model size is 16 MB.");
+        }
+        const publishKey = getPlatformPublishKey();
+        if (!publishKey) throw new Error(state.language === "ar"
+          ? "فعّل النشر التلقائي من لوحة الإدارة قبل رفع المجسم المشترك."
+          : "Enable automatic publishing in the admin panel before uploading a shared model.");
+        const buf = await readFileAsArrayBuffer(file);
+        const uploadResult = await platformApiRequest("/model", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/octet-stream",
+            "Authorization": "Bearer " + publishKey,
+            "X-File-Name": encodeURIComponent(file.name || "platform-model.glb")
+          },
+          body: buf
+        });
+        if (!uploadResult.ok) throw new Error(uploadResult.error || "تعذر رفع المجسم إلى التخزين المشترك.");
+        const sharedModelUrl = PLATFORM_SYNC_API + "/model?v=" + encodeURIComponent(uploadResult.updatedAt || Date.now());
+        await saveGlbToDb(buf, { fileName: file.name, fileSize: file.size, shared: true });
         const next = structuredClone(state.settings);
         next.model3d = {
           ...(next.model3d || DEFAULT_SETTINGS.model3d),
-          sourceType: "indexeddb",
+          sourceType: "url",
           fileName: file.name,
           fileSize: file.size,
-          url: ""
+          url: sharedModelUrl
         };
         updateSettings(next);
         if (model3dRuntime.loadCurrentModel) {
@@ -4779,12 +4814,14 @@
         } finally { platformPublishBusy=false; }
       },1000);
     }
+    let platformLastPublishedAt = "";
     async function loadPublishedPlatformData() {
       try {
         const response=await fetch(PLATFORM_SYNC_API+"/data",{cache:"no-store"});
         if(!response.ok)return false;
         const result=await response.json(), data=result?.data;
         if(!data || typeof data!=="object")return false;
+        if (result.updatedAt) platformLastPublishedAt = result.updatedAt;
         const next={};
         if(data.settings && typeof data.settings==="object" && !Array.isArray(data.settings)) next.settings=deepMergeDefaults(DEFAULT_SETTINGS,data.settings);
         if(data.about && typeof data.about==="object" && !Array.isArray(data.about)) next.about=deepMergeDefaults(DEFAULT_ABOUT,data.about);
@@ -4803,6 +4840,26 @@
       } catch { return false; }
     }
 
+    async function refreshPublishedPlatformDataIfChanged() {
+      if (document.hidden || state.adminUnlocked || state.visualEditMode || state.browseOverride) return false;
+      try {
+        const response = await fetch(PLATFORM_SYNC_API + "/data", { cache: "no-store" });
+        if (!response.ok) return false;
+        const result = await response.json();
+        if (!result?.updatedAt || result.updatedAt === platformLastPublishedAt) return false;
+        return await loadPublishedPlatformData();
+      } catch { return false; }
+    }
+
+    function startPlatformLiveSync() {
+      if (window.__mjmPlatformLiveSyncStarted) return;
+      window.__mjmPlatformLiveSyncStarted = true;
+      window.setInterval(() => { void refreshPublishedPlatformDataIfChanged(); }, 15000);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) void refreshPublishedPlatformDataIfChanged();
+      });
+      window.addEventListener("focus", () => { void refreshPublishedPlatformDataIfChanged(); });
+    }
 
     function resetAllPlatformData() {
       removeLocalKeys([
@@ -8082,6 +8139,13 @@
           break;
         }
         case "3d-remove": {
+          if (state.settings?.model3d?.url?.startsWith(PLATFORM_SYNC_API + "/model")) {
+            const publishKey = getPlatformPublishKey();
+            if (publishKey) await platformApiRequest("/model", {
+              method: "DELETE",
+              headers: { "Authorization": "Bearer " + publishKey }
+            });
+          }
           await clearGlbFromDb();
           const next = structuredClone(state.settings);
           next.model3d = {
@@ -9011,6 +9075,7 @@
       renderShell({ preserve3D: false });
       mountCustomCursor();
       void loadPublishedPlatformData();
+      startPlatformLiveSync();
     }
 
     initApp();
