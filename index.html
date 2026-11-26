@@ -4809,10 +4809,17 @@
       }
     }
     async function sendPlatformData(key) {
+      const payload = JSON.stringify({format:"mjm-platform-data-v1",data:collectPlatformData()});
+      const payloadBytes = new Blob([payload]).size;
+      const maxPayloadBytes = 20 * 1024 * 1024;
+      if (payloadBytes > maxPayloadBytes) {
+        const sizeMb = (payloadBytes / (1024 * 1024)).toFixed(1);
+        throw new Error("حجم بيانات المنصة (" + sizeMb + " ميغابايت) يتجاوز الحد الآمن البالغ 20 ميغابايت. قلّل حجم الصور أو عددها ثم أعد المحاولة.");
+      }
       const result = await platformApiRequest("/publish", {
         method:"POST",
         headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-        body:JSON.stringify({format:"mjm-platform-data-v1",data:collectPlatformData()})
+        body:payload
       });
       if (!result.ok) {
         if (result.error === "Unauthorized") {
