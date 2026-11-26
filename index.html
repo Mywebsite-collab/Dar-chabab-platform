@@ -2816,16 +2816,7 @@
       }
     }
 
-    // One-time cleanup of legacy browser-local copies. Shared site content now lives in Cloudflare.
-    removeLocalKeys([
-      "mjm_settings",
-      "mjm_about",
-      "mjm_activities",
-      "mjm_events",
-      "mjm_news",
-      "mjm_gallery",
-      "mjm_ui_strings"
-    ]);
+
 
     function getGeminiApiKey() {
       try {
@@ -4800,8 +4791,11 @@
         }
         if(data.uiStrings && typeof data.uiStrings==="object" && !Array.isArray(data.uiStrings)) next.uiStrings=deepMergeDefaults(DEFAULT_UI_STRINGS,data.uiStrings);
         if(!Object.keys(next).length)return false;
+        const hasCompleteSharedDataset = ["settings","about","activities","events","news","gallery","uiStrings"].every((key) => Object.prototype.hasOwnProperty.call(next, key));
         const previousModelConfig = JSON.stringify(state.settings?.model3d || null);
         Object.assign(state,next);
+        // Remove obsolete local copies only after a complete shared dataset was fetched successfully.
+        if (hasCompleteSharedDataset) removeLocalKeys(["mjm_settings","mjm_about","mjm_activities","mjm_events","mjm_news","mjm_gallery","mjm_ui_strings"]);
         const modelConfigChanged = JSON.stringify(state.settings?.model3d || null) !== previousModelConfig;
         // Cloudflare is the sole source of truth for shared site content; never cache it in localStorage.
         updateSeoHead(state.language,state.activePage,state.settings,state.uiStrings);
