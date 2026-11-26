@@ -9071,6 +9071,12 @@
 
     window.addEventListener("hashchange", () => {
       const next = parseHashPage();
+
+      // navigateTo() already updates state and renders before changing the hash.
+      // Ignore that matching hashchange event to avoid replacing the page twice
+      // while its smooth scroll is running (mobile browsers can jump to the form).
+      if (next === state.activePage) return;
+
       state.activePage = next;
       state.selectedArticleId = null;
       state.selectedActivityId = null;
