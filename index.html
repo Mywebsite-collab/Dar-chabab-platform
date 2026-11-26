@@ -4691,14 +4691,55 @@
     function getPlatformPublishKey() {
       try { return sessionStorage.getItem(PLATFORM_PUBLISH_SESSION_KEY) || ""; } catch { return ""; }
     }
+    async function platformApiRequest(path, options = {}) {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 20000);
+      let response;
+      try {
+        response = await fetch(PLATFORM_SYNC_API + path, {
+          ...options,
+          signal: controller.signal,
+          cache: "no-store"
+        });
+      } catch (error) {
+        if (error?.name === "AbortError") {
+          throw new Error("انتهت مهلة الاتصال بخادم النشر. تحقق من اتصال الإنترنت ثم أعد المحاولة.");
+        }
+        throw new Error("تعذر الاتصال بخادم النشر (Failed to fetch). تم تفعيل عنوان Workers.dev؛ إذا استمرت المشكلة فقد يكون السبب حجب الاتصال أو إعداد CORS.");
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
+      const raw = await response.text();
+      let result = {};
+      try { result = raw ? JSON.parse(raw) : {}; } catch {}
+      if (!response.ok) {
+        const detail = result.error || result.message || ("HTTP " + response.status);
+        throw new Error("خادم النشر أعاد خطأ: " + detail);
+      }
+      return result;
+    }
+    async function checkPlatformPublishConnection() {
+      try {
+        const result = await platformApiRequest("/health");
+        if (!result.ok) throw new Error("استجاب الخادم لكن فحص الصحة لم ينجح.");
+        window.alert("الاتصال بخادم النشر يعمل بنجاح. يمكنك الآن تفعيل النشر التلقائي.");
+        return true;
+      } catch (error) {
+        window.alert(error instanceof Error ? error.message : "تعذر فحص الاتصال بخادم النشر.");
+        return false;
+      }
+    }
     async function sendPlatformData(key) {
-      const response = await fetch(PLATFORM_SYNC_API + "/publish", {
-        method:"POST", headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+      const result = await platformApiRequest("/publish", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
         body:JSON.stringify({format:"mjm-platform-data-v1",data:collectPlatformData()})
       });
-      const result = await response.json().catch(()=>({}));
-      if (!response.ok || !result.ok) {
-        if (response.status===401) { try { sessionStorage.removeItem(PLATFORM_PUBLISH_SESSION_KEY); } catch {} throw new Error("مفتاح النشر غير صحيح أو لم تتم إضافته إلى Cloudflare."); }
+      if (!result.ok) {
+        if (result.error === "Unauthorized") {
+          try { sessionStorage.removeItem(PLATFORM_PUBLISH_SESSION_KEY); } catch {}
+          throw new Error("مفتاح النشر غير صحيح أو لم تتم إضافته إلى Cloudflare.");
+        }
         throw new Error(result.error || "تعذر نشر التعديلات.");
       }
       return result;
@@ -6783,6 +6824,9 @@
                   ${icon("mousePointerClick", "icon-svg")}
                   <span>${escapeHtml(lang === "ar" ? "تعديل بصري مباشر (انقر على أي عنصر)" : lang === "fr" ? "Édition Visuelle (Cliquer pour modifier)" : "Visual Click-to-Edit Mode")}</span>
                 </button>
+                <button type="button" data-action="check-platform-connection" class="btn btn-outline">
+                  <span>${escapeHtml(lang === "ar" ? "فحص اتصال النشر" : lang === "fr" ? "Tester la connexion de publication" : "Test publishing connection")}</span>
+                </button>
                 <button type="button" data-action="enable-platform-auto-publish" class="btn btn-gold">
                   <span>${escapeHtml(lang === "ar" ? "تفعيل النشر التلقائي للجميع" : lang === "fr" ? "Activer la publication automatique" : "Enable automatic publishing")}</span>
                 </button>
@@ -7925,6 +7969,9 @@
       const action = actionEl.getAttribute("data-action");
 
       switch (action) {
+        case "check-platform-connection":
+          await checkPlatformPublishConnection();
+          break;
         case "enable-platform-auto-publish":
           await enablePlatformAutoPublish();
           break;
