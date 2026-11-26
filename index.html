@@ -7258,7 +7258,12 @@
         switch (target.field) {
           case "institution.name": coreHtml = renderLocalizedFieldGrid(adminText(lang, "اسم المؤسسة", "Institution Name"), s.institution.name, { bindPrefix: "settings.institution.name" }); break;
           case "institution.subtitle": coreHtml = renderLocalizedFieldGrid(adminText(lang, "الوصف المختصر", "Institution Subtitle"), s.institution.subtitle, { multiline: true, bindPrefix: "settings.institution.subtitle" }); break;
-          case "hero.eyebrow": coreHtml = renderLocalizedFieldGrid("Hero Eyebrow", s.hero.eyebrow, { bindPrefix: "settings.hero.eyebrow" }); break;
+          case "hero.eyebrow": coreHtml = `
+            ${renderLocalizedFieldGrid("Hero Eyebrow", s.hero.eyebrow, { bindPrefix: "settings.hero.eyebrow" })}
+            <div style="display:flex;justify-content:flex-start;margin-top:0.75rem;">
+              <button type="button" data-action="ve-reset-pos" data-ve-key="settingsField:hero.eyebrow" class="btn btn-outline">${escapeHtml(lang === "ar" ? "استعادة الموضع الأصلي للنص" : lang === "fr" ? "Restaurer la position d’origine du texte" : "Restore Original Text Position")}</button>
+            </div>
+          `; break;
           case "hero.headline": coreHtml = renderLocalizedFieldGrid(adminText(lang, "العنوان الرئيسي", "Hero Headline"), s.hero.headline, { multiline: true, rows: 2, bindPrefix: "settings.hero.headline" }); break;
           case "hero.description": coreHtml = renderLocalizedFieldGrid(adminText(lang, "النص الافتتاحي", "Hero Description"), s.hero.description, { multiline: true, rows: 3, bindPrefix: "settings.hero.description" }); break;
           case "hero.heroImage": coreHtml = renderAdminImageControl({ language: lang, label: adminText(lang, "صورة الواجهة الرئيسية", "Main Hero Banner Image"), value: s.hero.heroImage, bindKey: "settings.hero.heroImage" }); break;
