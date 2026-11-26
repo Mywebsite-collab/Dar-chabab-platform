@@ -2683,17 +2683,6 @@
       responsiveByLanguage[language] = languagePositions;
       return { ...style, responsiveByLanguage };
     }
-
-    function clearAllVePositions(style = {}) {
-      // Hero text reset must clear legacy, device-specific and language-specific
-      // offsets so hidden text cannot remain outside the visible hero area.
-      const next = { ...style };
-      delete next.x;
-      delete next.y;
-      delete next.responsive;
-      delete next.responsiveByLanguage;
-      return next;
-    }
     function hasAnyVePosition(style = {}) {
       if (Number(style.x) || Number(style.y)) return true;
       const hasPosition = (pos) => pos && (
@@ -8677,11 +8666,7 @@
           if (veKey) {
             const next = structuredClone(state.settings);
             if (!next.elementStyles) next.elementStyles = {};
-            const currentStyle = next.elementStyles[veKey] || {};
-            const isHeroText = ["settingsField:hero.eyebrow", "settingsField:hero.headline", "settingsField:hero.description"].includes(veKey);
-            next.elementStyles[veKey] = isHeroText
-              ? clearAllVePositions(currentStyle)
-              : clearVeResponsivePosition(currentStyle);
+            next.elementStyles[veKey] = clearVeResponsivePosition(next.elementStyles[veKey] || {});
             if (!next.elementStyles[veKey].color && !hasAnyVePosition(next.elementStyles[veKey])) delete next.elementStyles[veKey];
             updateSettings(next);
             refreshBackgroundShellOnly();
