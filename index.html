@@ -1169,7 +1169,10 @@
       opacity: 0.8;
     }
     .fb-feed-resize-handle:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-    .fb-feed-panel.is-resizing { transition: none !important; }
+    .fb-feed-resize-handle.is-active { background: #f0d49a; transform: translateY(-50%) scale(1.08); }
+    .fb-feed-panel.is-resizing,
+    .fb-feed-panel.is-resizing * { transition: none !important; cursor: ew-resize !important; }
+    .fb-feed-panel.is-resizing { will-change: width; }
     .fb-feed-frame {
       grid-column: 2;
       grid-row: 1;
@@ -7811,16 +7814,21 @@
         if (!(panel instanceof HTMLElement)) return;
         e.preventDefault();
         e.stopPropagation();
+        const currentWidth = Math.max(50, Math.min(100, Number(state.settings?.facebookFeed?.desktopWidth) || 100));
         activeFbResize = {
           panel,
+          handle: resizeHandle,
           pointerId: e.pointerId,
           startX: e.clientX,
-          startWidth: Math.max(50, Math.min(100, Number(state.settings?.facebookFeed?.desktopWidth) || 100)),
+          startWidth: currentWidth,
           containerWidth: Math.max(1, panel.parentElement?.clientWidth || panel.clientWidth),
-          lastWidth: Math.max(50, Math.min(100, Number(state.settings?.facebookFeed?.desktopWidth) || 100))
+          lastWidth: currentWidth
         };
         panel.classList.add("is-resizing");
-        resizeHandle.setPointerCapture?.(e.pointerId);
+        resizeHandle.classList.add("is-active");
+        // Capture on the window as well as the handle so movement continues
+        // even if the pointer leaves the narrow resize grip.
+        try { resizeHandle.setPointerCapture(e.pointerId); } catch {}
         return;
       }
       if (!state.adminUnlocked || !state.visualEditMode || !state.veDragMode || state.browseOverride || state.activePage === "admin" || state.activeVeTarget) return;
@@ -7847,11 +7855,13 @@
       };
     }, { capture: true });
 
-    document.addEventListener("pointermove", (e) => {
+    window.addEventListener("pointermove", (e) => {
       if (activeFbResize && e.pointerId === activeFbResize.pointerId) {
         const dx = e.clientX - activeFbResize.startX;
-        activeFbResize.lastWidth = Math.max(50, Math.min(100, activeFbResize.startWidth + (dx * 2 / activeFbResize.containerWidth) * 100));
+        const nextWidth = activeFbResize.startWidth + (dx * 2 / activeFbResize.containerWidth) * 100;
+        activeFbResize.lastWidth = Math.round(Math.max(50, Math.min(100, nextWidth)) * 10) / 10;
         activeFbResize.panel.style.width = `${activeFbResize.lastWidth}%`;
+        activeFbResize.panel.style.maxWidth = "100%";
         e.preventDefault();
         return;
       }
@@ -7878,6 +7888,10 @@
         const resize = activeFbResize;
         activeFbResize = null;
         resize.panel.classList.remove("is-resizing");
+        resize.handle?.classList.remove("is-active");
+        try {
+          if (resize.handle?.hasPointerCapture?.(resize.pointerId)) resize.handle.releasePointerCapture(resize.pointerId);
+        } catch {}
         const next = structuredClone(state.settings);
         next.facebookFeed = { ...(next.facebookFeed || DEFAULT_SETTINGS.facebookFeed), desktopWidth: Math.round(resize.lastWidth) };
         updateSettings(next);
@@ -7899,8 +7913,8 @@
         updateSettings(next);
       }
     };
-    document.addEventListener("pointerup", finishVeDrag);
-    document.addEventListener("pointercancel", finishVeDrag);
+    window.addEventListener("pointerup", finishVeDrag, true);
+    window.addEventListener("pointercancel", finishVeDrag, true);
 
     // Visual Click-to-Edit capture interceptor
     document.addEventListener("click", (e) => {
