@@ -6327,7 +6327,9 @@
                 <button type="button" data-action="ve-reset-pos" data-ve-key="settingsField:hero.eyebrow" class="btn btn-outline">${escapeHtml(lang === "ar" ? "استعادة الموضع الأصلي للنص" : lang === "fr" ? "Restaurer la position d’origine du texte" : "Restore Original Text Position")}</button>
               </div>
               ${renderLocalizedFieldGrid(adminText(lang, "العنوان الرئيسي (Hero Headline)", "Hero Headline"), s.hero.headline, { bindPrefix: "settings.hero.headline" })}
+              <div style="display:flex;justify-content:flex-start;margin-top:-0.5rem;"><button type="button" data-action="ve-reset-pos" data-ve-key="settingsField:hero.headline" class="btn btn-outline">${escapeHtml(lang === "ar" ? "استعادة الموضع الأصلي للنص" : lang === "fr" ? "Restaurer la position d’origine du texte" : "Restore Original Text Position")}</button></div>
               ${renderLocalizedFieldGrid(adminText(lang, "النص الافتتاحي (Hero Description)", "Hero Description"), s.hero.description, { multiline: true, bindPrefix: "settings.hero.description" })}
+              <div style="display:flex;justify-content:flex-start;margin-top:-0.5rem;"><button type="button" data-action="ve-reset-pos" data-ve-key="settingsField:hero.description" class="btn btn-outline">${escapeHtml(lang === "ar" ? "استعادة الموضع الأصلي للنص" : lang === "fr" ? "Restaurer la position d’origine du texte" : "Restore Original Text Position")}</button></div>
               ${renderAdminImageControl({
                 language: lang,
                 label: lang === "ar" ? "صورة الواجهة الرئيسية (Hero Background)" : lang === "fr" ? "Image d'accueil principale (Hero)" : "Main Hero Banner Image",
@@ -7183,8 +7185,8 @@
               </span>
               <span class="badge-box" style="font-size:10px;padding:0.2rem 0.45rem;">${escapeHtml(lang.toUpperCase())} · ${escapeHtml(breakpointLabel)} · ${escapeHtml(lang === "ar" ? "إعداد مستقل" : lang === "fr" ? "Réglage indépendant" : "Independent")}</span>
               ${
-                (target.kind === "settingsField" && target.field === "hero.eyebrow") || curX !== 0 || curY !== 0
-                  ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(target.kind === "settingsField" && target.field === "hero.eyebrow" ? (lang === "ar" ? "استعادة الموضع الأصلي" : lang === "fr" ? "Restaurer la position d’origine" : "Restore Original Position") : adminText(lang, "إعادة المكان", "Reset Pos"))}</button>`
+                (target.kind === "settingsField" && ["hero.eyebrow", "hero.headline", "hero.description"].includes(target.field)) || curX !== 0 || curY !== 0
+                  ? `<button type="button" data-action="ve-reset-pos" data-ve-key="${escapeHtml(veKey)}" class="btn btn-outline" style="padding:0.2rem 0.55rem;font-size:11px;">${escapeHtml(target.kind === "settingsField" && ["hero.eyebrow", "hero.headline", "hero.description"].includes(target.field) ? (lang === "ar" ? "استعادة الموضع الأصلي للنص" : lang === "fr" ? "Restaurer la position d’origine du texte" : "Restore Original Text Position") : adminText(lang, "إعادة المكان", "Reset Pos"))}</button>`
                   : ""
               }
             </div>
@@ -7267,8 +7269,8 @@
               <button type="button" data-action="ve-reset-pos" data-ve-key="settingsField:hero.eyebrow" class="btn btn-outline">${escapeHtml(lang === "ar" ? "استعادة الموضع الأصلي للنص" : lang === "fr" ? "Restaurer la position d’origine du texte" : "Restore Original Text Position")}</button>
             </div>
           `; break;
-          case "hero.headline": coreHtml = renderLocalizedFieldGrid(adminText(lang, "العنوان الرئيسي", "Hero Headline"), s.hero.headline, { multiline: true, rows: 2, bindPrefix: "settings.hero.headline" }); break;
-          case "hero.description": coreHtml = renderLocalizedFieldGrid(adminText(lang, "النص الافتتاحي", "Hero Description"), s.hero.description, { multiline: true, rows: 3, bindPrefix: "settings.hero.description" }); break;
+          case "hero.headline": coreHtml = `${renderLocalizedFieldGrid(adminText(lang, "العنوان الرئيسي", "Hero Headline"), s.hero.headline, { multiline: true, rows: 2, bindPrefix: "settings.hero.headline" })}<div style="display:flex;justify-content:flex-start;margin-top:-0.5rem;"><button type="button" data-action="ve-reset-pos" data-ve-key="settingsField:hero.headline" class="btn btn-outline">${escapeHtml(lang === "ar" ? "استعادة الموضع الأصلي للنص" : lang === "fr" ? "Restaurer la position d’origine du texte" : "Restore Original Text Position")}</button></div>`; break;
+          case "hero.description": coreHtml = `${renderLocalizedFieldGrid(adminText(lang, "النص الافتتاحي", "Hero Description"), s.hero.description, { multiline: true, rows: 3, bindPrefix: "settings.hero.description" })}<div style="display:flex;justify-content:flex-start;margin-top:-0.5rem;"><button type="button" data-action="ve-reset-pos" data-ve-key="settingsField:hero.description" class="btn btn-outline">${escapeHtml(lang === "ar" ? "استعادة الموضع الأصلي للنص" : lang === "fr" ? "Restaurer la position d’origine du texte" : "Restore Original Text Position")}</button></div>`; break;
           case "hero.heroImage": coreHtml = renderAdminImageControl({ language: lang, label: adminText(lang, "صورة الواجهة الرئيسية", "Main Hero Banner Image"), value: s.hero.heroImage, bindKey: "settings.hero.heroImage" }); break;
           case "contact.address": coreHtml = renderLocalizedFieldGrid(adminText(lang, "العنوان", "Address"), s.contact.address, { bindPrefix: "settings.contact.address" }); break;
           case "contact.hours": coreHtml = renderLocalizedFieldGrid(adminText(lang, "أوقات العمل", "Opening Hours"), s.contact.hours, { bindPrefix: "settings.contact.hours" }); break;
