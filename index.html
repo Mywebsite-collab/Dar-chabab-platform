@@ -3195,11 +3195,118 @@
         ["events.json", bundle.events],
         ["news.json", bundle.news],
         ["gallery.json", bundle.gallery],
-        ["ui-strings.json", bundle.uiStrings]
+        ["ui-strings.json", bundle.uiStrings],
+        ["platform-backup.json", {
+          format: "mjm-platform-backup",
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          data: bundle
+        }]
       ];
       exportsList.forEach(([filename, payload], index) => {
-        window.setTimeout(() => downloadJsonFile(filename, payload), index * 150);
+        window.setTimeout(() => downloadJsonFile(filename, payload), index * 180);
       });
+    }
+
+    const PLATFORM_JSON_IMPORTS = {
+      "settings.json": { key: "settings", storageKey: "mjm_settings", type: "object" },
+      "about.json": { key: "about", storageKey: "mjm_about", type: "object" },
+      "activities.json": { key: "activities", storageKey: "mjm_activities", type: "array" },
+      "events.json": { key: "events", storageKey: "mjm_events", type: "array" },
+      "news.json": { key: "news", storageKey: "mjm_news", type: "array" },
+      "gallery.json": { key: "gallery", storageKey: "mjm_gallery", type: "array" },
+      "ui-strings.json": { key: "uiStrings", storageKey: "mjm_ui_strings", type: "object" }
+    };
+
+    function normalizePlatformJsonValue(value, spec, fileName) {
+      if (spec.type === "array") {
+        if (!Array.isArray(value)) throw new Error(`محتوى ${fileName} يجب أن يكون قائمة JSON.`);
+        return value;
+      }
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new Error(`محتوى ${fileName} يجب أن يكون كائن JSON.`);
+      }
+      if (spec.key === "uiStrings") {
+        if (!["ar", "fr", "en"].every((lang) => value[lang] && typeof value[lang] === "object" && !Array.isArray(value[lang]))) {
+          throw new Error("ملف ui-strings.json يجب أن يحتوي على ar وfr وen.");
+        }
+        return deepMergeDefaults(DEFAULT_UI_STRINGS, value);
+      }
+      return deepMergeDefaults(spec.key === "settings" ? DEFAULT_SETTINGS : DEFAULT_ABOUT, value);
+    }
+
+    function preparePlatformJsonImport(rawData, fileName, staged) {
+      if (fileName === "platform-backup.json") {
+        if (!rawData || rawData.format !== "mjm-platform-backup" || !rawData.data || typeof rawData.data !== "object") {
+          throw new Error("ملف النسخة الاحتياطية غير صالح.");
+        }
+        Object.entries(PLATFORM_JSON_IMPORTS).forEach(([name, spec]) => {
+          if (Object.prototype.hasOwnProperty.call(rawData.data, spec.key)) {
+            staged[spec.key] = normalizePlatformJsonValue(rawData.data[spec.key], spec, name);
+          }
+        });
+        if (!Object.keys(staged).length) throw new Error("لا يحتوي ملف النسخة الاحتياطية على بيانات معروفة.");
+        return;
+      }
+      const spec = PLATFORM_JSON_IMPORTS[fileName];
+      if (!spec) throw new Error(`اسم الملف غير مدعوم: ${fileName}`);
+      staged[spec.key] = normalizePlatformJsonValue(rawData, spec, fileName);
+    }
+
+    async function importPlatformJsonFiles(fileList) {
+      const files = Array.from(fileList || []);
+      if (!files.length) return;
+      const staged = {};
+      const seen = new Set();
+      try {
+        for (const file of files) {
+          const normalizedName = file.name.toLowerCase().replace(/\\s*\\(\\d+\\)(?=\\.json$)/, "");
+          if (seen.has(normalizedName)) throw new Error(`تم اختيار الملف نفسه أكثر من مرة: ${file.name}`);
+          seen.add(normalizedName);
+          const raw = JSON.parse(await file.text());
+          preparePlatformJsonImport(raw, normalizedName, staged);
+        }
+        if (!Object.keys(staged).length) throw new Error("لم يتم العثور على بيانات قابلة للاستيراد.");
+
+        const storageKeys = {
+          settings: "mjm_settings",
+          about: "mjm_about",
+          activities: "mjm_activities",
+          events: "mjm_events",
+          news: "mjm_news",
+          gallery: "mjm_gallery",
+          uiStrings: "mjm_ui_strings"
+        };
+        const previousStorage = {};
+        for (const dataKey of Object.keys(staged)) {
+          const storageKey = storageKeys[dataKey];
+          previousStorage[storageKey] = localStorage.getItem(storageKey);
+        }
+
+        try {
+          for (const [dataKey, value] of Object.entries(staged)) {
+            localStorage.setItem(storageKeys[dataKey], JSON.stringify(value));
+          }
+        } catch {
+          for (const [storageKey, previousValue] of Object.entries(previousStorage)) {
+            try {
+              if (previousValue === null) localStorage.removeItem(storageKey);
+              else localStorage.setItem(storageKey, previousValue);
+            } catch { /* Best-effort rollback if browser storage is full. */ }
+          }
+          throw new Error("تعذر الحفظ: مساحة التخزين في المتصفح غير كافية. لم تُعتمد البيانات المستوردة.");
+        }
+
+        Object.assign(state, staged);
+        state.storageWarning = false;
+        applyGlobalTextColors();
+        updateSeoHead(state.language, state.activePage, state.settings, state.uiStrings);
+        flashAdminSaved();
+        renderShell({ preserve3D: true });
+        window.alert(`تم استيراد ${files.length} ملف JSON وتحديث بيانات المنصة بنجاح.`);
+      } catch (error) {
+        window.alert(error instanceof Error ? error.message : "تعذر استيراد ملفات JSON.");
+      }
     }
 
     function cleanJsonString(rawText) {
@@ -6465,6 +6572,11 @@
                   ${icon("download", "icon-svg")}
                   <span>${escapeHtml(t.exportJson)}</span>
                 </button>
+                <button type="button" data-action="trigger-json-import" class="btn btn-outline">
+                  ${icon("upload", "icon-svg")}
+                  <span>${escapeHtml(lang === "ar" ? "استيراد JSON" : lang === "fr" ? "Importer JSON" : "Import JSON")}</span>
+                </button>
+                <input id="admin-json-import-input" class="sr-only" type="file" accept=".json,application/json" multiple />
                 <button type="button" data-action="reset-all" class="btn btn-outline">
                   ${icon("rotateCcw", "icon-svg")}
                   <span>${escapeHtml(t.resetDefaults)}</span>
@@ -7878,6 +7990,9 @@
           state.adminTab = actionEl.getAttribute("data-tab") || "settings";
           renderShell({ preserve3D: false });
           break;
+        case "trigger-json-import":
+          document.getElementById("admin-json-import-input")?.click();
+          break;
         case "export-all-json":
           exportAllPlatformJson({
             settings: state.settings,
@@ -8324,6 +8439,13 @@
     document.addEventListener("change", async (e) => {
       const target = e.target;
       if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
+
+      if (target.id === "admin-json-import-input" && target instanceof HTMLInputElement) {
+        const selectedFiles = target.files;
+        target.value = "";
+        if (selectedFiles?.length) await importPlatformJsonFiles(selectedFiles);
+        return;
+      }
 
       if (target.id === "model3d-file-input" && target instanceof HTMLInputElement && target.files?.[0]) {
         const file = target.files[0];
